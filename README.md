@@ -1,2 +1,2 @@
 # MMM-Spotify
-Spotify playing and control module for MagicMirror (without Raspotify)
+Spotify player for MagicMirror (without Raspotify)
