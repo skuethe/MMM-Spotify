@@ -1,0 +1,4 @@
+node_modules
+spotify.config.json
+token.json
+package-lock.json

@@ -1,0 +1,65 @@
+#SPOTIFY {
+  width:360px;
+  border-radius:10px;
+  height:400px;
+}
+
+#SPOTIFY_BACKGROUND {
+  background-size: cover;
+  background-position: center top;
+  filter: blur(32px) opacity(80%) grayscale(30%);
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+}
+
+#SPOTIFY_FOREGROUND {
+  position:absolute;
+  filter:none;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+}
+
+#SPOTIFY_INFO {
+  color:#EEE;
+  font-weight:normal;
+  font-size:20px;
+  text-align:center;
+  line-height:120%;
+  text-shadow:black 2px 2px;
+}
+
+#SPOTIFY_INFO .fas {
+  margin-right:10px;
+}
+
+#SPOTIFY_TITLE {
+  color:#FFF;
+  font-weight:bold;
+  font-size:22px;
+}
+
+
+
+
+#SPOTIFY_COVER {
+  width:320px;
+  height:320px;
+  padding:20px 20px 10px 20px;
+}
+
+#SPOTIFY_COVER_IMAGE {
+  width:100%;
+  height:100%;
+  border-radius:10px;
+}
+
+#SPOTIFY.pausing #SPOTIFY_FOREGROUND {
+  filter:brightness(50%);
+}
