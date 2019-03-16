@@ -2,8 +2,8 @@
   "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
   "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
   "AUTH_DOMAIN" : "http://localhost",
-  "AUTH_PATH" : "/spotify_auth",
-  "AUTH_PORT" : "8000",
+  "AUTH_PATH" : "/callback",
+  "AUTH_PORT" : "8888",
   "SCOPE" : "user-read-private playlist-read-private streaming user-read-playback-state user-modify-playback-state",
   "TOKEN" : "./token.json"
 }
