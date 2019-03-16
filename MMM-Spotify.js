@@ -1,7 +1,6 @@
 //
 // Module : MMM-Spotify
 //
-
 Module.register("MMM-Spotify", {
   default: {
     defaultPlayer: "RASPOTIFY",
@@ -76,6 +75,8 @@ Module.register("MMM-Spotify", {
       isChanged = true
     } else if (this.currentPlayback.device.id !== current.device.id) {
       isChanged = true
+    } else if (this.currentPlayback.progress_ms !== current.progress_ms)  {
+      isChanged = true
     }
 
     if (isChanged) {
@@ -126,16 +127,23 @@ Module.register("MMM-Spotify", {
     var device = document.createElement("div")
     device.id = "SPOTIFY_DEVICE"
 
+    var progress = document.createElement("div")
+    progress_ms = "PROGRESS_BAR"
+    
+//    var time_ms = this.currentPlayback.progress_ms
+    
+
     if (this.currentPlayback) {
-      title.innerHTML = `<i class="fas fa-music"></i>` + this.currentPlayback.item.name
-      artist.innerHTML = `<i class="fas fa-user-circle"></i>` + this.currentPlayback.item.artists[0].name
-      device.innerHTML = `<i class="fas fa-volume-up"></i>` + this.currentPlayback.device.name
-    }
+      title.innerHTML = `<i class="fas fa-music"></i>` + " " + this.currentPlayback.item.name
+      artist.innerHTML = `<i class="fas fa-user-circle"></i>` + "  " + this.currentPlayback.item.artists[0].name
+      device.innerHTML = `<i class="fas fa-volume-up"></i>` + " " + this.currentPlayback.device.name
+      progress.innerHTML  = `<i class="fas fa-clock"></i>` + " " +  Math.floor(this.currentPlayback.progress_ms / 60000) + ":" + ((this.currentPlayback.progress_ms % 60000) / 1000).toFixed(0)    }
+
     info.appendChild(title)
     info.appendChild(artist)
     info.appendChild(device)
+    info.appendChild(progress)
     fore.appendChild(info)
-
     m.appendChild(fore)
     return m
   },

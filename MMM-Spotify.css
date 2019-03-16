@@ -1,7 +1,10 @@
+	
 #SPOTIFY {
+  position: absolute;
+  z-index: 2;
   width:360px;
   border-radius:10px;
-  height:400px;
+  height:500px;
 }
 
 #SPOTIFY_BACKGROUND {
@@ -30,13 +33,13 @@
   color:#EEE;
   font-weight:normal;
   font-size:20px;
-  text-align:center;
+  text-align:left;
   line-height:120%;
   text-shadow:black 2px 2px;
 }
 
 #SPOTIFY_INFO .fas {
-  margin-right:10px;
+  margin-left:30px;
 }
 
 #SPOTIFY_TITLE {
@@ -44,9 +47,6 @@
   font-weight:bold;
   font-size:22px;
 }
-
-
-
 
 #SPOTIFY_COVER {
   width:320px;
