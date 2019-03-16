@@ -20,9 +20,9 @@ class Spotify {
         "CLIENT_ID" : "",
         "CLIENT_SECRET" : "",
         "AUTH_DOMAIN" : "http://localhost",
-        "AUTH_PATH" : "/spotify_auth",
-        "AUTH_PORT" : "8000",
-        "SCOPE" : "user-read-private playlist-read-private streaming",
+        "AUTH_PATH" : "/callback",
+        "AUTH_PORT" : "8888",
+        "SCOPE" : "user-read-private playlist-read-private streaming app-remote-control",
         "TOKEN" : "./token.json",
       }
     }
