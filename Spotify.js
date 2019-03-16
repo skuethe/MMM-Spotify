@@ -22,7 +22,7 @@ class Spotify {
         "AUTH_DOMAIN" : "http://localhost",
         "AUTH_PATH" : "/callback",
         "AUTH_PORT" : "8888",
-        "SCOPE" : "user-read-private playlist-read-private streaming app-remote-control",
+        "SCOPE" : "user-read-private app-remote-control playlist-read-private streaming user-read-playback-state user-modify-playback-state",
         "TOKEN" : "./token.json",
       }
     }
