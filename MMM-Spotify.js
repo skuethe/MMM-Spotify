@@ -5,6 +5,19 @@ Module.register("MMM-Spotify", {
   default: {
     style: "default", // "default", "mini" available.
     updateInterval: 1000,
+    onStart: null,
+    //If you want to play something on start; set like this.
+    /*
+    onStart: {
+      deviceName: "Web Player (Chrome)", //if null, current(last) activated device will be.
+      spotifyUri : "spotify:playlist:37i9dQZF1DX9EM98aZosoy", //when search is set, sportifyUri will be ignored.
+      search: {
+        type: "artist, track", // `artist`, track`, `album`, `playlist` available
+        keyword: "michael+jackson",
+        random:true,
+      }
+    }
+    */
   },
 
   getStyles: function() {
@@ -18,6 +31,7 @@ Module.register("MMM-Spotify", {
   notificationReceived: function(noti, payload, sender) {
     if (noti == "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.config)
+      this.onStart()
     }
     switch(noti) {
       case "SPOTIFY_SEARCH":
@@ -61,6 +75,11 @@ Module.register("MMM-Spotify", {
         this.updateCurrentPlayback(payload)
         break
     }
+  },
+
+  onStart: function() {
+    if (!this.config.onStart) return
+    this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
   updateProgress: function(current) {

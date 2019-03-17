@@ -224,13 +224,11 @@ class Spotify {
     this.doRequest("/v1/me/player/seek", "PUT", null, {position_ms:0}, cb)
   }
 
-  search(obj, cb) {
-    var param = obj.query
+  search(param, cb) {
     param.limit = 50
     this.doRequest("/v1/search", "GET", param, null, cb)
   }
 
-  // Not yet implemented
   transfer(req, cb) {
     if (req.device_ids.length > 1) {
       req.device_ids = [req.device_ids[0]]
@@ -263,8 +261,5 @@ class Spotify {
     this.doRequest("/v1/me/player/volume", "PUT", param, null, cb)
   }
 }
-
-
-
 
 module.exports = Spotify
