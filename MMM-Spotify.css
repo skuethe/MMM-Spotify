@@ -63,3 +63,38 @@
 #SPOTIFY.pausing #SPOTIFY_FOREGROUND {
   filter:brightness(50%);
 }
+
+#SPOTIFY_PROGRESS_TIME {
+	width:320px;
+	margin: 0 20px 0px 20px;
+	display:flex;
+	flex-direction:row;
+	justify-content:space-between;
+}
+
+#SPOTIFY_PROGRESS_END {
+
+}
+
+#SPOTIFY_PROGRESS_CURRENT {
+
+}
+
+
+
+#SPOTIFY_PROGRESS_BAR {
+	width: 320px;
+	margin: 0 20px 10px 20px;
+	background-color:#666;
+	height:10px;
+	position:relative;
+}
+
+
+#SPOTIFY_PROGRESS_BAR_NOW {
+	background-color:#FFF;
+	position:absolute;
+	top:0;
+	left:0;
+	height:10px;
+}
