@@ -1,7 +1,6 @@
 	
 #SPOTIFY {
-  position: absolute;
-  z-index: 2;
+  position: relative;
   width:360px;
   border-radius:10px;
   height:480px;
