@@ -180,6 +180,10 @@ class Spotify {
         if (error) {
           console.log(`[SPOTIFY] API Request fail on :`, api)
           console.log(error, body)
+        } else {
+          if (api !== "/v1/me/player" && type !== "GET") {
+            console.log(`[SPOTIFY] API Requested:`, api)
+          }
         }
         if (cb) {
           cb(response.statusCode, error, body)
@@ -228,12 +232,35 @@ class Spotify {
 
   // Not yet implemented
   transfer(req, cb) {
-
+    if (req.device_ids.length > 1) {
+      req.device_ids = [req.device_ids[0]]
+    }
+    this.doRequest("/v1/me/player", "PUT", null, req, cb)
   }
 
-  // Not yet implemented
-  volume(param, cb) {
+  transferByName(device_name, cb) {
+    this.getDevices((code, error, result)=>{
+      if (code == 200) {
+        var devices = result.devices
+        for (var i = 0; i < devices.length; i++) {
+          if (devices[i].name == device_name) {
+            this.transfer({device_ids:[devices[i].id]}, cb)
+            return
+          }
+        }
+      } else {
+        cb(code, error, result)
+      }
+    })
+  }
 
+  volume(param, cb) {
+    if (param.volume_percent) {
+      if (param.volume_percent > 100 || param.volume_percent < 0) {
+        param.volume_percent = 50
+      }
+    }
+    this.doRequest("/v1/me/player/volume", "PUT", param, null, cb)
   }
 }
 
