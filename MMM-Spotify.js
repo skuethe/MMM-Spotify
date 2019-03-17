@@ -148,8 +148,10 @@ Module.register("MMM-Spotify", {
     progress.id = "SPOTIFY_PROGRESS"
     var currentTime = document.createElement("div")
     currentTime.id = "SPOTIFY_PROGRESS_CURRENT"
+    currentTime.innerHTML = "--:--"
     var songTime = document.createElement("div")
     songTime.id = "SPOTIFY_PROGRESS_END"
+    songTime.innerHTML = "--:--"
     var time = document.createElement("div")
     time.id = "SPOTIFY_PROGRESS_TIME"
     time.appendChild(currentTime)
@@ -179,7 +181,16 @@ Module.register("MMM-Spotify", {
         back.style.backgroundImage = `url(${this.currentPlayback.item.album.images[0].url})`
         //progress.innerHTML  = `<i class="fas fa-clock"></i>` + " " +  Math.floor(this.currentPlayback.progress_ms / 60000) + ":" + (((this.currentPlayback.progress_ms % 60000) / 1000).toFixed(0)-1) + " / " + Math.floor(this.currentPlayback.item.duration_ms / 60000) + ":" + (((this.currentPlayback.item.duration_ms % 60000) / 1000).toFixed(0)-1)  }
         title.innerHTML = `<i class="fas fa-music"></i>` + " " + this.currentPlayback.item.name
-        artist.innerHTML = `<i class="fas fa-user-circle"></i>` + "  " + this.currentPlayback.item.artists[0].name
+        var artists = this.currentPlayback.item.artists
+        var artistName = ""
+        for (var x = 0; x < artists.length; x++) {
+          if (!artistName) {
+            artistName = artists[x].name
+          } else {
+            artistName += ", " + artists[x].name
+          }
+        }
+        artist.innerHTML = `<i class="fas fa-user-circle"></i>` + "  " + artistName
       }
       device.innerHTML = `<i class="fas fa-volume-up"></i>` + " " + this.currentPlayback.device.name
     }
