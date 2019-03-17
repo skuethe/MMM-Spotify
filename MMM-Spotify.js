@@ -111,6 +111,8 @@ Module.register("MMM-Spotify", {
     if (this.currentPlayback) {
       cover_img.src = this.currentPlayback.item.album.images[0].url
       back.style.backgroundImage = `url(${this.currentPlayback.item.album.images[0].url})`
+    } else  {
+      cover_img.src = "./modules/MMM-Spotify/spotify-xxl.png"
     }
     cover.appendChild(cover_img)
     fore.appendChild(cover)
@@ -137,7 +139,7 @@ Module.register("MMM-Spotify", {
       title.innerHTML = `<i class="fas fa-music"></i>` + " " + this.currentPlayback.item.name
       artist.innerHTML = `<i class="fas fa-user-circle"></i>` + "  " + this.currentPlayback.item.artists[0].name
       device.innerHTML = `<i class="fas fa-volume-up"></i>` + " " + this.currentPlayback.device.name
-      progress.innerHTML  = `<i class="fas fa-clock"></i>` + " " +  Math.floor(this.currentPlayback.progress_ms / 60000) + ":" + ((this.currentPlayback.progress_ms % 60000) / 1000).toFixed(0)    }
+      progress.innerHTML  = `<i class="fas fa-clock"></i>` + " " +  Math.floor(this.currentPlayback.progress_ms / 60000) + ":" + (((this.currentPlayback.progress_ms % 60000) / 1000).toFixed(0)-1) + " / " + Math.floor(this.currentPlayback.item.duration_ms / 60000) + ":" + (((this.currentPlayback.item.duration_ms % 60000) / 1000).toFixed(0)-1)  }
 
     info.appendChild(title)
     info.appendChild(artist)
