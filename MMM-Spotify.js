@@ -3,9 +3,8 @@
 //
 Module.register("MMM-Spotify", {
   default: {
-    defaultPlayer: "RASPOTIFY",
-
-    updateInterval: 2000,
+    style: "default", // "default", "mini" available.
+    updateInterval: 1000,
   },
 
   getStyles: function() {
@@ -86,7 +85,6 @@ Module.register("MMM-Spotify", {
     document.getElementById("SPOTIFY_PROGRESS_END").innerHTML = msToTime(songDur)
     document.getElementById("SPOTIFY_PROGRESS_CURRENT").innerHTML = msToTime(cur)
     document.getElementById("SPOTIFY_PROGRESS_BAR_NOW").style.width = pros + "%"
-
   },
 
   updateCurrentPlayback: function(current) {
@@ -115,6 +113,9 @@ Module.register("MMM-Spotify", {
   getDom: function(){
     var m = document.createElement("div")
     m.id = "SPOTIFY"
+    if (this.config.style !== "default") {
+      m.classList.add(this.config.style)
+    }
 
     var back = document.createElement("div")
     back.id = "SPOTIFY_BACKGROUND"
@@ -162,19 +163,15 @@ Module.register("MMM-Spotify", {
     var barNow = document.createElement("div")
     barNow.id = "SPOTIFY_PROGRESS_BAR_NOW"
     bar.appendChild(barNow)
-
-
     progress.appendChild(bar)
-
-
-//    var time_ms = this.currentPlayback.progress_ms
-
 
     if (this.currentPlayback) {
       if (this.currentPlayback.is_playing) {
-        m.className = "playing"
+        m.classList.add("playing")
+        m.classList.remove("pausing")
       } else {
-        m.className = "pausing"
+        m.classList.add("pausing")
+        m.classList.remove("playing")
       }
       if (this.currentPlayback.item) {
         cover_img.src = this.currentPlayback.item.album.images[0].url

@@ -106,12 +106,9 @@ module.exports = NodeHelper.create({
               }
             }
           }
-          console.log("FP", foundForPlay)
           if (foundForPlay && payload.condition.autoplay) {
             this.spotify.play(foundForPlay, (code, error, result)=>{
-              console.log("@", code, result)
               if (code !== 204) {
-                console.log("!", error)
                 return
               }
               this.sendSocketNotification("DONE_SEARCH_AUTOPLAY", result)
