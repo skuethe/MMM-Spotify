@@ -37,7 +37,7 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_SEARCH":
         var pl = {
           query: {
-            q: payload.query
+            q: payload.query,
             type: payload.type,
           },
           condition: {

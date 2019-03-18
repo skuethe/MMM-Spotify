@@ -1,7 +1,16 @@
 # MMM-Spotify
+Spotify controller for MagicMirror
+
+## Screenshot
+- ![screenshot]()
+- ![screenshot]()
+
+## Main Features
+- Showing Current playback
+- Playing Controllable by Notification (Play, pause, next, previous, volume)
+- Spotify Controllable by Notification (change device, search and play)
 
 ## Install
-
 ### 1. module install
 ```sh
 cd ~/MagicMirror/modules
