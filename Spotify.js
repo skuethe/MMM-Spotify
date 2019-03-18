@@ -252,13 +252,8 @@ class Spotify {
     })
   }
 
-  volume(param, cb) {
-    if (param.volume_percent) {
-      if (param.volume_percent > 100 || param.volume_percent < 0) {
-        param.volume_percent = 50
-      }
-    }
-    this.doRequest("/v1/me/player/volume", "PUT", param, null, cb)
+  volume(volume = 50, cb) {
+    this.doRequest("/v1/me/player/volume", "PUT", {volume_percent:volume}, null, cb)
   }
 }
 
