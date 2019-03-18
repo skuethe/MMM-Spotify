@@ -2,8 +2,8 @@
 Spotify controller for MagicMirror
 
 ## Screenshot
-- ![screenshot]()
-- ![screenshot]()
+- ![default](screenshots/spotify_default.png)
+- ![mini](screenshots/spotify_mini.png)
 
 ## Main Features
 - Showing Current playback
