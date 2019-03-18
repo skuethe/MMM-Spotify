@@ -82,7 +82,12 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
-  updateProgress: function(current) {
+  updateProgress: function(
+    current,
+    end = document.getElementById("SPOTIFY_PROGRESS_END"),
+    curbar = document.getElementById("SPOTIFY_PROGRESS_CURRENT"),
+    now = document.getElementById("SPOTIFY_PROGRESS_BAR_NOW")
+  ) {
     var msToTime = (duration) => {
       var ret = ""
       var milliseconds = parseInt((duration%1000)/100)
@@ -101,9 +106,9 @@ Module.register("MMM-Spotify", {
     var cur = current.progress_ms
     var pros = (cur / songDur) * 100
 
-    document.getElementById("SPOTIFY_PROGRESS_END").innerHTML = msToTime(songDur)
-    document.getElementById("SPOTIFY_PROGRESS_CURRENT").innerHTML = msToTime(cur)
-    document.getElementById("SPOTIFY_PROGRESS_BAR_NOW").style.width = pros + "%"
+    end.innerHTML = msToTime(songDur)
+    curbar.innerHTML = msToTime(cur)
+    now.style.width = pros + "%"
   },
 
   updateCurrentPlayback: function(current) {
@@ -120,6 +125,7 @@ Module.register("MMM-Spotify", {
     } else if (this.currentPlayback.progress_ms !== current.progress_ms)  {
       //isChanged = true  //It would make too many updateDom.
       //It's better to manipulate Dom directly
+      this.currentPlayback = current
       this.updateProgress(current)
     }
 
@@ -152,39 +158,41 @@ Module.register("MMM-Spotify", {
     cover.appendChild(cover_img)
     fore.appendChild(cover)
 
-    var info = document.createElement("div")
-    info.id = "SPOTIFY_INFO"
-
-    var title = document.createElement("div")
-    title.id = "SPOTIFY_TITLE"
-
-    var artist = document.createElement("div")
-    artist.id = "SPOTIFY_ARTIST"
-
-    var device = document.createElement("div")
-    device.id = "SPOTIFY_DEVICE"
-
-    var progress = document.createElement("div")
-    progress.id = "SPOTIFY_PROGRESS"
-    var currentTime = document.createElement("div")
-    currentTime.id = "SPOTIFY_PROGRESS_CURRENT"
-    currentTime.innerHTML = "--:--"
-    var songTime = document.createElement("div")
-    songTime.id = "SPOTIFY_PROGRESS_END"
-    songTime.innerHTML = "--:--"
-    var time = document.createElement("div")
-    time.id = "SPOTIFY_PROGRESS_TIME"
-    time.appendChild(currentTime)
-    time.appendChild(songTime)
-    progress.appendChild(time)
-    var bar = document.createElement("div")
-    bar.id = "SPOTIFY_PROGRESS_BAR"
-    var barNow = document.createElement("div")
-    barNow.id = "SPOTIFY_PROGRESS_BAR_NOW"
-    bar.appendChild(barNow)
-    progress.appendChild(bar)
-
     if (this.currentPlayback) {
+      var info = document.createElement("div")
+      info.id = "SPOTIFY_INFO"
+
+      var title = document.createElement("div")
+      title.id = "SPOTIFY_TITLE"
+
+      var artist = document.createElement("div")
+      artist.id = "SPOTIFY_ARTIST"
+
+      var device = document.createElement("div")
+      device.id = "SPOTIFY_DEVICE"
+
+      var progress = document.createElement("div")
+      progress.id = "SPOTIFY_PROGRESS"
+      var currentTime = document.createElement("div")
+      currentTime.id = "SPOTIFY_PROGRESS_CURRENT"
+      currentTime.innerHTML = "--:--"
+      var songTime = document.createElement("div")
+      songTime.id = "SPOTIFY_PROGRESS_END"
+      songTime.innerHTML = "--:--"
+      var time = document.createElement("div")
+      time.id = "SPOTIFY_PROGRESS_TIME"
+      time.appendChild(currentTime)
+      time.appendChild(songTime)
+      progress.appendChild(time)
+      var bar = document.createElement("div")
+      bar.id = "SPOTIFY_PROGRESS_BAR"
+      var barNow = document.createElement("div")
+      barNow.id = "SPOTIFY_PROGRESS_BAR_NOW"
+      bar.appendChild(barNow)
+      progress.appendChild(bar)
+
+      this.updateProgress(this.currentPlayback, songTime, currentTime, barNow)
+
       if (this.currentPlayback.is_playing) {
         m.classList.add("playing")
         m.classList.remove("pausing")
@@ -209,12 +217,14 @@ Module.register("MMM-Spotify", {
         artist.innerHTML = `<i class="fas fa-user-circle"></i>` + "  " + artistName
       }
       device.innerHTML = `<i class="fas fa-volume-up"></i>` + " " + this.currentPlayback.device.name
+
+      info.appendChild(progress)
+      info.appendChild(title)
+      info.appendChild(artist)
+      info.appendChild(device)
+      fore.appendChild(info)
     }
-    info.appendChild(progress)
-    info.appendChild(title)
-    info.appendChild(artist)
-    info.appendChild(device)
-    fore.appendChild(info)
+
     m.appendChild(fore)
     return m
   },
