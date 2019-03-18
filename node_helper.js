@@ -101,6 +101,12 @@ module.exports = NodeHelper.create({
       })
     }
 
+    if (noti == "VOLUME") {
+      this.spotify.volume(payload, (code, error, result)=>{
+        this.sendSocketNotification("DONE_VOLUME", result)
+      })
+    }
+
     if (noti == "SEARCH_AND_PLAY") {
       this.searchAndPlay(payload.query, payload.condition)
     }
