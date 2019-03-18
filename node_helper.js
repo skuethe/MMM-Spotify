@@ -113,7 +113,6 @@ module.exports = NodeHelper.create({
   },
 
   searchAndPlay: function(param, condition) {
-    console.log(param, condition)
     var pickup = (items, random, retType)=>{
       var ret = {}
       var r = null
