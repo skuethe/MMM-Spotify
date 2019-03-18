@@ -84,7 +84,6 @@ That's all. `token.json` will be created, if success.
 ### `onStart` feature
 You can control Spotify on start of MagicMirror (By example; Autoplay specific playlist when MM starts)
 ```js
-onStart {
   onStart: {
     deviceName: "RASPOTIFY", //if null, current(last) activated device will be.
     spotifyUri: "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ"
@@ -95,7 +94,6 @@ onStart {
     	random:true,
     }
   }
-}
 ```
 When `search` field exists, `spotifyUri` will be ignored.
 
