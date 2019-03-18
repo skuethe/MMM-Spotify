@@ -104,6 +104,12 @@ module.exports = NodeHelper.create({
     if (noti == "SEARCH_AND_PLAY") {
       this.searchAndPlay(payload.query, payload.condition)
     }
+
+    if (noti == "TRANSFER") {
+      this.spotify.transferByName(payload, (code, error, result)=>{
+        this.sendSocketNotification("DONE_TRANSFER", result)
+      })
+    }
   },
 
   searchAndPlay: function(param, condition) {

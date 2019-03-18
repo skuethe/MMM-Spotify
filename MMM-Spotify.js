@@ -37,19 +37,18 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_SEARCH":
         var pl = {
           query: {
-            q:"michael+jackson",
-            type:"artist",
+            q: payload.query
+            type: payload.type,
           },
           condition: {
-            random:false,
+            random:payload.random,
             autoplay:true,
           }
         }
         this.sendSocketNotification("SEARCH_AND_PLAY", pl)
         break
       case "SPOTIFY_PLAY":
-        var pl = {context_uri:"spotify:playlist:37i9dQZF1DX9EM98aZosoy"}
-        this.sendSocketNotification("PLAY", pl)
+        this.sendSocketNotification("PLAY", payload)
         break
       case "SPOTIFY_PAUSE":
         this.sendSocketNotification("PAUSE")
@@ -61,9 +60,10 @@ Module.register("MMM-Spotify", {
         this.sendSocketNotification("PREVIOUS")
         break
       case "SPOTIFY_VOLUME":
-        var pl = 50
-        this.sendSocketNotification("VOLUME", pl)
+        this.sendSocketNotification("VOLUME", payload)
         break
+      case "SPOTIFY_TRANSFER":
+        this.sendSocketNotification("TRANSFER", payload)
     }
   },
 
