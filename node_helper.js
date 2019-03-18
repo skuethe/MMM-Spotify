@@ -46,6 +46,27 @@ module.exports = NodeHelper.create({
       this.sendSocketNotification("INITIALIZED")
     }
 
+    if (noti == "ONSTART") {
+      payload.position_ms = 0
+      if (payload.search) {
+        var param = {
+          q: payload.search.keyword,
+          type: payload.search.type,
+        }
+        var condition = {
+          random: payload.search.random,
+          autoplay: true,
+        }
+        this.searchAndPlay(param, condition)
+
+      } else if (payload.spotifyUri.match("track")) {
+        this.spotify.play({uris:[payload.spotifyUri]})
+      } else if (payload.spotifyUri) {
+        this.spotify.play({context_uri:payload.spotifyUri})
+      }
+      if (payload.deviceName) this.spotify.transferByName(payload.deviceName)
+    }
+
     if (noti == "GET_DEVICES") {
       this.spotify.getDevices((code, error, result)=>{
         this.sendSocketNotification("LIST_DEVICES", result)
@@ -81,49 +102,59 @@ module.exports = NodeHelper.create({
     }
 
     if (noti == "SEARCH_AND_PLAY") {
-      var pickup = (items, random, retType)=>{
-        var ret = {}
-        var r = null
-        r = (random) ? items[Math.floor(Math.random() * items.length)] : items[0]
-        ret[retType] = (retType == "uris") ? [r.uri] : r.uri
-        return ret
-      }
-      this.spotify.search(payload, (code, error, result)=>{
-        var foundForPlay = null
-        if (code == 200) { //When success
-          const map = {
-            "tracks" : "uris",
-            "artists" : "context_uri",
-            "albums" : "context_uri",
-            "playlists" : "context_uri"
-          }
+      this.searchAndPlay(payload.query, payload.condition)
+    }
 
-          for (var section in map) {
-            if (map.hasOwnProperty(section) && !foundForPlay) {
-              var retType = map[section]
-              if (result[section]) {
-                foundForPlay = pickup(result[section].items, payload.condition.random, retType)
-              }
-            }
-          }
-          console.log("FP", foundForPlay)
-          if (foundForPlay && payload.condition.autoplay) {
-            this.spotify.play(foundForPlay, (code, error, result)=>{
-              console.log("@", code, result)
-              if (code !== 204) {
-                console.log("!", error)
-                return
-              }
-              this.sendSocketNotification("DONE_SEARCH_AUTOPLAY", result)
-            })
-          } else {
-            // nothing found
-            this.sendSocketNotification("DONE_SEARCH_NOTHING")
-          }
-        } else { //when fail
-          this.sendSocketNotification("DONE_SEARCH_ERROR")
-        }
+    if (noti == "TRANSFER") {
+      this.spotify.transferByName(payload, (code, error, result)=>{
+        this.sendSocketNotification("DONE_TRANSFER", result)
       })
     }
   },
+
+  searchAndPlay: function(param, condition) {
+    var pickup = (items, random, retType)=>{
+      var ret = {}
+      var r = null
+      r = (random) ? items[Math.floor(Math.random() * items.length)] : items[0]
+      ret[retType] = (retType == "uris") ? [r.uri] : r.uri
+      return ret
+    }
+    this.spotify.search(param, (code, error, result)=>{
+      //console.log(code, error, result)
+      var foundForPlay = null
+      if (code == 200) { //When success
+        const map = {
+          "tracks" : "uris",
+          "artists" : "context_uri",
+          "albums" : "context_uri",
+          "playlists" : "context_uri"
+        }
+        //console.log(result)
+        for (var section in map) {
+          if (map.hasOwnProperty(section) && !foundForPlay) {
+            var retType = map[section]
+            if (result[section]) {
+              foundForPlay = pickup(result[section].items, condition.random, retType)
+            }
+          }
+        }
+        //console.log(foundForPlay)
+        if (foundForPlay && condition.autoplay) {
+          this.spotify.play(foundForPlay, (code, error, result)=>{
+            if (code !== 204) {
+              return
+            }
+            this.sendSocketNotification("DONE_SEARCH_AUTOPLAY", result)
+          })
+        } else {
+          // nothing found
+          this.sendSocketNotification("DONE_SEARCH_NOTHING")
+        }
+      } else { //when fail
+        console.log(code, error, result)
+        this.sendSocketNotification("DONE_SEARCH_ERROR")
+      }
+    })
+  }
 })

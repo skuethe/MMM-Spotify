@@ -1,14 +1,17 @@
-	
+
 #SPOTIFY {
   position: relative;
   width:360px;
   border-radius:10px;
   height:480px;
+	box-sizing:border-box;
 }
+
+
 
 #SPOTIFY_BACKGROUND {
   background-size: cover;
-  background-position: center top;
+  background-position: center center;
   filter: blur(32px) opacity(80%) grayscale(30%);
   position:absolute;
   top:0;
@@ -26,6 +29,8 @@
   width:100%;
   height:100%;
   z-index:2;
+	display:flex;
+	flex-direction:column;
 }
 
 #SPOTIFY_INFO {
@@ -45,6 +50,15 @@
   color:#FFF;
   font-weight:bold;
   font-size:22px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#SPOTIFY_ARTIST {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #SPOTIFY_COVER {
@@ -61,4 +75,78 @@
 
 #SPOTIFY.pausing #SPOTIFY_FOREGROUND {
   filter:brightness(50%);
+}
+
+#SPOTIFY_PROGRESS_TIME {
+	margin:0 20px 0 20px;
+	display:flex;
+	flex-direction:row;
+	justify-content:space-between;
+}
+
+#SPOTIFY_PROGRESS_END {
+
+}
+
+#SPOTIFY_PROGRESS_CURRENT {
+
+}
+
+
+
+#SPOTIFY_PROGRESS_BAR {
+	margin: 0 20px 10px 20px;
+	background-color:#666;
+	height:10px;
+	position:relative;
+}
+
+
+#SPOTIFY_PROGRESS_BAR_NOW {
+	background-color:#FFF;
+	position:absolute;
+	top:0;
+	left:0;
+	height:10px;
+}
+
+
+/* style "mini" */
+#SPOTIFY.mini {
+	width:360px;
+	height:120px;
+}
+
+#SPOTIFY.mini #SPOTIFY_FOREGROUND {
+	flex-direction:row;
+}
+
+#SPOTIFY.mini #SPOTIFY_COVER {
+	min-width:120px;
+	width:120px;
+	height:120px;
+	padding:0;
+}
+
+#SPOTIFY.mini #SPOTIFY_COVER_IMAGE {
+	height:120px;
+}
+
+#SPOTIFY.mini #SPOTIFY_INFO {
+	width:240px;
+	padding-left:10px;
+}
+
+#SPOTIFY.mini #SPOTIFY_PROGRESS_BAR {
+	width:240px;
+	margin:0;
+	margin-bottom:10px;
+}
+
+#SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
+	margin:0;
+}
+
+#SPOTIFY.mini #SPOTIFY_INFO .fas {
+	margin:0;
 }
