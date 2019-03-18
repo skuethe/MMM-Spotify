@@ -105,9 +105,9 @@ When `search` field exists, `spotifyUri` will be ignored.
 ```
   this.sendNotification("SPOTIFY_SEARCH", {type:"artist,playlist", query:"michael+jackson", random:false})
 ```
-- `SPOTIFY_PLAY` : playing specific SpotifyUri. `uri` be payloads.
+- `SPOTIFY_PLAY` : playing specific SpotifyUri.
 ```
-  this.sendNotification("SPOTIFY_PLAY", {uri:"spotify:track:3ENXjRhFPkH8YSH3qBXTfQ"})
+  this.sendNotification("SPOTIFY_PLAY", "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ")
 ```
 This notification also be used as `resume` reature of stopped player without payloads
 - `SPOTIFY_PAUSE` : pausing current playback.
