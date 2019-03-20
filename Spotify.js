@@ -215,13 +215,21 @@ class Spotify {
   }
 
   next(cb) {
-    this.doRequest("/v1/me/player/next", "POST", null, null, null)
-    this.doRequest("/v1/me/player/seek", "PUT", null, {position_ms:0}, cb)
+    this.doRequest("/v1/me/player/next", "POST", null, null, (code, error, body)=>{
+      this.doRequest("/v1/me/player/seek", "PUT", {position_ms:0}, null, cb)
+    })
+
   }
 
   previous(cb) {
-    this.doRequest("/v1/me/player/previous", "POST", null, null, null)
-    this.doRequest("/v1/me/player/seek", "PUT", null, {position_ms:0}, cb)
+    /*
+    this.doRequest("/v1/me/player/previous", "POST", null, null, (code, error, body)=>{
+      this.doRequest("/v1/me/player/seek", "PUT", null, {position_ms:0}, cb)
+    })
+    */
+    this.doRequest("/v1/me/player/seek", "PUT", {position_ms:0}, null, (code, error, body)=>{
+      this.doRequest("/v1/me/player/previous", "POST", null, null, cb)
+    })
   }
 
   search(param, cb) {
