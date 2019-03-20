@@ -132,29 +132,8 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
   this.sendNotification("SPOTIFY_TRANSFER", "RASPOTIFY")
 ```
 
-MK2 assisant transcriptionHook sample for search: 
-```
-SPOTIFY_SEARCH: {
-        pattern: "(.*) on Spotify",  // Will play any song, artist, track or playlist on spotify
-        command: "SPOTIFY_SEARCH"
-        },
-```
-Mk2 assisant Command Sample for search: 
-```
-SPOTIFY_SEARCH: {
-         notificationExec: {
-           notification: "SPOTIFY_SEARCH",
-        
-        payload: (params) => {
-                console.log("SPOTIFY_SEARCH @",params)
-                return {
-                        type: "artist,track,album,playlist",
-                        query: params[1],   // params[1] is the value of (.*) in the pattern. 
-                        random:false,
-                        }
-                     }
-                }
-        },
-```        
-        
+## Usage & Tip
+See the wiki
 
+## Credit
+Special thanks to @ejay-ibm so much for taking the time to cowork to make this module. 
