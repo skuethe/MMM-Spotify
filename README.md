@@ -6,7 +6,7 @@ Spotify controller for MagicMirror
 - ![mini](screenshots/spotify_mini.png)
 
 ## Main Features
-- Showing Current playback
+- Showing Current playback on any devices
 - Playing Controllable by Notification (Play, pause, next, previous, volume)
 - Spotify Controllable by Notification (change device, search and play)
 
@@ -107,11 +107,7 @@ When `search` field exists, `spotifyUri` will be ignored.
 ```
   this.sendNotification("SPOTIFY_PLAY", "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ")
 ```
-This notification also be used as `resume` reature of stopped player without payloads
-- `SPOTIFY_PAUSE` : pausing current playback.
-```
-  this.sendNotification("SPOTIFY_PAUSE")
-```
+The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/paused player, when used without payloads
 - `SPOTIFY_PAUSE` : pausing current playback.
 ```
   this.sendNotification("SPOTIFY_PAUSE")
@@ -133,3 +129,9 @@ This notification also be used as `resume` reature of stopped player without pay
 ```
   this.sendNotification("SPOTIFY_TRANSFER", "RASPOTIFY")
 ```
+
+## Usage & Tip
+See the wiki
+
+## Credit
+Special thanks to @ejay-ibm so much for taking the time to cowork to make this module. 

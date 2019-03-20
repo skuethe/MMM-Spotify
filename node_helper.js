@@ -101,6 +101,12 @@ module.exports = NodeHelper.create({
       })
     }
 
+    if (noti == "VOLUME") {
+      this.spotify.volume(payload, (code, error, result)=>{
+        this.sendSocketNotification("DONE_VOLUME", result)
+      })
+    }
+
     if (noti == "SEARCH_AND_PLAY") {
       this.searchAndPlay(payload.query, payload.condition)
     }
@@ -113,12 +119,26 @@ module.exports = NodeHelper.create({
   },
 
   searchAndPlay: function(param, condition) {
+    if (!param.type) {
+      param.type = "artist,track,album,playlist"
+    } else {
+      param.type = param.type.replace(/\s/g,'')
+    }
+    if (!param.q) {
+      param.q = "something cool"
+    }
+
     var pickup = (items, random, retType)=>{
       var ret = {}
       var r = null
       r = (random) ? items[Math.floor(Math.random() * items.length)] : items[0]
-      ret[retType] = (retType == "uris") ? [r.uri] : r.uri
-      return ret
+      if (r.uri) {
+        ret[retType] = (retType == "uris") ? [r.uri] : r.uri
+        return ret
+      } else {
+        console.log("[SPOTIFY] Unplayable item: ", r)
+        return false
+      }
     }
     this.spotify.search(param, (code, error, result)=>{
       //console.log(code, error, result)
@@ -134,7 +154,7 @@ module.exports = NodeHelper.create({
         for (var section in map) {
           if (map.hasOwnProperty(section) && !foundForPlay) {
             var retType = map[section]
-            if (result[section]) {
+            if (result[section] && result[section].items.length > 1) {
               foundForPlay = pickup(result[section].items, condition.random, retType)
             }
           }
@@ -148,7 +168,7 @@ module.exports = NodeHelper.create({
             this.sendSocketNotification("DONE_SEARCH_AUTOPLAY", result)
           })
         } else {
-          // nothing found
+          // nothing found or not play.
           this.sendSocketNotification("DONE_SEARCH_NOTHING")
         }
       } else { //when fail
