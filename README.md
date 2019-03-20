@@ -131,7 +131,7 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 ```
 
 ## Usage & Tip
-See the wiki
+See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 
 ## Credit
 Special thanks to @ejay-ibm so much for taking the time to cowork to make this module. 
