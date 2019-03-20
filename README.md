@@ -6,7 +6,7 @@ Spotify controller for MagicMirror
 - ![mini](screenshots/spotify_mini.png)
 
 ## Main Features
-- Showing Current playback
+- Showing Current playback on any devices
 - Playing Controllable by Notification (Play, pause, next, previous, volume)
 - Spotify Controllable by Notification (change device, search and play)
 
@@ -109,11 +109,7 @@ When `search` field exists, `spotifyUri` will be ignored.
 ```
   this.sendNotification("SPOTIFY_PLAY", "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ")
 ```
-This notification also be used as `resume` reature of stopped player without payloads
-- `SPOTIFY_PAUSE` : pausing current playback.
-```
-  this.sendNotification("SPOTIFY_PAUSE")
-```
+The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/paused player, when used without payloads
 - `SPOTIFY_PAUSE` : pausing current playback.
 ```
   this.sendNotification("SPOTIFY_PAUSE")
@@ -135,3 +131,30 @@ This notification also be used as `resume` reature of stopped player without pay
 ```
   this.sendNotification("SPOTIFY_TRANSFER", "RASPOTIFY")
 ```
+
+MK2 assisant transcriptionHook sample for search: 
+```
+SPOTIFY_SEARCH: {
+        pattern: "(.*) on Spotify",  // Will play any song, artist, track or playlist on spotify
+        command: "SPOTIFY_SEARCH"
+        },
+```
+Mk2 assisant Command Sample for search: 
+```
+SPOTIFY_SEARCH: {
+         notificationExec: {
+           notification: "SPOTIFY_SEARCH",
+        
+        payload: (params) => {
+                console.log("SPOTIFY_SEARCH @",params)
+                return {
+                        type: "artist,track,album,playlist",
+                        query: params[1],   // params[1] is the value of (.*) in the pattern. 
+                        random:false,
+                        }
+                     }
+                }
+        },
+```        
+        
+
