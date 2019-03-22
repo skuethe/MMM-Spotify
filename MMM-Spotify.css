@@ -1,10 +1,14 @@
-
 #SPOTIFY {
   position: relative;
   width:360px;
   border-radius:10px;
-  height:480px;
 	box-sizing:border-box;
+  color:#EEE;
+  font-weight:normal;
+  font-size:18px;
+  text-align:left;
+  line-height:120%;
+  text-shadow:black 2px 2px;
 }
 
 
@@ -22,31 +26,34 @@
 }
 
 #SPOTIFY_FOREGROUND {
-  position:absolute;
+  position:relative;
   filter:none;
   top:0;
   left:0;
   width:100%;
   height:100%;
+  padding:20px;
   z-index:2;
 	display:flex;
 	flex-direction:column;
+  box-sizing:border-box
 }
 
 #SPOTIFY_INFO {
-  color:#EEE;
-  font-weight:normal;
-  font-size:20px;
-  text-align:left;
-  line-height:120%;
-  text-shadow:black 2px 2px;
+
 }
 
-#SPOTIFY_INFO .fas {
-  margin-left:30px;
+#SPOTIFY_INFO .iconify {
+
+}
+
+#SPOTIFY_INFO .text {
+  
 }
 
 #SPOTIFY_TITLE {
+  display:block;
+  width:300px;
   color:#FFF;
   font-weight:bold;
   font-size:22px;
@@ -64,7 +71,6 @@
 #SPOTIFY_COVER {
   width:320px;
   height:320px;
-  padding:20px 20px 10px 20px;
 }
 
 #SPOTIFY_COVER_IMAGE {
@@ -78,10 +84,10 @@
 }
 
 #SPOTIFY_PROGRESS_TIME {
-	margin:0 20px 0 20px;
 	display:flex;
 	flex-direction:row;
 	justify-content:space-between;
+  font-size:14px;
 }
 
 #SPOTIFY_PROGRESS_END {
@@ -93,12 +99,12 @@
 }
 
 
-
 #SPOTIFY_PROGRESS_BAR {
-	margin: 0 20px 10px 20px;
+	margin-bottom:10px;
 	background-color:#666;
 	height:10px;
 	position:relative;
+
 }
 
 
@@ -108,6 +114,20 @@
 	top:0;
 	left:0;
 	height:10px;
+}
+
+
+#SPOTIFY_CONTROL {
+  display:flex;
+  flex-direction:row;
+  justify-content: space-around;
+  font-size:32px;
+  color:#FFF;
+}
+
+#SPOTIFY_CONTROL > * {
+  border-radius:4px;
+  background-color:rgba(0,0,0,0.2);
 }
 
 

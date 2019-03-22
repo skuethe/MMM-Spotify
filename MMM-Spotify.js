@@ -2,7 +2,7 @@
 // Module : MMM-Spotify
 //
 Module.register("MMM-Spotify", {
-  default: {
+  defaults: {
     style: "default", // "default", "mini" available.
     updateInterval: 1000,
     onStart: null,
@@ -18,10 +18,14 @@ Module.register("MMM-Spotify", {
       }
     }
     */
+
+    iconify: "https://code.iconify.design/1/1.0.0-rc7/iconify.min.js"
+    //iconify: null,
+    //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
   },
 
   getStyles: function() {
-    return ["MMM-Spotify.css", "font-awesome5.css"]
+    return ["MMM-Spotify.css"]
   },
 
   start: function() {
@@ -31,6 +35,8 @@ Module.register("MMM-Spotify", {
   notificationReceived: function(noti, payload, sender) {
     if (noti == "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.config)
+      console.log(this.config)
+      this.loadExternalScript(this.config.iconify)
       this.onStart()
     }
     switch(noti) {
@@ -165,6 +171,7 @@ Module.register("MMM-Spotify", {
       var title = document.createElement("div")
       title.id = "SPOTIFY_TITLE"
 
+
       var artist = document.createElement("div")
       artist.id = "SPOTIFY_ARTIST"
 
@@ -197,19 +204,34 @@ Module.register("MMM-Spotify", {
       var random = document.createElement("div")
       random.id = "SPOTIFY_CONTROL_RANDOM"
       random.class = "off"
-      random.innerHTML = `<i class="fas fa-random"></i>`
+      random.innerHTML = `<span class="iconify" data-icon="mdi:shuffle" data-inline="false"></span>`
+      //<span class="iconify" data-icon="mdi:shuffle-disabled" data-inline="false"></span>
       var repeat = document.createElement("div")
       repeat.id = "SPOTIFY_CONTROL_REPEAT"
       repeat.class = "off"
-      repeat.innerHTML = `<i class="fas fa-random"></i>`
+      repeat.innerHTML = `<span class="iconify" data-icon="mdi:repeat" data-inline="false"></span>`
+      //<span class="iconify" data-icon="mdi:repeat-off" data-inline="false"></span>
+      //<span class="iconify" data-icon="mdi:repeat-once" data-inline="false"></span>
       var backward = document.createElement("div")
       backward.id = "SPOTIFY_CONTROL_BACKWARD"
+      backward.innerHTML = `<span class="iconify" data-icon="mdi:skip-previous" data-inline="false"></span>`
       var forward = document.createElement("div")
       forward.id = "SPOTIFY_CONTROL_FORWARD"
+      forward.innerHTML = `<span class="iconify" data-icon="mdi:skip-next" data-inline="false"></span>`
       var play = document.createElement("div")
       play.id = "SPOTIFY_CONTROL_PLAY"
+      play.innerHTML = `<span class="iconify" data-icon="mdi:play-circle-outline" data-inline="false"></span>`
+      //<span class="iconify" data-icon="mdi:pause-circle-outline" data-inline="false"></span>
+      var restart = document.createElement("div")
+      restart.id = "SPOTIFY_CONTROL_RESTART"
+      restart.innerHTML = `<span class="iconify" data-icon="mdi:restart" data-inline="false"></span>`
 
-
+      control.appendChild(random)
+      control.appendChild(backward)
+      control.appendChild(restart)
+      control.appendChild(play)
+      control.appendChild(forward)
+      control.appendChild(repeat)
 
       if (this.currentPlayback.is_playing) {
         m.classList.add("playing")
@@ -222,7 +244,8 @@ Module.register("MMM-Spotify", {
         cover_img.src = this.currentPlayback.item.album.images[0].url
         back.style.backgroundImage = `url(${this.currentPlayback.item.album.images[0].url})`
         //progress.innerHTML  = `<i class="fas fa-clock"></i>` + " " +  Math.floor(this.currentPlayback.progress_ms / 60000) + ":" + (((this.currentPlayback.progress_ms % 60000) / 1000).toFixed(0)-1) + " / " + Math.floor(this.currentPlayback.item.duration_ms / 60000) + ":" + (((this.currentPlayback.item.duration_ms % 60000) / 1000).toFixed(0)-1)  }
-        title.innerHTML = `<i class="fas fa-music"></i>` + " " + this.currentPlayback.item.name
+
+        title.innerHTML = `<span class="iconify" data-icon="mdi:music" data-inline="false"></span><div class="text">${this.currentPlayback.item.name}</div>`
         var artists = this.currentPlayback.item.artists
         var artistName = ""
         for (var x = 0; x < artists.length; x++) {
@@ -232,18 +255,28 @@ Module.register("MMM-Spotify", {
             artistName += ", " + artists[x].name
           }
         }
-        artist.innerHTML = `<i class="fas fa-user-circle"></i>` + "  " + artistName
+        artist.innerHTML = `<i class="iconify" data-icon="ic-baseline-person"></i>` + "  " + artistName
       }
-      device.innerHTML = `<i class="fas fa-volume-up"></i>` + " " + this.currentPlayback.device.name
+      device.innerHTML = `<i class="iconify" data-icon="ic-baseline-devices"></i>` + " " + this.currentPlayback.device.name
 
       info.appendChild(title)
       info.appendChild(artist)
       info.appendChild(device)
       fore.appendChild(info)
       fore.appendChild(progress)
+      fore.appendChild(control)
     }
 
     m.appendChild(fore)
     return m
+  },
+
+  loadExternalScript:function(url) {
+    if (url) {
+      var tag = document.createElement("script")
+      tag.src = url
+      var firstScriptTag = document.getElementsByTagName("script")[0]
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+    }
   },
 })
