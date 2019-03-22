@@ -190,8 +190,26 @@ Module.register("MMM-Spotify", {
       barNow.id = "SPOTIFY_PROGRESS_BAR_NOW"
       bar.appendChild(barNow)
       progress.appendChild(bar)
-
       this.updateProgress(this.currentPlayback, songTime, currentTime, barNow)
+
+      var control = document.createElement("div")
+      control.id = "SPOTIFY_CONTROL"
+      var random = document.createElement("div")
+      random.id = "SPOTIFY_CONTROL_RANDOM"
+      random.class = "off"
+      random.innerHTML = `<i class="fas fa-random"></i>`
+      var repeat = document.createElement("div")
+      repeat.id = "SPOTIFY_CONTROL_REPEAT"
+      repeat.class = "off"
+      repeat.innerHTML = `<i class="fas fa-random"></i>`
+      var backward = document.createElement("div")
+      backward.id = "SPOTIFY_CONTROL_BACKWARD"
+      var forward = document.createElement("div")
+      forward.id = "SPOTIFY_CONTROL_FORWARD"
+      var play = document.createElement("div")
+      play.id = "SPOTIFY_CONTROL_PLAY"
+
+
 
       if (this.currentPlayback.is_playing) {
         m.classList.add("playing")
@@ -218,11 +236,11 @@ Module.register("MMM-Spotify", {
       }
       device.innerHTML = `<i class="fas fa-volume-up"></i>` + " " + this.currentPlayback.device.name
 
-      info.appendChild(progress)
       info.appendChild(title)
       info.appendChild(artist)
       info.appendChild(device)
       fore.appendChild(info)
+      fore.appendChild(progress)
     }
 
     m.appendChild(fore)
