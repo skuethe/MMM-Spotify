@@ -106,7 +106,7 @@ You can control Spotify on start of MagicMirror (By example; Autoplay specific p
     search: {
       type: "playlist", // `artist`, track`, `album`, `playlist` and its combination(`artist,playlist,album`) be available
       keyword: "death metal",
-    	random:true,
+      random:true,
     }
   }
 ```
