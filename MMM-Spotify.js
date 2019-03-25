@@ -81,6 +81,13 @@ Module.register("MMM-Spotify", {
         break
       case "SPOTIFY_TRANSFER":
         this.sendSocketNotification("TRANSFER", payload)
+        break
+      case "SPOTIFY_SHUFFLE":
+        this.clickShuffle()
+        break
+      case "SPOTIFY_REPEAT":
+        this.clickRepeat()
+        break
     }
   },
 
@@ -427,14 +434,4 @@ Module.register("MMM-Spotify", {
     m.appendChild(fore)
     return m
   },
-/*
-  loadExternalScript:function(url) {
-    if (url) {
-      var tag = document.createElement("script")
-      tag.src = url
-      var firstScriptTag = document.getElementsByTagName("script")[0]
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
-    }
-  },
-  */
 })
