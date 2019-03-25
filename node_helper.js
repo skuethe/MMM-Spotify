@@ -116,6 +116,24 @@ module.exports = NodeHelper.create({
         this.sendSocketNotification("DONE_TRANSFER", result)
       })
     }
+
+    if (noti == "REPEAT") {
+      this.spotify.repeat(payload, (code, error, result) => {
+        this.sendSocketNotification("DONE_REPEAT", result)
+      })
+    }
+
+    if (noti == "SHUFFLE") {
+      this.spotify.shuffle(payload, (code, error, result) => {
+        this.sendSocketNotification("DONE_SHUFFLE", result)
+      })
+    }
+
+    if (noti == "REPLAY") {
+      this.spotify.replay((code, error, result) => {
+        this.sendSocketNotification("DONE_REPLAY", result)
+      })
+    }
   },
 
   searchAndPlay: function(param, condition) {

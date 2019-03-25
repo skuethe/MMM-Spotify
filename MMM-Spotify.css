@@ -8,15 +8,20 @@
   font-size:18px;
   text-align:left;
   line-height:120%;
-  text-shadow:black 2px 2px;
+  text-shadow:black 2px 2px 2px;
 }
+
+#SPOTIFY * {
+  box-sizing: border-box;
+}
+
 
 
 
 #SPOTIFY_BACKGROUND {
   background-size: cover;
   background-position: center center;
-  filter: blur(32px) opacity(80%) grayscale(30%);
+  filter: blur(16px) opacity(90%) grayscale(33%);
   position:absolute;
   top:0;
   left:0;
@@ -40,37 +45,36 @@
 }
 
 #SPOTIFY_INFO {
+  width:320px;
+}
 
+#SPOTIFY_INFO > * {
+  display:flex;
+  justify-content: flex-start;
 }
 
 #SPOTIFY_INFO .iconify {
-
+  width: 20px;
+  margin-right:10px;
 }
 
 #SPOTIFY_INFO .text {
-  
+  width: 290px;
+  overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+  display:inline-block;
 }
 
 #SPOTIFY_TITLE {
-  display:block;
-  width:300px;
   color:#FFF;
   font-weight:bold;
-  font-size:22px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-#SPOTIFY_ARTIST {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 #SPOTIFY_COVER {
   width:320px;
   height:320px;
+  margin-bottom:5px;
 }
 
 #SPOTIFY_COVER_IMAGE {
@@ -79,8 +83,8 @@
   border-radius:10px;
 }
 
-#SPOTIFY.pausing #SPOTIFY_FOREGROUND {
-  filter:brightness(50%);
+#SPOTIFY.pausing #SPOTIFY_COVER_IMAGE {
+  filter:brightness(50%) grayscale(75%);
 }
 
 #SPOTIFY_PROGRESS_TIME {
@@ -134,11 +138,11 @@
 /* style "mini" */
 #SPOTIFY.mini {
 	width:360px;
-	height:120px;
 }
 
 #SPOTIFY.mini #SPOTIFY_FOREGROUND {
 	flex-direction:row;
+  padding:0;
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER {
@@ -155,18 +159,29 @@
 #SPOTIFY.mini #SPOTIFY_INFO {
 	width:240px;
 	padding-left:10px;
+  margin-top:5px;
 }
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_BAR {
-	width:240px;
-	margin:0;
-	margin-bottom:10px;
+	margin:5px;
 }
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
-	margin:0;
+	display:none;
 }
 
 #SPOTIFY.mini #SPOTIFY_INFO .fas {
 	margin:0;
+}
+
+#SPOTIFY.mini.noPlayback {
+  width:120px;
+}
+
+#SPOTIFY.noPlayback #SPOTIFY_FOREGROUND > * {
+  display:none;
+}
+
+#SPOTIFY.noPlayback #SPOTIFY_FOREGROUND #SPOTIFY_COVER {
+  display:block;
 }

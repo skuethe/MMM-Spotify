@@ -182,7 +182,7 @@ class Spotify {
           console.log(error, body)
         } else {
           if (api !== "/v1/me/player" && type !== "GET") {
-            console.log(`[SPOTIFY] API Requested:`, api)
+            //console.log(`[SPOTIFY] API Requested:`, api)
           }
         }
         if (cb) {
@@ -262,6 +262,18 @@ class Spotify {
 
   volume(volume = 50, cb) {
     this.doRequest("/v1/me/player/volume", "PUT", {volume_percent:volume}, null, cb)
+  }
+
+  repeat(state, cb) {
+    this.doRequest("/v1/me/player/repeat", "PUT", {state:state}, null, cb)
+  }
+
+  shuffle(state, cb) {
+    this.doRequest("/v1/me/player/shuffle", "PUT", {state:state}, null, cb)
+  }
+
+  replay(cb) {
+    this.doRequest("/v1/me/player/seek", "PUT", {position_ms:0}, null, cb)
   }
 }
 

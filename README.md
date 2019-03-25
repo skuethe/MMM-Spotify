@@ -7,8 +7,21 @@ Spotify controller for MagicMirror
 
 ## Main Features
 - Showing Current playback on any devices
-- Playing Controllable by Notification (Play, pause, next, previous, volume)
+- Playing Controllable by Notification & touch (Play, pause, next, previous, volume)
 - Spotify Controllable by Notification (change device, search and play)
+
+## New updates
+### 1.1.0 (2019-03-25)
+- Added: touch(click) interface
+- Device Limitation : Now you can allow or limit devices to display its playing on MM.
+- Some CSS structure is changed.
+- Now this module can emit `SPOTIFY_*` notifications for other module.
+- How to update from older version
+```sh
+cd ~/MagicMirror/modules/MMM-Spotify
+git pull
+```
+
 
 ## Install
 ### 1. module install
@@ -77,6 +90,8 @@ That's all. `token.json` will be created, if success.
     style: "default", // "default" or "mini" available
     updateInterval: 1000,
     onStart: null, // disable onStart feature with `null`
+    allowDevices: [], //If you want to limit devices to display info, use this.
+    // allowDevices: ["RASPOTIFY", "My iPhoneX", "My Home speaker"],
   }
 }
 ```
@@ -134,4 +149,4 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 
 ## Credit
-Special thanks to @ejay-ibm so much for taking the time to cowork to make this module. 
+Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
