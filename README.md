@@ -144,6 +144,14 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 ```
   this.sendNotification("SPOTIFY_TRANSFER", "RASPOTIFY")
 ```
+- `SPOTIFY_SHUFFLE` : toggle shuffle mode.
+```
+  this.sendNotification("SPOTIFY_SHUFFLE")
+```
+- `SPOTIFY_REPEAT` : change repeat mode. (`off` -> `track` -> `context`)
+```
+this.sendNotification("SPOTIFY_REPEAT")
+```
 
 ## Usage & Tip
 See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
