@@ -88,6 +88,7 @@ That's all. `token.json` will be created, if success.
   position: "bottom_left",
   config: {
     style: "default", // "default" or "mini" available
+    control: "default", //"default", "hidden" available
     updateInterval: 1000,
     onStart: null, // disable onStart feature with `null`
     allowDevices: [], //If you want to limit devices to display info, use this.

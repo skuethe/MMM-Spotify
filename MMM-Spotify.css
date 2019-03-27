@@ -16,8 +16,6 @@
 }
 
 
-
-
 #SPOTIFY_BACKGROUND {
   background-size: cover;
   background-position: center center;
@@ -134,6 +132,10 @@
   background-color:rgba(0,0,0,0.2);
 }
 
+/* control "hidden" */
+#SPOTIFY.hidden #SPOTIFY_CONTROL{
+  display:none;
+}
 
 /* style "mini" */
 #SPOTIFY.mini {
