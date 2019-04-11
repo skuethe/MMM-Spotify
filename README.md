@@ -12,7 +12,7 @@ Spotify controller for MagicMirror
 
 ## New updates
 ### 1.1.1 (2019-04-11)
-- Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize)
+- Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize .default mode. For .mini, just leave it as 360px)
 - Added : Hiding module when current playback device is inactivated. (More test might be needed, but...)
 
 - How to update from older version
