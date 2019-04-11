@@ -19,7 +19,6 @@
   box-sizing: border-box;
 }
 
-
 #SPOTIFY.inactive {
   display:none;
 }
@@ -140,6 +139,10 @@
   background-color:rgba(0,0,0,0.2);
 }
 
+/* control "hidden" */
+#SPOTIFY.hidden #SPOTIFY_CONTROL{
+  display:none;
+}
 
 /* style "mini" */
 #SPOTIFY.mini {

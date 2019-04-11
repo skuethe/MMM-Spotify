@@ -4,6 +4,7 @@
 Module.register("MMM-Spotify", {
   defaults: {
     style: "default", // "default", "mini" available.
+    control: "default", //"default", "hidden" available
     updateInterval: 1000,
     allowDevices: [],
     // If you don't want to showing
@@ -318,6 +319,9 @@ Module.register("MMM-Spotify", {
     m.id = "SPOTIFY"
     if (this.config.style !== "default") {
       m.classList.add(this.config.style)
+    }
+     if (this.config.control !== "default") {
+      m.classList.add(this.config.control)
     }
     m.classList.add("noPlayback")
     var back = document.createElement("div")
