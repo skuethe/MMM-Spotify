@@ -123,7 +123,7 @@ Module.register("MMM-Spotify", {
 
   updateNoPlayback: function() {
     var dom = document.getElementById("SPOTIFY")
-    dom.className = "inactive"
+    dom.classList.add("inactive")
   },
 
   updateCurrentPlayback: function(current) {
