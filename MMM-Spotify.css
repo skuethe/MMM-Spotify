@@ -1,6 +1,10 @@
+:root {
+  --sp-width: 360px;
+}
+
 #SPOTIFY {
   position: relative;
-  width:360px;
+  width: var(--sp-width);
   border-radius:10px;
 	box-sizing:border-box;
   color:#EEE;
@@ -14,6 +18,14 @@
 #SPOTIFY * {
   box-sizing: border-box;
 }
+
+
+#SPOTIFY.inactive {
+  display:none;
+}
+
+
+
 
 
 
@@ -45,7 +57,7 @@
 }
 
 #SPOTIFY_INFO {
-  width:320px;
+  width: calc(var(--sp-width) - 20px);
 }
 
 #SPOTIFY_INFO > * {
@@ -59,7 +71,7 @@
 }
 
 #SPOTIFY_INFO .text {
-  width: 290px;
+  width: calc(var(--sp-width) - 70px);
   overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -72,8 +84,8 @@
 }
 
 #SPOTIFY_COVER {
-  width:320px;
-  height:320px;
+  width: calc(var(--sp-width) - 40px);
+  height: calc(var(--sp-width) - 40px);
   margin-bottom:5px;
 }
 

@@ -107,6 +107,8 @@ Module.register("MMM-Spotify", {
           this.updateDom()
         }
         break
+      case "CURRENT_PLAYBACK_FAIL":
+        this.updateNoPlayback()
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
@@ -118,9 +120,13 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
+  updateNoPlayback: function() {
+    var dom = document.getElementById("SPOTIFY")
+    dom.className = "inactive"
+  },
+
   updateCurrentPlayback: function(current) {
     if (!current) return
-
     if (!this.currentPlayback) {
       this.updateSongInfo(current)
       this.updatePlaying(current)
@@ -229,11 +235,13 @@ Module.register("MMM-Spotify", {
     if(newPlayback.is_playing) {
       s.classList.add("playing")
       s.classList.remove("pausing")
+      s.classList.remove("inactive")
       pi.dataset.icon = "mdi:play-circle-outline"
       p.className = "playing"
     } else {
       s.classList.add("pausing")
       s.classList.remove("playing")
+      s.classList.remove("inactive")
       pi.dataset.icon = "mdi:pause-circle-outline"
       p.className = "pausing"
     }

@@ -23,13 +23,12 @@ module.exports = NodeHelper.create({
 
   initAfterLoading: function(config) {
     this.config = config
-
     this.updatePulse()
   },
 
   updatePulse: function() {
     this.spotify.getCurrentPlayback((code, error, result) => {
-      if (code !== 200) {
+      if (code !== 200 || typeof result == "undefined") {
         this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null)
       } else {
         this.sendSocketNotification("CURRENT_PLAYBACK", result)
