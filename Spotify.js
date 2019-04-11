@@ -186,7 +186,13 @@ class Spotify {
           }
         }
         if (cb) {
-          cb(response.statusCode, error, body)
+          if(response.statusCode) {
+            cb(response.statusCode, error, body)
+          } else {
+            console.log(`[SPOTIFY] Invalid response`)
+            cb('400', error, body)
+          }
+
         }
       })
     }
