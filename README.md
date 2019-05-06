@@ -11,9 +11,9 @@ Spotify controller for MagicMirror
 - Spotify Controllable by Notification (change device, search and play)
 
 ## New updates
-### 1.1.1 (2019-04-11)
-- Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize)
-- Added : Hiding module when current playback device is inactivated. (More test might be needed, but...)
+### 1.1.2 (2019-05-06)
+- Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
+
 
 - How to update from older version
 ```sh
@@ -127,6 +127,10 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 ```
   this.sendNotification("SPOTIFY_PAUSE")
 ```
+- `SPOTIFY_TOGGLE` : toggling for playing/pausing
+```
+  this.sendNotification("SPOTIFY_TOGGLE")
+```
 - `SPOTIFY_NEXT` : next track of current playback.
 ```
   this.sendNotification("SPOTIFY_NEXT")
@@ -158,6 +162,10 @@ See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 
 
 ## Update History
+### 1.1.1 (2019-04-11)
+- Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize)
+- Added : Hiding module when current playback device is inactivated. (More test might be needed, but...)
+
 ### 1.1.0 (2019-03-25)
 - Added: touch(click) interface
 - Device Limitation : Now you can allow or limit devices to display its playing on MM.

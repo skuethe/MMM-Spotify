@@ -89,6 +89,9 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_REPEAT":
         this.clickRepeat()
         break
+      case "SPOTIFY_TOGGLE":
+        this.clickPlay()
+        break
     }
   },
 
