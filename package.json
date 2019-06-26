@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/eouia/MMM-Spotify",
   "dependencies": {
-    "opn": "^5.4.0",
+    "open": "^6.3.0",
     "querystring": "^0.2.0"
   },
   "devDependencies": {}

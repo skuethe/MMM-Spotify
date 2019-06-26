@@ -8,7 +8,7 @@ const fs = require("fs")
 const path = require("path")
 const request = require("request")
 const querystring = require("querystring")
-const opn = require("opn")
+const opn = require("open")
 const express = require("express")
 const app = express()
 
