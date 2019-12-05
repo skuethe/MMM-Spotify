@@ -102,8 +102,7 @@ Module.register("MMM-Spotify", {
       case "CURRENT_PLAYBACK":
         if (
           (this.config.allowDevices.length == 0)
-          || (this.config.allowDevices.length > 1
-            && this.config.allowDevices.includes(payload.device.name))
+          || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
         ) {
           this.updateCurrentPlayback(payload)
         } else {
