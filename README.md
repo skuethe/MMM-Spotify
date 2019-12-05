@@ -69,6 +69,13 @@ Then, Allowance dialog popup will be opened. Log in(if it is needed) and allow i
 That's all. `token.json` will be created, if success.
 
 
+### 5. `Error: Cannot find module 'open'` after update(`git pull`).
+```sh
+cd ~/MagicMirror/modules/MMM-Spotify
+npm install open
+```
+
+
 ## Configuration
 ### Simple
 ```js
