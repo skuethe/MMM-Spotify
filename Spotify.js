@@ -17,6 +17,7 @@ class Spotify {
     constructor(config = null) {
         if (config == null) {
             config = {
+                "USERNAME": "",
                 "CLIENT_ID": "",
                 "CLIENT_SECRET": "",
                 "AUTH_DOMAIN": "http://localhost",
@@ -61,18 +62,19 @@ class Spotify {
     }) {
         if (!this.config.CLIENT_ID) {
             let msg = `[SPOTIFY_AUTH] CLIENT_ID doesn't exist.`;
-            console.error(msg);
+            console.log(msg);
             error(msg);
             return;
         }
 
         if (this.token) {
             let msg = `[SPOTIFY_AUTH] You already have a token. no need to auth.`;
-            console.error(msg);
+            console.log(msg);
             error(msg);
             return;
         }
 
+        console.log('[SPOTIFY_AUTH] creating server', this.config);
         let server = app.get(this.config.AUTH_PATH, (req, res) => {
             let code = req.query.code || null;
             let authOptions = {
@@ -91,31 +93,31 @@ class Spotify {
             request.post(authOptions, (requestError, response, body) => {
                 if (requestError || response.statusCode !== 200) {
                     let msg = `[SPOTIFY_AUTH] Error in request`;
-                    console.error(msg, requestError, body);
+                    console.log(msg, requestError, body);
                     error(msg);
                     return;
                 }
-
+                console.log('Request body', body);
                 this.writeToken(body);
                 server.close();
                 res.send(`${this.config.TOKEN} would be created. Check it`);
                 afterCallback();
-            }).listen(this.config.AUTH_PORT);
-
-            let url = "https://accounts.spotify.com/authorize?" +
-                querystring.stringify({
-                    response_type: 'code',
-                    client_id: this.config.CLIENT_ID,
-                    scope: this.config.SCOPE,
-                    redirect_uri: this.redirect_uri,
-                    state: this.state,
-                    show_dialog: true
-                });
-
-            console.log('[SPOTIFY_AUTH] Opening URL.(' + url + ')');
-            opn(url).catch(() => {
-                console.log('[SPOTIFY_AUTH] Failed to automatically open the URL. Copy/paste this in your browser:\n', url);
             });
+        }).listen(this.config.AUTH_PORT);
+
+        let url = "https://accounts.spotify.com/authorize?" +
+            querystring.stringify({
+                response_type: 'code',
+                client_id: this.config.CLIENT_ID,
+                scope: this.config.SCOPE,
+                redirect_uri: this.redirect_uri,
+                state: this.state,
+                show_dialog: true
+            });
+
+        console.log('[SPOTIFY_AUTH] Opening URL.(' + url + ')');
+        opn(url).catch(() => {
+            console.log('[SPOTIFY_AUTH] Failed to automatically open the URL. Copy/paste this in your browser:\n', url);
         });
     }
 

@@ -7,8 +7,6 @@ Module.register("MMM-Spotify", {
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
     allowDevices: [],
-    // If you don't want to showing
-
     iconify: "https://code.iconify.design/1/1.0.0-rc7/iconify.min.js",
     //iconify: null,
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
@@ -45,7 +43,7 @@ Module.register("MMM-Spotify", {
   },
 
   notificationReceived: function(noti, payload, sender) {
-    if (noti == "DOM_OBJECTS_CREATED") {
+    if (noti === "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.config)
       //console.log(this.config)
       //this.loadExternalScript(this.config.iconify)
@@ -101,7 +99,7 @@ Module.register("MMM-Spotify", {
         break
       case "CURRENT_PLAYBACK":
         if (
-          (this.config.allowDevices.length == 0)
+          (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
         ) {
           this.updateCurrentPlayback(payload)
@@ -294,9 +292,9 @@ Module.register("MMM-Spotify", {
   clickRepeat: function() {
     var c = this.currentPlayback.repeat_state
     var n = ""
-    if (c == "off") n = "track"
-    if (c == "track") n = "context"
-    if (c == "context") n = "off"
+    if (c === "off") n = "track"
+    if (c === "track") n = "context"
+    if (c === "context") n = "off"
     this.sendSocketNotification("REPEAT", n)
   },
 

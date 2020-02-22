@@ -20,7 +20,7 @@ function authorize(configuration) {
             console.log("First authorization is finished. Check ", configuration.TOKEN);
             resolve();
         }, () => {
-            console.error("Error in authentication flow!");
+            console.log("Error in authentication flow!");
             reject();
         });
     });
@@ -28,10 +28,17 @@ function authorize(configuration) {
 
 async function authorizations(configurations) {
     for (const configuration of configurations) {
-        await authorize(configuration);
+        try {
+            await authorize(configuration);
+            console.log('Authorization finished');
+        } catch (e) {
+            console.log('ERROR: ', e);
+        }
     }
 }
 
 authorizations(configurations).then(result => {
     console.log('Authorization process finished!', result);
+}, reason => {
+    console.log('Authorization process failed!:', reason);
 });
