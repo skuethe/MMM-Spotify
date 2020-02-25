@@ -1,5 +1,5 @@
 # MMM-Spotify
-Spotify controller for MagicMirror
+Spotify controller for MagicMirror. Multiples accounts supported!
 
 ## Screenshot
 - ![default](screenshots/spotify_default.png)
@@ -9,8 +9,11 @@ Spotify controller for MagicMirror
 - Showing Current playback on any devices
 - Playing Controllable by Notification & touch (Play, pause, next, previous, volume)
 - Spotify Controllable by Notification (change device, search and play)
+- Multiple accounts supported
 
 ## New updates
+### 1.2 (2020-02-20)
+- Added : `MULTIPLE ACCOUNTS`
 
 ### 1.1.2 (2019-05-06)
 - Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
@@ -47,17 +50,20 @@ cd ~/MagicMirror/modules/MMM-Spotify
 cp spotify.config.json.example spotify.config.json
 nano spotify.config.json
 ```
-Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You need to just fill `CLIENT_ID` and `CLIENT_SECRET`. Then, save it.
+Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.
 ```json
-{
-  "CLIENT_ID" : "YOUR_CLIENT_ID",
-  "CLIENT_SECRET" : "YOUR_CLIENT_SECRET",
-  "AUTH_DOMAIN" : "http://localhost",
-  "AUTH_PATH" : "/callback",
-  "AUTH_PORT" : "8888",
-  "SCOPE" : "user-read-private playlist-read-private streaming user-read-playback-state user-modify-playback-state",
-  "TOKEN" : "./token.json"
-}
+[
+  {
+      "USERNAME": "USERNAME",
+      "CLIENT_ID" : "YOUR_CLIENT_ID",
+      "CLIENT_SECRET" : "YOUR_CLIENT_SECRET",
+      "AUTH_DOMAIN" : "http://localhost",
+      "AUTH_PATH" : "/callback",
+      "AUTH_PORT" : "8888",
+      "SCOPE" : "user-read-private playlist-read-private streaming user-read-playback-state user-modify-playback-state",
+      "TOKEN" : "./token.json"
+  }
+]
 ```
 
 ### 4. Get Auth
@@ -65,7 +71,7 @@ Or any editor as your wish be ok. Open the `spotify.config.json` then modify it.
 cd ~/MagicMirror/modules/MMM-Spotify
 node first_auth.js
 ```
-Then, Allowance dialog popup will be opened. Log in(if it is needed) and allow it.
+Then, Allowance dialog popup will be opened. You MUST LOG IN IN SAME ORDER YOU PUT YOUR USERS IN CONFIGURATION FILE. Log in(if it is needed) and allow it.
 That's all. `token.json` will be created, if success.
 
 
