@@ -9,6 +9,15 @@ const Spotify = require("./Spotify.js")
 
 var NodeHelper = require("node_helper")
 
+let updateOldSingleSpotifyConfigurationToNewMultipleSpotifyConfiguration = function (configuration) {
+    if (Array.isArray(configuration)) {
+        // not update required
+        return configuration;
+    }
+
+    return [configuration];
+};
+
 module.exports = NodeHelper.create({
     start: function () {
         this.config = null; // Configuration come from MM config file.
@@ -17,7 +26,8 @@ module.exports = NodeHelper.create({
         this.spotifies = [];
         let file = path.resolve(__dirname, "spotify.config.json");
         if (fs.existsSync(file)) {
-            this.spotifyConfigurations = JSON.parse(fs.readFileSync(file));
+            let parsedConfigurations = JSON.parse(fs.readFileSync(file));
+            this.spotifyConfigurations = updateOldSingleSpotifyConfigurationToNewMultipleSpotifyConfiguration(parsedConfigurations);
             this.spotifyConfigurations.forEach(configuration => {
                 this.spotifies.push(new Spotify(configuration));
             });
