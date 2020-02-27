@@ -12,11 +12,11 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 - Multiple accounts supported
 
 ## New updates
+### 1.2.1 (2020-02-27)
+- Fixed: Using old configuration error.
+
 ### 1.2 (2020-02-20)
 - Added : `MULTIPLE ACCOUNTS`
-
-### 1.1.2 (2019-05-06)
-- Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
 
 
 - How to update from older version
@@ -176,6 +176,10 @@ See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 
 
 ## Update History
+
+### 1.1.2 (2019-05-06)
+- Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
+
 ### 1.1.1 (2019-04-11)
 - Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize)
 - Added : Hiding module when current playback device is inactivated. (More test might be needed, but...)
