@@ -132,9 +132,15 @@ When `search` field exists, `spotifyUri` will be ignored.
 ```
   this.sendNotification("SPOTIFY_SEARCH", {type:"artist,playlist", query:"michael+jackson", random:false})
 ```
-- `SPOTIFY_PLAY` : playing specific SpotifyUri.
+- `SPOTIFY_PLAY` : playing specific SpotifyUri. There could be two types of uri - `context_uri` and `uris`. 
+    - `context_uri:String` : Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+    - `uris:[]`: A JSON array of the Spotify track URIs to play
 ```
-  this.sendNotification("SPOTIFY_PLAY", "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ")
+   this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:album:1Je1IMUlBXcx1Fz0WE7oPT"})
+//OR
+   this.sendNotification("SPOTIFY_PLAY", {
+     "uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]
+   })
 ```
 The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/paused player, when used without payloads
 - `SPOTIFY_PAUSE` : pausing current playback.
