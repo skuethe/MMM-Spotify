@@ -97,94 +97,97 @@ module.exports = NodeHelper.create({
             this.sendSocketNotification("INITIALIZED")
         }
 
-        if (noti == "ONSTART") {
-            payload.position_ms = 0
-            if (payload.search) {
-                var param = {
-                    q: payload.search.keyword,
-                    type: payload.search.type,
+        if(this.spotify){
+            if (noti == "ONSTART") {
+                payload.position_ms = 0
+                if (payload.search) {
+                    var param = {
+                        q: payload.search.keyword,
+                        type: payload.search.type,
+                    }
+                    var condition = {
+                        random: payload.search.random,
+                        autoplay: true,
+                    }
+                    this.searchAndPlay(param, condition)
+    
+                } else if (payload.spotifyUri.match("track")) {
+                    this.spotify.play({uris: [payload.spotifyUri]})
+                } else if (payload.spotifyUri) {
+                    this.spotify.play({context_uri: payload.spotifyUri})
                 }
-                var condition = {
-                    random: payload.search.random,
-                    autoplay: true,
-                }
-                this.searchAndPlay(param, condition)
-
-            } else if (payload.spotifyUri.match("track")) {
-                this.spotify.play({uris: [payload.spotifyUri]})
-            } else if (payload.spotifyUri) {
-                this.spotify.play({context_uri: payload.spotifyUri})
+                if (payload.deviceName) this.spotify.transferByName(payload.deviceName)
             }
-            if (payload.deviceName) this.spotify.transferByName(payload.deviceName)
-        }
 
-        if (noti == "GET_DEVICES") {
-            this.spotify.getDevices((code, error, result) => {
-                this.sendSocketNotification("LIST_DEVICES", result)
-            })
-        }
+            if (noti == "GET_DEVICES") {
+                this.spotify.getDevices((code, error, result) => {
+                    this.sendSocketNotification("LIST_DEVICES", result)
+                })
+            }
 
-        if (noti == "PLAY") {
-            this.spotify.play(payload, (code, error, result) => {
-                if (code !== 204) {
-                    console.log(error)
-                    return
-                }
-                this.sendSocketNotification("DONE_PLAY", result)
-            })
-        }
+            if (noti == "PLAY") {
+                this.spotify.play(payload, (code, error, result) => {
+                    if (code !== 204) {
+                        console.log(error)
+                        return
+                    }
+                    this.sendSocketNotification("DONE_PLAY", result)
+                })
+            }
 
-        if (noti == "PAUSE") {
-            this.spotify.pause((code, error, result) => {
-                this.sendSocketNotification("DONE_PAUSE", result)
-            })
-        }
+            if (noti == "PAUSE") {
+                this.spotify.pause((code, error, result) => {
+                    this.sendSocketNotification("DONE_PAUSE", result)
+                })
+            }
 
-        if (noti == "NEXT") {
-            this.spotify.next((code, error, result) => {
-                this.sendSocketNotification("DONE_NEXT", result)
-            })
-        }
+            if (noti == "NEXT") {
+                this.spotify.next((code, error, result) => {
+                    this.sendSocketNotification("DONE_NEXT", result)
+                })
+            }
 
-        if (noti == "PREVIOUS") {
-            this.spotify.previous((code, error, result) => {
-                this.sendSocketNotification("DONE_PREVIOUS", result)
-            })
-        }
+            if (noti == "PREVIOUS") {
+                this.spotify.previous((code, error, result) => {
+                    this.sendSocketNotification("DONE_PREVIOUS", result)
+                })
+            }
 
-        if (noti == "VOLUME") {
-            this.spotify.volume(payload, (code, error, result) => {
-                this.sendSocketNotification("DONE_VOLUME", result)
-            })
+            if (noti == "VOLUME") {
+                this.spotify.volume(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_VOLUME", result)
+                })
+            }
+
+            if (noti == "TRANSFER") {
+                this.spotify.transferByName(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_TRANSFER", result)
+                })
+            }
+    
+            if (noti == "REPEAT") {
+                this.spotify.repeat(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_REPEAT", result)
+                })
+            }
+    
+            if (noti == "SHUFFLE") {
+                this.spotify.shuffle(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_SHUFFLE", result)
+                })
+            }
+    
+            if (noti == "REPLAY") {
+                this.spotify.replay((code, error, result) => {
+                    this.sendSocketNotification("DONE_REPLAY", result)
+                })
+            }
         }
 
         if (noti == "SEARCH_AND_PLAY") {
             this.searchAndPlay(payload.query, payload.condition)
         }
-
-        if (noti == "TRANSFER") {
-            this.spotify.transferByName(payload, (code, error, result) => {
-                this.sendSocketNotification("DONE_TRANSFER", result)
-            })
-        }
-
-        if (noti == "REPEAT") {
-            this.spotify.repeat(payload, (code, error, result) => {
-                this.sendSocketNotification("DONE_REPEAT", result)
-            })
-        }
-
-        if (noti == "SHUFFLE") {
-            this.spotify.shuffle(payload, (code, error, result) => {
-                this.sendSocketNotification("DONE_SHUFFLE", result)
-            })
-        }
-
-        if (noti == "REPLAY") {
-            this.spotify.replay((code, error, result) => {
-                this.sendSocketNotification("DONE_REPLAY", result)
-            })
-        }
+        
     },
 
     searchAndPlay: function (param, condition) {
