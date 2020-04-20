@@ -127,7 +127,7 @@ module.exports = NodeHelper.create({
 
             if (noti == "PLAY") {
                 this.spotify.play(payload, (code, error, result) => {
-                    if (code !== 204) {
+                    if ((code !== 204) && (code !== 202)){
                         console.log(error)
                         return
                     }
