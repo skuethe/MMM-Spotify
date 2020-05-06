@@ -1,6 +1,7 @@
 //
 // Module : MMM-Spotify
 //
+
 Module.register("MMM-Spotify", {
   defaults: {
     style: "default", // "default", "mini" available.
@@ -35,7 +36,7 @@ Module.register("MMM-Spotify", {
   },
 
   getStyles: function() {
-    return ["MMM-Spotify.css"]
+    return ["MMM-Spotify.css", 'font-awesome.css']
   },
 
   start: function() {
@@ -223,31 +224,36 @@ Module.register("MMM-Spotify", {
 
   updateDevice: function(newPlayback) {
     var device = document.querySelector("#SPOTIFY_DEVICE .text")
-    device.textContent = newPlayback.device.name
+    var deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
+
+    device.textContent = 'Listening on ' + newPlayback.device.name
+    deviceIcon.className = this.getFAIconClass(newPlayback.device.type)
+
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", newPlayback.device)
   },
 
   updatePlaying: function(newPlayback) {
-    var s = document.getElementById("SPOTIFY")
-    var p = document.getElementById("SPOTIFY_CONTROL_PLAY")
-    var pi = document.createElement("span")
-    pi.className = "iconify"
-    pi.dataset.inline = "false"
+    const s = document.getElementById("SPOTIFY")
+    const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
+
     if(newPlayback.is_playing) {
       s.classList.add("playing")
       s.classList.remove("pausing")
       s.classList.remove("inactive")
-      pi.dataset.icon = "mdi:play-circle-outline"
       p.className = "playing"
     } else {
       s.classList.add("pausing")
       s.classList.remove("playing")
       s.classList.remove("inactive")
-      pi.dataset.icon = "mdi:pause-circle-outline"
       p.className = "pausing"
     }
+
+    const icon = newPlayback.is_playing ? "mdi:play-circle-outline" : "mdi:pause-circle-outline";
+
     p.innerHTML = ""
-    p.appendChild(pi)
+    p.appendChild(
+      this.getIconContainer('iconify', "SPOTIFY_CONTROL_PLAY_ICON", icon),
+    )
     this.sendNotification("SPOTIFY_UPDATE_PLAYING", newPlayback.is_playing)
   },
 
@@ -267,9 +273,13 @@ Module.register("MMM-Spotify", {
     var title = document.querySelector("#SPOTIFY_TITLE .text")
     title.textContent = newPlayback.item.name
 
+    var album = document.querySelector("#SPOTIFY_ALBUM .text")
+    album.textContent = newPlayback.item.album.name
+
     var artist = document.querySelector("#SPOTIFY_ARTIST .text")
     var artists = newPlayback.item.artists
     var artistName = ""
+
     for (var x = 0; x < artists.length; x++) {
       if (!artistName) {
         artistName = artists[x].name
@@ -314,133 +324,173 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("NEXT")
   },
 
-  getDom: function(){
-    var m = document.createElement("div")
-    m.id = "SPOTIFY"
-    if (this.config.style !== "default") {
-      m.classList.add(this.config.style)
+  getFAIcon(iconType) {
+    switch (iconType) {
+      case 'Title':
+        return 'fa fa-music fa-sm';
+      case 'Artist':
+        return 'fa fa-user fa-sm';
+      case 'Album':
+        return 'fa fa-folder fa-sm';
+      case 'Speaker':
+        return 'fa fa-headphones fa-sm';
+      case 'Smartphone':
+        return 'fas fa-mobile fa-sm';
+      case 'TV':
+        return 'fas fa-tv fa-sm';
+      default:
+        return 'fa fa-desktop fa-sm';
     }
-     if (this.config.control !== "default") {
-      m.classList.add(this.config.control)
-    }
-    m.classList.add("noPlayback")
-    var back = document.createElement("div")
-    back.id = "SPOTIFY_BACKGROUND"
-    m.appendChild(back)
-    var fore = document.createElement("div")
-    fore.id = "SPOTIFY_FOREGROUND"
-    var cover = document.createElement("div")
-    cover.id = "SPOTIFY_COVER"
-    var cover_img = document.createElement("img")
-    cover_img.id = "SPOTIFY_COVER_IMAGE"
-    cover_img.src = "./modules/MMM-Spotify/resources/spotify-xxl.png"
-    cover.appendChild(cover_img)
-    fore.appendChild(cover)
-    var misc = document.createElement("div")
-    misc.id = "SPOTIFY_MISC"
-    var info = document.createElement("div")
-    info.id = "SPOTIFY_INFO"
-    var title = document.createElement("div")
-    title.id = "SPOTIFY_TITLE"
-    var ti = document.createElement("span")
-    ti.className = "iconify"
-    ti.dataset.icon = "mdi:music"
-    ti.dataset.inline = "false"
-    title.appendChild(ti)
-    var tt = document.createElement("span")
-    tt.className = "text"
-    tt.textContent = ""
-    title.appendChild(tt)
-    var artist = document.createElement("div")
-    artist.id = "SPOTIFY_ARTIST"
-    var ai = document.createElement("span")
-    ai.className = "iconify"
-    ai.dataset.icon = "ic-baseline-person"
-    ai.dataset.inline = "false"
-    artist.appendChild(ai)
-    var at = document.createElement("span")
-    at.className = "text"
-    at.textContent = ""
-    artist.appendChild(at)
-    var device = document.createElement("div")
-    device.id = "SPOTIFY_DEVICE"
-    var di = document.createElement("span")
-    di.className = "iconify"
-    di.dataset.icon = "ic-baseline-devices"
-    di.dataset.inline = "false"
-    device.appendChild(di)
-    var dt = document.createElement("span")
-    dt.className = "text"
-    dt.textContent = ""
-    device.appendChild(dt)
-    var progress = document.createElement("div")
-    progress.id = "SPOTIFY_PROGRESS"
-    var currentTime = document.createElement("div")
-    currentTime.id = "SPOTIFY_PROGRESS_CURRENT"
-    currentTime.innerHTML = "--:--"
-    var songTime = document.createElement("div")
-    songTime.id = "SPOTIFY_PROGRESS_END"
-    songTime.innerHTML = "--:--"
-    var time = document.createElement("div")
-    time.id = "SPOTIFY_PROGRESS_TIME"
-    time.appendChild(currentTime)
-    time.appendChild(songTime)
-    progress.appendChild(time)
-    var bar = document.createElement("div")
-    bar.id = "SPOTIFY_PROGRESS_BAR"
-    var barNow = document.createElement("div")
-    barNow.id = "SPOTIFY_PROGRESS_BAR_NOW"
-    bar.appendChild(barNow)
-    progress.appendChild(bar)
-    var control = document.createElement("div")
-    control.id = "SPOTIFY_CONTROL"
-    var shuffle = document.createElement("div")
-    shuffle.id = "SPOTIFY_CONTROL_SHUFFLE"
-    shuffle.addEventListener("click", ()=>{this.clickShuffle()})
-    shuffle.className = "off"
-    var si = document.createElement("span")
-    si.className = "iconify"
-    si.dataset.icon = "mdi:shuffle"
-    si.dataset.inline = "false"
-    shuffle.appendChild(si)
-    var repeat = document.createElement("div")
-    repeat.id = "SPOTIFY_CONTROL_REPEAT"
-    repeat.addEventListener("click", ()=>{this.clickRepeat()})
-    var ri = document.createElement("span")
-    ri.className = "iconify"
-    ri.dataset.inline = "false"
-    repeat.className = "off"
-    ri.dataset.icon = "mdi:repeat-off"
-    repeat.appendChild(ri)
-    var backward = document.createElement("div")
-    backward.id = "SPOTIFY_CONTROL_BACKWARD"
-    backward.addEventListener("click", ()=>{this.clickBackward()})
-    backward.innerHTML = `<span class="iconify" data-icon="mdi:skip-previous" data-inline="false"></span>`
-    var forward = document.createElement("div")
-    forward.id = "SPOTIFY_CONTROL_FORWARD"
-    forward.innerHTML = `<span class="iconify" data-icon="mdi:skip-next" data-inline="false"></span>`
-    forward.addEventListener("click", ()=>{this.clickForward()})
-    var play = document.createElement("div")
-    play.id = "SPOTIFY_CONTROL_PLAY"
-    play.addEventListener("click", ()=>{this.clickPlay()})
-    var pi = document.createElement("span")
-    pi.className = "iconify"
-    pi.dataset.inline = "false"
-    //pi.dataset.icon = (this.currentPlayback.is_playing) ? "mdi:play-circle-outline" : "mdi:pause-circle-outline"
-    pi.dataset.icon = "mdi:play-circle-outline"
-    play.appendChild(pi)
+  },
 
-    info.appendChild(title)
-    info.appendChild(artist)
-    info.appendChild(device)
-    misc.appendChild(info)
-    misc.appendChild(progress)
+  getFAIconClass(iconType) {
+    return 'iconify ' + this.getFAIcon(iconType);
+  },
+
+  getIconContainer(className, id,  icon) {
+    const iconContainer = document.createElement("i")
+    iconContainer.className = className
+    iconContainer.dataset.inline = "false"
+    iconContainer.id = id
+    iconContainer.dataset.icon = icon
+
+    return iconContainer;
+  },
+
+  getHTMLElementWithID(type, id) {
+    const divElement = document.createElement(type)
+    divElement.id = id
+    return divElement;
+  },
+
+  getDeviceContainer() {
+    const device = this.getHTMLElementWithID('div','SPOTIFY_DEVICE')
+    device.appendChild(
+      this.getIconContainer(this.getFAIconClass('default'), "SPOTIFY_DEVICE_ICON"),
+    )
+    const deviceText = document.createElement("span")
+    deviceText.className = "text"
+    deviceText.textContent = ""
+    device.appendChild(deviceText)
+
+    return device;
+  },
+
+  getControlsContainer() {
+    const control = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL")
+
+    const shuffle = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_SHUFFLE")
+    shuffle.addEventListener("click", () => { this.clickShuffle() })
+    shuffle.className = "off"
+
+    shuffle.appendChild(this.getIconContainer('iconify', null, 'mdi:shuffle'))
+
+    const repeat = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_REPEAT")
+    repeat.addEventListener("click", () => { this.clickRepeat() })
+    repeat.className = "off"
+    repeat.appendChild(this.getIconContainer('iconify', null, 'mdi:repeat-off'))
+
+    const backward = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_BACKWARD")
+    backward.addEventListener("click", () => { this.clickBackward() })
+
+    backward.appendChild(this.getIconContainer('iconify', null, 'mdi:skip-previous'))
+
+    const forward = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_FORWARD")
+    forward.addEventListener("click", () => { this.clickForward() })
+    forward.appendChild(this.getIconContainer('iconify', null, 'mdi:skip-next'))
+
+    const play = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_PLAY")
+    play.addEventListener("click", () => { this.clickPlay() })
+    play.appendChild(
+      this.getIconContainer('iconify', "SPOTIFY_CONTROL_PLAY_ICON", 'mdi:play-circle-outline'),
+    )
+
     control.appendChild(shuffle)
     control.appendChild(backward)
     control.appendChild(play)
     control.appendChild(forward)
     control.appendChild(repeat)
-    misc.appendChild(control)
+
+    return control;
+  },
+
+  getDom: function(){
+    var m = this.getHTMLElementWithID('div',"SPOTIFY")
+
+    if (this.config.style !== "default") {
+      m.classList.add(this.config.style)
+    }
+    
+    if (this.config.control !== "default") {
+      m.classList.add(this.config.control)
+    }
+
+    m.classList.add("noPlayback")
+    m.appendChild(this.getHTMLElementWithID('div',"SPOTIFY_BACKGROUND"))
+
+    var fore = this.getHTMLElementWithID('div',"SPOTIFY_FOREGROUND")
+    var cover = this.getHTMLElementWithID('div',"SPOTIFY_COVER")
+    var cover_img = this.getHTMLElementWithID('img',"SPOTIFY_COVER_IMAGE")
+
+    cover_img.src = "./modules/MMM-Spotify/resources/spotify-xxl.png"
+    cover.appendChild(cover_img)
+
+    fore.appendChild(cover)
+
+    var misc = this.getHTMLElementWithID('div',"SPOTIFY_MISC")
+    var info = this.getHTMLElementWithID('div',"SPOTIFY_INFO")
+    var title = this.getHTMLElementWithID('div',"SPOTIFY_TITLE")
+
+    title.appendChild(this.getIconContainer(this.getFAIconClass('Title')))
+
+    var tt = document.createElement("span")
+    tt.className = "text"
+    tt.textContent = ""
+    title.appendChild(tt)
+
+    var album = this.getHTMLElementWithID('div', "SPOTIFY_ALBUM")
+    album.appendChild(this.getIconContainer(this.getFAIconClass('Album')))
+
+    var at = document.createElement("span")
+    at.className = "text"
+    at.textContent = ""
+    album.appendChild(at)
+
+    var artist = this.getHTMLElementWithID('div',"SPOTIFY_ARTIST")
+    artist.appendChild(this.getIconContainer(this.getFAIconClass('Artist')))
+
+    var at = document.createElement("span")
+    at.className = "text"
+    at.textContent = ""
+    artist.appendChild(at)
+
+    var progress = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS")
+
+    var currentTime = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_CURRENT")
+    currentTime.innerHTML = "--:--"
+
+    var songTime = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_END")
+    songTime.innerHTML = "--:--"
+
+    var time = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_TIME")
+
+    time.appendChild(currentTime)
+    time.appendChild(songTime)
+    progress.appendChild(time)
+
+    var bar = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_BAR")
+    var barNow = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_BAR_NOW")
+
+    bar.appendChild(barNow)
+    progress.appendChild(bar)
+
+    info.appendChild(title)
+    info.appendChild(album)
+    info.appendChild(artist)
+    info.appendChild(this.getDeviceContainer())
+    misc.appendChild(info)
+    misc.appendChild(progress)
+    misc.appendChild(this.getControlsContainer())
     fore.appendChild(misc)
 
     m.appendChild(fore)
