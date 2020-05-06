@@ -27,7 +27,7 @@ Module.register("MMM-Spotify", {
     */
   },
 
-  getScripts: function() {
+  getScripts: function () {
     r = []
     if (this.config.iconify) {
       r.push(this.config.iconify)
@@ -35,22 +35,22 @@ Module.register("MMM-Spotify", {
     return r
   },
 
-  getStyles: function() {
+  getStyles: function () {
     return ["MMM-Spotify.css", 'font-awesome.css']
   },
 
-  start: function() {
+  start: function () {
     this.currentPlayback = null
   },
 
-  notificationReceived: function(noti, payload, sender) {
+  notificationReceived: function (noti, payload, sender) {
     if (noti === "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.config)
       //console.log(this.config)
       //this.loadExternalScript(this.config.iconify)
       this.onStart()
     }
-    switch(noti) {
+    switch (noti) {
       case "SPOTIFY_SEARCH":
         var pl = {
           query: {
@@ -58,8 +58,8 @@ Module.register("MMM-Spotify", {
             type: payload.type,
           },
           condition: {
-            random:payload.random,
-            autoplay:true,
+            random: payload.random,
+            autoplay: true,
           }
         }
         this.sendSocketNotification("SEARCH_AND_PLAY", pl)
@@ -94,8 +94,8 @@ Module.register("MMM-Spotify", {
     }
   },
 
-  socketNotificationReceived: function(noti, payload) {
-    switch(noti) {
+  socketNotificationReceived: function (noti, payload) {
+    switch (noti) {
       case "INITIALIZED":
         break
       case "CURRENT_PLAYBACK":
@@ -117,17 +117,17 @@ Module.register("MMM-Spotify", {
     }
   },
 
-  onStart: function() {
+  onStart: function () {
     if (!this.config.onStart) return
     this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
-  updateNoPlayback: function() {
+  updateNoPlayback: function () {
     var dom = document.getElementById("SPOTIFY")
     dom.classList.add("inactive")
   },
 
-  updateCurrentPlayback: function(current) {
+  updateCurrentPlayback: function (current) {
     if (!current) return
     if (!this.currentPlayback) {
       this.updateSongInfo(current)
@@ -153,7 +153,7 @@ Module.register("MMM-Spotify", {
       if (this.currentPlayback.shuffle_state !== current.shuffle_state) {
         this.updateShuffle(current)
       }
-      if (this.currentPlayback.progress_ms !== current.progress_ms)  {
+      if (this.currentPlayback.progress_ms !== current.progress_ms) {
         this.updateProgress(current)
       }
     }
@@ -161,7 +161,7 @@ Module.register("MMM-Spotify", {
     this.currentPlayback = current
   },
 
-  updateProgress: function(
+  updateProgress: function (
     current,
     end = document.getElementById("SPOTIFY_PROGRESS_END"),
     curbar = document.getElementById("SPOTIFY_PROGRESS_CURRENT"),
@@ -169,10 +169,10 @@ Module.register("MMM-Spotify", {
   ) {
     var msToTime = (duration) => {
       var ret = ""
-      var milliseconds = parseInt((duration%1000)/100)
-        , seconds = parseInt((duration/1000)%60)
-        , minutes = parseInt((duration/(1000*60))%60)
-        , hours = parseInt((duration/(1000*60*60))%24)
+      var milliseconds = parseInt((duration % 1000) / 100)
+        , seconds = parseInt((duration / 1000) % 60)
+        , minutes = parseInt((duration / (1000 * 60)) % 60)
+        , hours = parseInt((duration / (1000 * 60 * 60)) % 24)
       if (hours > 0) {
         hours = (hours < 10) ? "0" + hours : hours
         ret = ret + hours + ":"
@@ -190,7 +190,7 @@ Module.register("MMM-Spotify", {
     now.style.width = pros + "%"
   },
 
-  updateShuffle: function(newPlayback) {
+  updateShuffle: function (newPlayback) {
     var shuffle = document.getElementById("SPOTIFY_CONTROL_SHUFFLE")
     var si = document.createElement("span")
     si.className = "iconify"
@@ -206,23 +206,23 @@ Module.register("MMM-Spotify", {
     shuffle.appendChild(si)
   },
 
-  updateRepeat: function(newPlayback) {
+  updateRepeat: function (newPlayback) {
     var repeat = document.getElementById("SPOTIFY_CONTROL_REPEAT")
     var ri = document.createElement("span")
     ri.className = "iconify"
     ri.dataset.inline = "false"
     repeat.className = newPlayback.repeat_state
     const ris = {
-      "off" : "mdi:repeat-off",
-      "track" : "mdi:repeat-once",
-      "context" : "mdi:repeat"
+      "off": "mdi:repeat-off",
+      "track": "mdi:repeat-once",
+      "context": "mdi:repeat"
     }
     ri.dataset.icon = ris[newPlayback.repeat_state]
     repeat.innerHTML = ""
     repeat.appendChild(ri)
   },
 
-  updateDevice: function(newPlayback) {
+  updateDevice: function (newPlayback) {
     var device = document.querySelector("#SPOTIFY_DEVICE .text")
     var deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
@@ -232,11 +232,11 @@ Module.register("MMM-Spotify", {
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", newPlayback.device)
   },
 
-  updatePlaying: function(newPlayback) {
+  updatePlaying: function (newPlayback) {
     const s = document.getElementById("SPOTIFY")
     const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
 
-    if(newPlayback.is_playing) {
+    if (newPlayback.is_playing) {
       s.classList.add("playing")
       s.classList.remove("pausing")
       s.classList.remove("inactive")
@@ -248,7 +248,9 @@ Module.register("MMM-Spotify", {
       p.className = "pausing"
     }
 
-    const icon = newPlayback.is_playing ? "mdi:play-circle-outline" : "mdi:pause-circle-outline";
+    const icon = newPlayback.is_playing 
+      ? "mdi:play-circle-outline" 
+      : "mdi:pause-circle-outline";
 
     p.innerHTML = ""
     p.appendChild(
@@ -257,7 +259,7 @@ Module.register("MMM-Spotify", {
     this.sendNotification("SPOTIFY_UPDATE_PLAYING", newPlayback.is_playing)
   },
 
-  updateSongInfo: function(newPlayback) {
+  updateSongInfo: function (newPlayback) {
     if (!newPlayback) return
     if (!newPlayback.item) return
 
@@ -291,7 +293,7 @@ Module.register("MMM-Spotify", {
     this.sendNotification("SPOTIFY_UPDATE_SONG_INFO", newPlayback.item)
   },
 
-  clickPlay: function() {
+  clickPlay: function () {
     if (this.currentPlayback.is_playing) {
       this.sendSocketNotification("PAUSE")
     } else {
@@ -299,7 +301,7 @@ Module.register("MMM-Spotify", {
     }
   },
 
-  clickRepeat: function() {
+  clickRepeat: function () {
     var c = this.currentPlayback.repeat_state
     var n = ""
     if (c === "off") n = "track"
@@ -308,11 +310,11 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("REPEAT", n)
   },
 
-  clickShuffle: function() {
+  clickShuffle: function () {
     this.sendSocketNotification("SHUFFLE", !this.currentPlayback.shuffle_state)
   },
 
-  clickBackward: function() {
+  clickBackward: function () {
     if (this.currentPlayback.progress_ms < 3000) {
       this.sendSocketNotification("PREVIOUS")
     } else {
@@ -320,7 +322,7 @@ Module.register("MMM-Spotify", {
     }
   },
 
-  clickForward: function() {
+  clickForward: function () {
     this.sendSocketNotification("NEXT")
   },
 
@@ -347,7 +349,7 @@ Module.register("MMM-Spotify", {
     return 'iconify ' + this.getFAIcon(iconType);
   },
 
-  getIconContainer(className, id,  icon) {
+  getIconContainer(className, id, icon) {
     const iconContainer = document.createElement("i")
     iconContainer.className = className
     iconContainer.dataset.inline = "false"
@@ -363,43 +365,48 @@ Module.register("MMM-Spotify", {
     return divElement;
   },
 
+  getEmptyTextHTMLElement() {
+    const text = document.createElement("span")
+    text.className = "text"
+    text.textContent = ""
+
+    return text;
+  },
+
   getDeviceContainer() {
-    const device = this.getHTMLElementWithID('div','SPOTIFY_DEVICE')
+    const device = this.getHTMLElementWithID('div', 'SPOTIFY_DEVICE')
     device.appendChild(
       this.getIconContainer(this.getFAIconClass('default'), "SPOTIFY_DEVICE_ICON"),
     )
-    const deviceText = document.createElement("span")
-    deviceText.className = "text"
-    deviceText.textContent = ""
-    device.appendChild(deviceText)
+    device.appendChild(this.getEmptyTextHTMLElement())
 
     return device;
   },
 
   getControlsContainer() {
-    const control = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL")
+    const control = this.getHTMLElementWithID('div', "SPOTIFY_CONTROL")
 
-    const shuffle = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_SHUFFLE")
+    const shuffle = this.getHTMLElementWithID('div', "SPOTIFY_CONTROL_SHUFFLE")
     shuffle.addEventListener("click", () => { this.clickShuffle() })
     shuffle.className = "off"
 
     shuffle.appendChild(this.getIconContainer('iconify', null, 'mdi:shuffle'))
 
-    const repeat = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_REPEAT")
+    const repeat = this.getHTMLElementWithID('div', "SPOTIFY_CONTROL_REPEAT")
     repeat.addEventListener("click", () => { this.clickRepeat() })
     repeat.className = "off"
     repeat.appendChild(this.getIconContainer('iconify', null, 'mdi:repeat-off'))
 
-    const backward = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_BACKWARD")
+    const backward = this.getHTMLElementWithID('div', "SPOTIFY_CONTROL_BACKWARD")
     backward.addEventListener("click", () => { this.clickBackward() })
 
     backward.appendChild(this.getIconContainer('iconify', null, 'mdi:skip-previous'))
 
-    const forward = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_FORWARD")
+    const forward = this.getHTMLElementWithID('div', "SPOTIFY_CONTROL_FORWARD")
     forward.addEventListener("click", () => { this.clickForward() })
     forward.appendChild(this.getIconContainer('iconify', null, 'mdi:skip-next'))
 
-    const play = this.getHTMLElementWithID('div',"SPOTIFY_CONTROL_PLAY")
+    const play = this.getHTMLElementWithID('div', "SPOTIFY_CONTROL_PLAY")
     play.addEventListener("click", () => { this.clickPlay() })
     play.appendChild(
       this.getIconContainer('iconify', "SPOTIFY_CONTROL_PLAY_ICON", 'mdi:play-circle-outline'),
@@ -414,83 +421,78 @@ Module.register("MMM-Spotify", {
     return control;
   },
 
-  getDom: function(){
-    var m = this.getHTMLElementWithID('div',"SPOTIFY")
+  getInfoContainer() {
+    const info = this.getHTMLElementWithID('div', "SPOTIFY_INFO")
+    const title = this.getHTMLElementWithID('div', "SPOTIFY_TITLE")
+
+    title.appendChild(this.getIconContainer(this.getFAIconClass('Title')))
+    title.appendChild(this.getEmptyTextHTMLElement())
+
+    const album = this.getHTMLElementWithID('div', "SPOTIFY_ALBUM")
+    album.appendChild(this.getIconContainer(this.getFAIconClass('Album')))
+    album.appendChild(this.getEmptyTextHTMLElement())
+
+    const artist = this.getHTMLElementWithID('div', "SPOTIFY_ARTIST")
+    artist.appendChild(this.getIconContainer(this.getFAIconClass('Artist')))
+    artist.appendChild(this.getEmptyTextHTMLElement())
+
+    info.appendChild(title)
+    info.appendChild(album)
+    info.appendChild(artist)
+    info.appendChild(this.getDeviceContainer())
+
+    return info;
+  },
+
+  getProgressContainer() {
+    const progress = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS")
+    const currentTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_CURRENT")
+    currentTime.innerHTML = "--:--"
+
+    const songTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_END")
+    songTime.innerHTML = "--:--"
+
+    const time = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_TIME")
+
+    time.appendChild(currentTime)
+    time.appendChild(songTime)
+    progress.appendChild(time)
+
+    const bar = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_BAR")
+
+    bar.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_BAR_NOW"))
+    progress.appendChild(bar)
+    return progress;
+  },
+
+  getDom: function () {
+    var m = this.getHTMLElementWithID('div', "SPOTIFY")
 
     if (this.config.style !== "default") {
       m.classList.add(this.config.style)
     }
-    
+
     if (this.config.control !== "default") {
       m.classList.add(this.config.control)
     }
 
     m.classList.add("noPlayback")
-    m.appendChild(this.getHTMLElementWithID('div',"SPOTIFY_BACKGROUND"))
+    m.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
 
-    var fore = this.getHTMLElementWithID('div',"SPOTIFY_FOREGROUND")
-    var cover = this.getHTMLElementWithID('div',"SPOTIFY_COVER")
-    var cover_img = this.getHTMLElementWithID('img',"SPOTIFY_COVER_IMAGE")
+    var fore = this.getHTMLElementWithID('div', "SPOTIFY_FOREGROUND")
+    var cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
+    var cover_img = this.getHTMLElementWithID('img', "SPOTIFY_COVER_IMAGE")
 
     cover_img.src = "./modules/MMM-Spotify/resources/spotify-xxl.png"
     cover.appendChild(cover_img)
 
     fore.appendChild(cover)
 
-    var misc = this.getHTMLElementWithID('div',"SPOTIFY_MISC")
-    var info = this.getHTMLElementWithID('div',"SPOTIFY_INFO")
-    var title = this.getHTMLElementWithID('div',"SPOTIFY_TITLE")
-
-    title.appendChild(this.getIconContainer(this.getFAIconClass('Title')))
-
-    var tt = document.createElement("span")
-    tt.className = "text"
-    tt.textContent = ""
-    title.appendChild(tt)
-
-    var album = this.getHTMLElementWithID('div', "SPOTIFY_ALBUM")
-    album.appendChild(this.getIconContainer(this.getFAIconClass('Album')))
-
-    var at = document.createElement("span")
-    at.className = "text"
-    at.textContent = ""
-    album.appendChild(at)
-
-    var artist = this.getHTMLElementWithID('div',"SPOTIFY_ARTIST")
-    artist.appendChild(this.getIconContainer(this.getFAIconClass('Artist')))
-
-    var at = document.createElement("span")
-    at.className = "text"
-    at.textContent = ""
-    artist.appendChild(at)
-
-    var progress = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS")
-
-    var currentTime = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_CURRENT")
-    currentTime.innerHTML = "--:--"
-
-    var songTime = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_END")
-    songTime.innerHTML = "--:--"
-
-    var time = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_TIME")
-
-    time.appendChild(currentTime)
-    time.appendChild(songTime)
-    progress.appendChild(time)
-
-    var bar = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_BAR")
-    var barNow = this.getHTMLElementWithID('div',"SPOTIFY_PROGRESS_BAR_NOW")
-
-    bar.appendChild(barNow)
-    progress.appendChild(bar)
-
-    info.appendChild(title)
-    info.appendChild(album)
-    info.appendChild(artist)
-    info.appendChild(this.getDeviceContainer())
-    misc.appendChild(info)
-    misc.appendChild(progress)
+    var misc = this.getHTMLElementWithID('div', "SPOTIFY_MISC")
+    misc.appendChild(this.getInfoContainer())
+    misc.appendChild(this.getProgressContainer())
     misc.appendChild(this.getControlsContainer())
+
     fore.appendChild(misc)
 
     m.appendChild(fore)
