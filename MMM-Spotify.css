@@ -60,6 +60,7 @@
 #SPOTIFY_INFO .iconify {
   width: 20px;
   margin-right:10px;
+  text-shadow:black 2px 2px 2px;
 }
 
 #SPOTIFY_INFO .text {
@@ -71,6 +72,11 @@
 }
 
 #SPOTIFY_TITLE {
+  color:#FFF;
+  font-weight:bold;
+}
+
+#SPOTIFY_ALBUM {
   color:#FFF;
   font-weight:bold;
 }
@@ -115,7 +121,6 @@
 
 }
 
-
 #SPOTIFY_PROGRESS_BAR_NOW {
 	background-color:#FFF;
 	position:absolute;
@@ -123,7 +128,6 @@
 	left:0;
 	height:10px;
 }
-
 
 #SPOTIFY_CONTROL {
   display:flex;
@@ -145,7 +149,7 @@
 
 /* style "mini" */
 #SPOTIFY.mini {
-	var(--sp-width);
+	width: var(--sp-width);
 }
 
 #SPOTIFY.mini #SPOTIFY_FOREGROUND {
