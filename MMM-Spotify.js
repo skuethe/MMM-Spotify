@@ -40,6 +40,7 @@ Module.register("MMM-Spotify", {
 
   start: function() {
     this.currentPlayback = null
+    this.conected = false
   },
 
   notificationReceived: function(noti, payload, sender) {
@@ -98,6 +99,7 @@ Module.register("MMM-Spotify", {
       case "INITIALIZED":
         break
       case "CURRENT_PLAYBACK":
+        this.conected = true
         if (
           (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
@@ -110,6 +112,8 @@ Module.register("MMM-Spotify", {
         break
       case "CURRENT_PLAYBACK_FAIL":
         this.updateNoPlayback()
+        if (this.conected) this.sendNotification("SPOTIFY_DISCONNECTED")
+        this.conected = false
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
