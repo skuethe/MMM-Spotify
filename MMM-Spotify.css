@@ -142,6 +142,12 @@
   background-color:rgba(0,0,0,0.2);
 }
 
+#SPOTIFY_CONTROL .iconify {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* control "hidden" */
 #SPOTIFY.hidden #SPOTIFY_CONTROL{
   display:none;
