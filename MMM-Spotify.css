@@ -76,11 +76,6 @@
   font-weight:bold;
 }
 
-#SPOTIFY_ALBUM {
-  color:#FFF;
-  font-weight:bold;
-}
-
 #SPOTIFY_COVER {
   width: calc(var(--sp-width) - 40px);
   height: calc(var(--sp-width) - 40px);
@@ -155,7 +150,7 @@
 
 /* style "mini" */
 #SPOTIFY.mini {
-	width: var(--sp-width);
+	var(--sp-width);
 }
 
 #SPOTIFY.mini #SPOTIFY_FOREGROUND {
@@ -185,10 +180,6 @@
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
 	display:none;
-}
-
-#SPOTIFY.mini #SPOTIFY_INFO .fas {
-	margin:0;
 }
 
 #SPOTIFY.mini.noPlayback {
