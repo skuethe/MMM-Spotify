@@ -67,7 +67,7 @@ module.exports = NodeHelper.create({
     updateSpotify: function (spotify) {
         return new Promise((resolve, reject) => {
             spotify.getCurrentPlayback((code, error, result) => {
-                if (code !== 200 || typeof result === "undefined") {
+                if (typeof result == "undefined" || code !== 200) {
                     reject();
                 } else {
                     resolve(result);
@@ -78,7 +78,7 @@ module.exports = NodeHelper.create({
 
     updatePulse: function () {
         this.spotify.getCurrentPlayback((code, error, result) => {
-            if (code !== 200 || typeof result == "undefined") {
+            if (typeof result == "undefined" || code !== 200) {
                 this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
                 this.spotify = null;
                 this.findCurrentSpotify();
@@ -120,27 +120,68 @@ module.exports = NodeHelper.create({
                 if (payload.deviceName) this.spotify.transferByName(payload.deviceName)
                 return
             }
-            
-            const allControlNotifications = {
-                "GET_DEVICES": "LIST_DEVICES",
-                "PAUSE": "DONE_PAUSE",
-                "NEXT": "DONE_NEXT",
-                "PREVIOUS": "DONE_PREVIOUS",
-                "VOLUME": "DONE_VOLUME",
-                "TRANSFER": "DONE_TRANSFER",
-                "REPEAT": "DONE_REPEAT",
-                "SHUFFLE": "DONE_SHUFFLE",
-                "REPLAY": "DONE_REPLAY",
-            };
 
-            if (Object.keys(allControlNotifications).includes(noti)) {
-                this.spotify.pause((code, error, result) => {
-                    if ((code !== 204) && (code !== 202)){
-                        //console.log(error)
+            if (noti == "GET_DEVICES") {
+                this.spotify.getDevices((code, error, result) => {
+                    this.sendSocketNotification("LIST_DEVICES", result)
+                })
+            }
+
+            if (noti == "PLAY") {
+                this.spotify.play(payload, (code, error, result) => {
+                    if ((code !== 204) && (code !== 202)) {
+                        console.log(error)
                         return
                     }
-                    this.sendSocketNotification(allControlNotifications[noti], result)
-                    return
+                    this.sendSocketNotification("DONE_PLAY", result)
+                })
+            }
+
+            if (noti == "PAUSE") {
+                this.spotify.pause((code, error, result) => {
+                    this.sendSocketNotification("DONE_PAUSE", result)
+                })
+            }
+
+            if (noti == "NEXT") {
+                this.spotify.next((code, error, result) => {
+                    this.sendSocketNotification("DONE_NEXT", result)
+                })
+            }
+
+            if (noti == "PREVIOUS") {
+                this.spotify.previous((code, error, result) => {
+                    this.sendSocketNotification("DONE_PREVIOUS", result)
+                })
+            }
+
+            if (noti == "VOLUME") {
+                this.spotify.volume(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_VOLUME", result)
+                })
+            }
+
+            if (noti == "TRANSFER") {
+                this.spotify.transferByName(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_TRANSFER", result)
+                })
+            }
+
+            if (noti == "REPEAT") {
+                this.spotify.repeat(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_REPEAT", result)
+                })
+            }
+
+            if (noti == "SHUFFLE") {
+                this.spotify.shuffle(payload, (code, error, result) => {
+                    this.sendSocketNotification("DONE_SHUFFLE", result)
+                })
+            }
+
+            if (noti == "REPLAY") {
+                this.spotify.replay((code, error, result) => {
+                    this.sendSocketNotification("DONE_REPLAY", result)
                 })
             }
         }
