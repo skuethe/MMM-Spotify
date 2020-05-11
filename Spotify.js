@@ -155,7 +155,11 @@ class Spotify {
         }
 
         request.post(authOptions, (error, response, body) => {
-            if (!error && response.statusCode === 200) {
+            if (
+                typeof response != 'undefined' && 
+                !error && 
+                response.statusCode === 200
+            ) {
                 body.refresh_token = this.token.refresh_token
                 this.writeToken(body, cb)
             } else {
@@ -197,10 +201,12 @@ class Spotify {
                     }
                 }
                 if (cb) {
-                    if (typeof response !== 'undefined' && response.statusCode) {
+                    if (typeof response != 'undefined' && response.statusCode) {
                         cb(response.statusCode, error, body)
+                        //console.log(body)
                     } else {
                         //console.log(`[SPOTIFY] Invalid response`)
+                        //console.log(body)
                         cb('400', error, body)
                     }
 
