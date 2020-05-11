@@ -11,6 +11,7 @@ const querystring = require("querystring")
 const opn = require("open")
 const express = require("express")
 const app = express()
+//const isInFlight ;
 
 
 class Spotify {
@@ -51,7 +52,7 @@ class Spotify {
         this.token = token
         var file = path.resolve(__dirname, this.config.TOKEN)
         fs.writeFileSync(file, JSON.stringify(token))
-        console.log("[SPOTIFY_AUTH] Token is written.")
+        //console.log("[SPOTIFY_AUTH] Token is written.")
         if (cb) {
             cb()
         }
@@ -62,19 +63,19 @@ class Spotify {
     }) {
         if (!this.config.CLIENT_ID) {
             let msg = `[SPOTIFY_AUTH] CLIENT_ID doesn't exist.`;
-            console.log(msg);
+            //console.log(msg);
             error(msg);
             return;
         }
 
         if (this.token) {
             let msg = `[SPOTIFY_AUTH] You already have a token. no need to auth.`;
-            console.log(msg);
+            //console.log(msg);
             error(msg);
             return;
         }
 
-        console.log('[SPOTIFY_AUTH] creating server', this.config);
+        //console.log('[SPOTIFY_AUTH] creating server', this.config);
         let server = app.get(this.config.AUTH_PATH, (req, res) => {
             let code = req.query.code || null;
             let authOptions = {
@@ -93,11 +94,11 @@ class Spotify {
             request.post(authOptions, (requestError, response, body) => {
                 if (requestError || response.statusCode !== 200) {
                     let msg = `[SPOTIFY_AUTH] Error in request`;
-                    console.log(msg, requestError, body);
+                    //console.log(msg, requestError, body);
                     error(msg);
                     return;
                 }
-                console.log('Request body', body);
+                //console.log('Request body', body);
                 this.writeToken(body);
                 server.close();
                 res.send(`${this.config.TOKEN} would be created. Check it`);
@@ -115,9 +116,9 @@ class Spotify {
                 show_dialog: true
             });
 
-        console.log('[SPOTIFY_AUTH] Opening URL.(' + url + ')');
+        //console.log('[SPOTIFY_AUTH] Opening URL.(' + url + ')');
         opn(url).catch(() => {
-            console.log('[SPOTIFY_AUTH] Failed to automatically open the URL. Copy/paste this in your browser:\n', url);
+            //console.log('[SPOTIFY_AUTH] Failed to automatically open the URL. Copy/paste this in your browser:\n', url);
         });
     }
 
@@ -126,20 +127,20 @@ class Spotify {
         if (fs.existsSync(file)) {
             this.token = JSON.parse(fs.readFileSync(file))
             if (this.isExpired()) {
-                console.log("[SPOTIFY_AUTH] Token is expired. It will be refreshed")
+                //console.log("[SPOTIFY_AUTH] Token is expired. It will be refreshed")
                 this.refreshToken()
             } else {
-                console.log("[SPOTIFY_AUTH] Token is fresh.")
+                //console.log("[SPOTIFY_AUTH] Token is fresh.")
             }
         }
     }
 
     isExpired() {
-        return (Date.now() > this.token.expires_at);
+        return (Date.now() >= this.token.expires_at);
     }
 
     refreshToken(cb = null) {
-        console.log("[SPOTIFY_AUTH] Token refreshing...")
+        //console.log("[SPOTIFY_AUTH] Token refreshing...")
         var refresh_token = this.token.refresh_token
         var authOptions = {
             url: 'https://accounts.spotify.com/api/token',
@@ -158,8 +159,8 @@ class Spotify {
                 body.refresh_token = this.token.refresh_token
                 this.writeToken(body, cb)
             } else {
-                console.log("[SPOTIFY_AUTH] Token refreshing failed.")
-                console.log(error, body)
+                //console.log("[SPOTIFY_AUTH] Token refreshing failed.")
+                //console.log(error, body)
             }
         })
     }
@@ -188,18 +189,18 @@ class Spotify {
         var req = () => {
             request(authOptions, (error, response, body) => {
                 if (error) {
-                    console.log(`[SPOTIFY] API Request fail on :`, api)
-                    console.log(error, body)
+                    //console.log(`[SPOTIFY] API Request fail on :`, api)
+                    //console.log(error, body)
                 } else {
                     if (api !== "/v1/me/player" && type !== "GET") {
                         //console.log(`[SPOTIFY] API Requested:`, api)
                     }
                 }
                 if (cb) {
-                    if (response.statusCode) {
+                    if (response && response.statusCode) {
                         cb(response.statusCode, error, body)
                     } else {
-                        console.log(`[SPOTIFY] Invalid response`)
+                        //console.log(`[SPOTIFY] Invalid response`)
                         cb('400', error, body)
                     }
 
@@ -232,7 +233,7 @@ class Spotify {
 
     next(cb) {
         this.doRequest("/v1/me/player/next", "POST", null, null, (code, error, body) => {
-            this.doRequest("/v1/me/player/seek", "PUT", {position_ms: 0}, null, cb)
+            this.doRequest("/v1/me/player/seek", "PUT", { position_ms: 0 }, null, cb)
         })
 
     }
@@ -243,7 +244,7 @@ class Spotify {
           this.doRequest("/v1/me/player/seek", "PUT", null, {position_ms:0}, cb)
         })
         */
-        this.doRequest("/v1/me/player/seek", "PUT", {position_ms: 0}, null, (code, error, body) => {
+        this.doRequest("/v1/me/player/seek", "PUT", { position_ms: 0 }, null, (code, error, body) => {
             this.doRequest("/v1/me/player/previous", "POST", null, null, cb)
         })
     }
@@ -263,10 +264,10 @@ class Spotify {
     transferByName(device_name, cb) {
         this.getDevices((code, error, result) => {
             if (code == 200) {
-                var devices = result.devices
-                for (var i = 0; i < devices.length; i++) {
+                let devices = result.devices
+                for (let i = 0; i < devices.length; i++) {
                     if (devices[i].name == device_name) {
-                        this.transfer({device_ids: [devices[i].id]}, cb)
+                        this.transfer({ device_ids: [devices[i].id] }, cb)
                         return
                     }
                 }
@@ -277,19 +278,19 @@ class Spotify {
     }
 
     volume(volume = 50, cb) {
-        this.doRequest("/v1/me/player/volume", "PUT", {volume_percent: volume}, null, cb)
+        this.doRequest("/v1/me/player/volume", "PUT", { volume_percent: volume }, null, cb)
     }
 
     repeat(state, cb) {
-        this.doRequest("/v1/me/player/repeat", "PUT", {state: state}, null, cb)
+        this.doRequest("/v1/me/player/repeat", "PUT", { state: state }, null, cb)
     }
 
     shuffle(state, cb) {
-        this.doRequest("/v1/me/player/shuffle", "PUT", {state: state}, null, cb)
+        this.doRequest("/v1/me/player/shuffle", "PUT", { state: state }, null, cb)
     }
 
     replay(cb) {
-        this.doRequest("/v1/me/player/seek", "PUT", {position_ms: 0}, null, cb)
+        this.doRequest("/v1/me/player/seek", "PUT", { position_ms: 0 }, null, cb)
     }
 }
 
