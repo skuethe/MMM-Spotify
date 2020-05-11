@@ -102,13 +102,11 @@ module.exports = NodeHelper.create({
             if (noti == "ONSTART") {
                 payload.position_ms = 0
                 if (payload.search) {
-                    // was var
-                    const param = {
+                    var param = {
                         q: payload.search.keyword,
                         type: payload.search.type,
                     }
-                    // was var
-                    const condition = {
+                    var condition = {
                         random: payload.search.random,
                         autoplay: true,
                     }
