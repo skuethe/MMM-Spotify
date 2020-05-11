@@ -233,10 +233,10 @@ Module.register("MMM-Spotify", {
   },
 
   updateDevice: function (device) {
-    var device = document.querySelector("#SPOTIFY_DEVICE .text")
-    var deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
+    const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
+    const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
-    device.textContent = 'Listening on ' + device.name
+    deviceContainer.textContent = 'Listening on ' + device.name
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
