@@ -353,7 +353,6 @@ Module.register("MMM-Spotify", {
       case 'CastAudio':
       case 'Speaker':
         return 'fa fa-headphones fa-sm';
-      // check why not working // return 'fab fa-chromecast fa-sm';
       case 'Automobile':
         return 'fas fa-car fa-sm';
       case 'Smartphone':
