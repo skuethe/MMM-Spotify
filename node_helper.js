@@ -38,7 +38,7 @@ module.exports = NodeHelper.create({
         this.config = config
         // this.updatePulse()
         this.findCurrentSpotify().then(r => {
-            console.log('[MMM-Spotify] Starting');
+            //console.log('[MMM-Spotify] Starting');
         });
     },
 
@@ -95,6 +95,7 @@ module.exports = NodeHelper.create({
         if (noti == "INIT") {
             this.initAfterLoading(payload)
             this.sendSocketNotification("INITIALIZED")
+            return
         }
 
         if(this.spotify){
@@ -117,75 +118,36 @@ module.exports = NodeHelper.create({
                     this.spotify.play({context_uri: payload.spotifyUri})
                 }
                 if (payload.deviceName) this.spotify.transferByName(payload.deviceName)
+                return
             }
+            
+            const allControlNotifications = {
+                "GET_DEVICES": "LIST_DEVICES",
+                "PAUSE": "DONE_PAUSE",
+                "NEXT": "DONE_NEXT",
+                "PREVIOUS": "DONE_PREVIOUS",
+                "VOLUME": "DONE_VOLUME",
+                "TRANSFER": "DONE_TRANSFER",
+                "REPEAT": "DONE_REPEAT",
+                "SHUFFLE": "DONE_SHUFFLE",
+                "REPLAY": "DONE_REPLAY",
+            };
 
-            if (noti == "GET_DEVICES") {
-                this.spotify.getDevices((code, error, result) => {
-                    this.sendSocketNotification("LIST_DEVICES", result)
-                })
-            }
-
-            if (noti == "PLAY") {
-                this.spotify.play(payload, (code, error, result) => {
+            if (Object.keys(allControlNotifications).includes(noti)) {
+                this.spotify.pause((code, error, result) => {
                     if ((code !== 204) && (code !== 202)){
-                        console.log(error)
+                        //console.log(error)
                         return
                     }
-                    this.sendSocketNotification("DONE_PLAY", result)
-                })
-            }
-
-            if (noti == "PAUSE") {
-                this.spotify.pause((code, error, result) => {
-                    this.sendSocketNotification("DONE_PAUSE", result)
-                })
-            }
-
-            if (noti == "NEXT") {
-                this.spotify.next((code, error, result) => {
-                    this.sendSocketNotification("DONE_NEXT", result)
-                })
-            }
-
-            if (noti == "PREVIOUS") {
-                this.spotify.previous((code, error, result) => {
-                    this.sendSocketNotification("DONE_PREVIOUS", result)
-                })
-            }
-
-            if (noti == "VOLUME") {
-                this.spotify.volume(payload, (code, error, result) => {
-                    this.sendSocketNotification("DONE_VOLUME", result)
-                })
-            }
-
-            if (noti == "TRANSFER") {
-                this.spotify.transferByName(payload, (code, error, result) => {
-                    this.sendSocketNotification("DONE_TRANSFER", result)
-                })
-            }
-    
-            if (noti == "REPEAT") {
-                this.spotify.repeat(payload, (code, error, result) => {
-                    this.sendSocketNotification("DONE_REPEAT", result)
-                })
-            }
-    
-            if (noti == "SHUFFLE") {
-                this.spotify.shuffle(payload, (code, error, result) => {
-                    this.sendSocketNotification("DONE_SHUFFLE", result)
-                })
-            }
-    
-            if (noti == "REPLAY") {
-                this.spotify.replay((code, error, result) => {
-                    this.sendSocketNotification("DONE_REPLAY", result)
+                    this.sendSocketNotification(allControlNotifications[noti], result)
+                    return
                 })
             }
         }
 
         if (noti == "SEARCH_AND_PLAY") {
             this.searchAndPlay(payload.query, payload.condition)
+            return
         }
         
     },
@@ -208,7 +170,7 @@ module.exports = NodeHelper.create({
                 ret[retType] = (retType == "uris") ? [r.uri] : r.uri
                 return ret
             } else {
-                console.log("[SPOTIFY] Unplayable item: ", r)
+                //console.log("[SPOTIFY] Unplayable item: ", r)
                 return false
             }
         }
@@ -244,7 +206,7 @@ module.exports = NodeHelper.create({
                     this.sendSocketNotification("DONE_SEARCH_NOTHING")
                 }
             } else { //when fail
-                console.log(code, error, result)
+                //console.log(code, error, result)
                 this.sendSocketNotification("DONE_SEARCH_ERROR")
             }
         })
