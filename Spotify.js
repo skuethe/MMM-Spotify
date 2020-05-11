@@ -197,7 +197,7 @@ class Spotify {
                     }
                 }
                 if (cb) {
-                    if (response && response.statusCode) {
+                    if (typeof response !== 'undefined' && response.statusCode) {
                         cb(response.statusCode, error, body)
                     } else {
                         //console.log(`[SPOTIFY] Invalid response`)
