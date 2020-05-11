@@ -137,7 +137,6 @@ module.exports = NodeHelper.create({
                 this.spotify.pause((code, error, result) => {
                     if ((code !== 204) && (code !== 202)){
                         //console.log(error)
-                        return
                     }
                     this.sendSocketNotification(allControlNotifications[noti], result)
                     return
