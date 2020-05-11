@@ -1,6 +1,8 @@
 //
 // Module : MMM-Spotify
 //
+var conected;
+var currentPlayback;
 
 Module.register("MMM-Spotify", {
   defaults: {
@@ -134,40 +136,39 @@ Module.register("MMM-Spotify", {
   updateCurrentPlayback: function (current) {
     if (!current) return
     if (!this.currentPlayback) {
-      this.updateSongInfo(current)
-      this.updatePlaying(current)
-      this.updateDevice(current)
-      this.updateShuffle(current)
-      this.updateRepeat(current)
-      this.updateProgress(current)
+      this.updateSongInfo(current.item)
+      this.updatePlaying(current.is_playing)
+      this.updateDevice(current.device)
+      this.updateShuffle(current.shuffle_state)
+      this.updateRepeat(current.repeat_state)
+      this.updateProgress(current.progress_ms, current.item.duration_ms)
     } else {
       if (this.currentPlayback.is_playing !== current.is_playing) {
-        this.updateSongInfo(current)
-        this.updatePlaying(current)
+        this.updatePlaying(current.is_playing)
       }
       if (this.currentPlayback.item.id !== current.item.id) {
-        this.updateSongInfo(current)
+        this.updateSongInfo(current.item)
       }
       if (this.currentPlayback.device.id !== current.device.id) {
-        this.updateDevice(current)
+        this.updateDevice(current.device)
       }
       if (this.currentPlayback.repeat_state !== current.repeat_state) {
-        this.updateRepeat(current)
+        this.updateRepeat(current.repeat_state)
       }
       if (this.currentPlayback.shuffle_state !== current.shuffle_state) {
-        this.updateShuffle(current)
+        this.updateShuffle(current.shuffle_state)
       }
       if (this.currentPlayback.progress_ms !== current.progress_ms) {
-        this.updateProgress(current)
+        this.updateProgress(current.progress_ms, current.item.duration_ms)
       }
     }
 
     this.currentPlayback = current
   },
 
-  msToTime(duration){
-    var ret = ""
-    var seconds = parseInt((duration / 1000) % 60)
+  msToTime(duration) {
+    let ret = ""
+    let seconds = parseInt((duration / 1000) % 60)
       , minutes = parseInt((duration / (1000 * 60)) % 60)
       , hours = parseInt((duration / (1000 * 60 * 60)) % 24)
     if (hours > 0) {
@@ -179,71 +180,73 @@ Module.register("MMM-Spotify", {
     return ret + minutes + ":" + seconds
   },
 
+
   updateProgress: function (
-    current,
+    progressMS,
+    durationMS,
     end = document.getElementById("SPOTIFY_PROGRESS_END"),
     curbar = document.getElementById("SPOTIFY_PROGRESS_CURRENT"),
     now = document.getElementById("SPOTIFY_PROGRESS_BAR_NOW")
   ) {
-    var songDur = current.item.duration_ms
-    var cur = current.progress_ms
-    var pros = (cur / songDur) * 100
+    var pros = (progressMS / durationMS) * 100
 
-    end.innerHTML = this.msToTime(songDur)
-    curbar.innerHTML = this.msToTime(cur)
+    curbar.innerHTML = this.msToTime(progressMS)
     now.style.width = pros + "%"
-  },
 
-  updateShuffle: function (newPlayback) {
-    if (this.config.control === "hidden") return;
-
-    var shuffle = document.getElementById("SPOTIFY_CONTROL_SHUFFLE")
-    var si = document.createElement("span")
-    si.className = "iconify"
-    if (newPlayback.shuffle_state) {
-      shuffle.className = "on"
-      si.dataset.icon = "mdi:shuffle"
-    } else {
-      shuffle.className = "off"
-      si.dataset.icon = "mdi:shuffle-disabled"
+    if (end.innerHTML != this.msToTime(durationMS)) {
+      end.innerHTML = this.msToTime(durationMS)
     }
-    shuffle.innerHTML = ""
-    shuffle.appendChild(si)
   },
 
-  updateRepeat: function (newPlayback) {
+  updateShuffle: function (shuffleState) {
     if (this.config.control === "hidden") return;
 
-    var repeat = document.getElementById("SPOTIFY_CONTROL_REPEAT")
-    var ri = document.createElement("span")
-    ri.className = "iconify"
-    ri.dataset.inline = "false"
-    repeat.className = newPlayback.repeat_state
+    const shuffle = document.getElementById("SPOTIFY_CONTROL_SHUFFLE")
+    shuffle.className = shuffleState
+      ? "on"
+      : "off"
+
+    const icon = shuffleState
+      ? "mdi:shuffle"
+      : "mdi:shuffle-disabled";
+    
+    shuffle.innerHTML = ""
+    shuffle.appendChild(
+      this.getIconContainer('iconify', "SPOTIFY_CONTROL_SHUFFLE_ICON", icon),
+    )
+  },
+
+  updateRepeat: function (repeatState) {
+    if (this.config.control === "hidden") return;
+
+    const repeat = document.getElementById("SPOTIFY_CONTROL_REPEAT")
+    repeat.className = repeatState
     const ris = {
       "off": "mdi:repeat-off",
       "track": "mdi:repeat-once",
       "context": "mdi:repeat"
     }
-    ri.dataset.icon = ris[newPlayback.repeat_state]
     repeat.innerHTML = ""
-    repeat.appendChild(ri)
+    repeat.appendChild(
+      this.getIconContainer('iconify', null, ris[repeatState]),
+    )
   },
 
-  updateDevice: function (newPlayback) {
-    var device = document.querySelector("#SPOTIFY_DEVICE .text")
-    var deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
+  updateDevice: function (device) {
+    const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
+    const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
-    device.textContent = 'Listening on ' + newPlayback.device.name
-    deviceIcon.className = this.getFAIconClass(newPlayback.device.type)
+    deviceContainer.textContent = 'Listening on ' + device.name
+    deviceIcon.className = this.getFAIconClass(device.type)
 
-    this.sendNotification("SPOTIFY_UPDATE_DEVICE", newPlayback.device)
+    this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
 
-  updatePlaying: function (newPlayback) {
+  updatePlaying: function (isPlaying) {
     const s = document.getElementById("SPOTIFY")
     s.classList.remove("inactive")
 
-    if (newPlayback.is_playing) {
+    if (isPlaying) {
       s.classList.add("playing")
       s.classList.remove("pausing")
     } else {
@@ -253,8 +256,8 @@ Module.register("MMM-Spotify", {
 
     if (this.config.control !== "hidden") {
       const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
-      p.className = newPlayback.is_playing ? "playing" : "pausing"
-      const icon = newPlayback.is_playing
+      p.className = isPlaying ? "playing" : "pausing"
+      const icon = isPlaying
         ? "mdi:play-circle-outline"
         : "mdi:pause-circle-outline";
 
@@ -264,33 +267,32 @@ Module.register("MMM-Spotify", {
       )
     }
 
-    this.sendNotification("SPOTIFY_UPDATE_PLAYING", newPlayback.is_playing)
+    this.sendNotification("SPOTIFY_UPDATE_PLAYING", isPlaying)
   },
 
-  updateSongInfo: function (newPlayback) {
-    if (!newPlayback) return
-    if (!newPlayback.item) return
+  updateSongInfo: function (playbackItem) {
+    if (!playbackItem) return
 
-    var sDom = document.getElementById("SPOTIFY")
+    const sDom = document.getElementById("SPOTIFY")
     sDom.classList.remove("noPlayback")
 
-    var cover_img = document.getElementById("SPOTIFY_COVER_IMAGE")
-    cover_img.src = newPlayback.item.album.images[0].url
+    const cover_img = document.getElementById("SPOTIFY_COVER_IMAGE")
+    cover_img.src = playbackItem.album.images[0].url
 
-    var back = document.getElementById("SPOTIFY_BACKGROUND")
-    back.style.backgroundImage = `url(${newPlayback.item.album.images[0].url})`
+    const back = document.getElementById("SPOTIFY_BACKGROUND")
+    back.style.backgroundImage = `url(${playbackItem.album.images[0].url})`
 
-    var title = document.querySelector("#SPOTIFY_TITLE .text")
-    title.textContent = newPlayback.item.name
+    const title = document.querySelector("#SPOTIFY_TITLE .text")
+    title.textContent = playbackItem.name
 
-    var album = document.querySelector("#SPOTIFY_ALBUM .text")
-    album.textContent = newPlayback.item.album.name
+    const album = document.querySelector("#SPOTIFY_ALBUM .text")
+    album.textContent = playbackItem.album.name
 
-    var artist = document.querySelector("#SPOTIFY_ARTIST .text")
-    var artists = newPlayback.item.artists
-    var artistName = ""
+    const artist = document.querySelector("#SPOTIFY_ARTIST .text")
+    const artists = playbackItem.artists
+    let artistName = ""
 
-    for (var x = 0; x < artists.length; x++) {
+    for (let x = 0; x < artists.length; x++) {
       if (!artistName) {
         artistName = artists[x].name
       } else {
@@ -298,7 +300,7 @@ Module.register("MMM-Spotify", {
       }
     }
     artist.textContent = artistName
-    this.sendNotification("SPOTIFY_UPDATE_SONG_INFO", newPlayback.item)
+    this.sendNotification("SPOTIFY_UPDATE_SONG_INFO", playbackItem)
   },
 
   clickPlay: function () {
@@ -338,19 +340,34 @@ Module.register("MMM-Spotify", {
         return 'fa fa-user fa-sm';
       case 'Album':
         return 'fa fa-folder fa-sm';
+      // Device Icons
+      case 'Tablet':
+        return 'fas fa-tablet fa-sm';
+      case 'GameConsole':
+        return 'fas fa-gamepad fa-sm';
+      case 'AVR':
+      case 'STB':
+      case 'AudioDongle':
+      case 'CastVideo':
+      case 'CastAudio':
       case 'Speaker':
         return 'fa fa-headphones fa-sm';
+      case 'Automobile':
+        return 'fas fa-car fa-sm';
       case 'Smartphone':
         return 'fas fa-mobile fa-sm';
       case 'TV':
         return 'fas fa-tv fa-sm';
-      default:
+      case 'Unknown':
+      case 'Computer':
         return 'fa fa-desktop fa-sm';
+      default:
+        return 'fa fa-headphones fa-sm';
     }
   },
 
   getFAIconClass(iconType) {
-    return 'iconify ' + this.getFAIcon(iconType);
+    return 'infoicon ' + this.getFAIcon(iconType);
   },
 
   getIconContainer(className, id, icon) {
@@ -391,7 +408,7 @@ Module.register("MMM-Spotify", {
     const button = this.getHTMLElementWithID('div', id)
     button.className = "off"
     button.addEventListener("click", action)
-    button.appendChild(this.getIconContainer('iconify', null, icon))
+    button.appendChild(this.getIconContainer('iconify', id + "_ICON", icon))
 
     return button;
   },
