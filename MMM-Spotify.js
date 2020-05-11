@@ -1,6 +1,8 @@
 //
 // Module : MMM-Spotify
 //
+var conected;
+var currentPlayback;
 
 Module.register("MMM-Spotify", {
   defaults: {
@@ -139,10 +141,9 @@ Module.register("MMM-Spotify", {
       this.updateDevice(current)
       this.updateShuffle(current)
       this.updateRepeat(current)
-      this.updateProgress(current)
+      this.updateProgress(current.progress_ms, current.item.duration_ms)
     } else {
       if (this.currentPlayback.is_playing !== current.is_playing) {
-        this.updateSongInfo(current)
         this.updatePlaying(current)
       }
       if (this.currentPlayback.item.id !== current.item.id) {
@@ -158,7 +159,7 @@ Module.register("MMM-Spotify", {
         this.updateShuffle(current)
       }
       if (this.currentPlayback.progress_ms !== current.progress_ms) {
-        this.updateProgress(current)
+        this.updateProgress(current.progress_ms, current.item.duration_ms)
       }
     }
 
@@ -180,18 +181,20 @@ Module.register("MMM-Spotify", {
   },
 
   updateProgress: function (
-    current,
+    progressMS,
+    durationMS,
     end = document.getElementById("SPOTIFY_PROGRESS_END"),
     curbar = document.getElementById("SPOTIFY_PROGRESS_CURRENT"),
     now = document.getElementById("SPOTIFY_PROGRESS_BAR_NOW")
   ) {
-    var songDur = current.item.duration_ms
-    var cur = current.progress_ms
-    var pros = (cur / songDur) * 100
+    var pros = (progressMS / durationMS) * 100
 
-    end.innerHTML = this.msToTime(songDur)
-    curbar.innerHTML = this.msToTime(cur)
+    curbar.innerHTML = this.msToTime(progressMS)
     now.style.width = pros + "%"
+
+    if (end.innerHTML != this.msToTime(durationMS)) {
+      end.innerHTML = this.msToTime(durationMS)
+    }
   },
 
   updateShuffle: function (newPlayback) {
@@ -338,14 +341,30 @@ Module.register("MMM-Spotify", {
         return 'fa fa-user fa-sm';
       case 'Album':
         return 'fa fa-folder fa-sm';
+      // Device Icons
+      case 'Tablet':
+        return 'fas fa-tablet fa-sm';
+      case 'GameConsole':
+        return 'fas fa-gamepad fa-sm';
+      case 'AVR':
+      case 'STB':
+      case 'AudioDongle':
+      case 'CastVideo':
+      case 'CastAudio':
       case 'Speaker':
         return 'fa fa-headphones fa-sm';
+      // check why not working // return 'fab fa-chromecast fa-sm';
+      case 'Automobile':
+        return 'fas fa-car fa-sm';
       case 'Smartphone':
         return 'fas fa-mobile fa-sm';
       case 'TV':
         return 'fas fa-tv fa-sm';
-      default:
+      case 'Unknown':
+      case 'Computer':
         return 'fa fa-desktop fa-sm';
+      default:
+        return 'fa fa-headphones fa-sm';
     }
   },
 
