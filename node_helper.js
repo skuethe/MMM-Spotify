@@ -36,7 +36,6 @@ module.exports = NodeHelper.create({
 
     initAfterLoading: function (config) {
         this.config = config
-        // this.updatePulse()
         this.findCurrentSpotify().then(r => {
             //console.log('[MMM-Spotify] Starting');
         });
@@ -44,11 +43,11 @@ module.exports = NodeHelper.create({
 
     findCurrentSpotify: async function () {
         let playing = false;
-        for (const spotify of this.spotifies) {
+        for (let spotify of this.spotifies) {
+            this.spotify = spotify;
+            playing = true;
             try {
                 let result = await this.updateSpotify(spotify);
-                this.spotify = spotify;
-                playing = true;
                 this.sendSocketNotification("CURRENT_PLAYBACK", result);
             } catch (e) {
                 // console.log('This spotify is not playing:', spotify.config.USERNAME)
@@ -77,11 +76,14 @@ module.exports = NodeHelper.create({
     },
 
     updatePulse: function () {
+        if (this.spotify == null) {
+            this.findCurrentSpotify()
+        }
         this.spotify.getCurrentPlayback((code, error, result) => {
             if (result === "undefined" || code !== 200) {
-                this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
                 this.spotify = null;
                 this.findCurrentSpotify();
+                this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
             } else {
                 this.sendSocketNotification("CURRENT_PLAYBACK", result);
                 setTimeout(() => {
@@ -190,7 +192,6 @@ module.exports = NodeHelper.create({
             this.searchAndPlay(payload.query, payload.condition)
             return
         }
-        
     },
 
     searchAndPlay: function (param, condition) {
@@ -205,8 +206,10 @@ module.exports = NodeHelper.create({
 
         var pickup = (items, random, retType) => {
             var ret = {}
-            var r = null
-            r = (random) ? items[Math.floor(Math.random() * items.length)] : items[0]
+            var r = (random) 
+                ? items[Math.floor(Math.random() * items.length)] 
+                : items[0]
+
             if (r.uri) {
                 ret[retType] = (retType == "uris") ? [r.uri] : r.uri
                 return ret
