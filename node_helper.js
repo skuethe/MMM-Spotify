@@ -36,19 +36,18 @@ module.exports = NodeHelper.create({
 
     initAfterLoading: function (config) {
         this.config = config
-        // this.updatePulse()
         this.findCurrentSpotify().then(r => {
-            console.log('[MMM-Spotify] Starting');
+            //console.log('[MMM-Spotify] Starting');
         });
     },
 
     findCurrentSpotify: async function () {
         let playing = false;
-        for (const spotify of this.spotifies) {
+        for (let spotify of this.spotifies) {
+            this.spotify = spotify;
+            playing = true;
             try {
                 let result = await this.updateSpotify(spotify);
-                this.spotify = spotify;
-                playing = true;
                 this.sendSocketNotification("CURRENT_PLAYBACK", result);
             } catch (e) {
                 // console.log('This spotify is not playing:', spotify.config.USERNAME)
@@ -67,7 +66,7 @@ module.exports = NodeHelper.create({
     updateSpotify: function (spotify) {
         return new Promise((resolve, reject) => {
             spotify.getCurrentPlayback((code, error, result) => {
-                if (code !== 200 || typeof result === "undefined") {
+                if (result === "undefined" || code !== 200) {
                     reject();
                 } else {
                     resolve(result);
@@ -77,11 +76,15 @@ module.exports = NodeHelper.create({
     },
 
     updatePulse: function () {
+        if (this.spotify == null) {
+            this.findCurrentSpotify()
+            return
+        }
         this.spotify.getCurrentPlayback((code, error, result) => {
-            if (code !== 200 || typeof result == "undefined") {
-                this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
+            if (result === "undefined" || code !== 200) {
                 this.spotify = null;
                 this.findCurrentSpotify();
+                this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
             } else {
                 this.sendSocketNotification("CURRENT_PLAYBACK", result);
                 setTimeout(() => {
@@ -95,6 +98,7 @@ module.exports = NodeHelper.create({
         if (noti == "INIT") {
             this.initAfterLoading(payload)
             this.sendSocketNotification("INITIALIZED")
+            return
         }
 
         if(this.spotify){
@@ -117,6 +121,7 @@ module.exports = NodeHelper.create({
                     this.spotify.play({context_uri: payload.spotifyUri})
                 }
                 if (payload.deviceName) this.spotify.transferByName(payload.deviceName)
+                return
             }
 
             if (noti == "GET_DEVICES") {
@@ -127,8 +132,8 @@ module.exports = NodeHelper.create({
 
             if (noti == "PLAY") {
                 this.spotify.play(payload, (code, error, result) => {
-                    if ((code !== 204) && (code !== 202)){
-                        console.log(error)
+                    if ((code !== 204) && (code !== 202)) {
+                        //console.log(error)
                         return
                     }
                     this.sendSocketNotification("DONE_PLAY", result)
@@ -164,19 +169,19 @@ module.exports = NodeHelper.create({
                     this.sendSocketNotification("DONE_TRANSFER", result)
                 })
             }
-    
+
             if (noti == "REPEAT") {
                 this.spotify.repeat(payload, (code, error, result) => {
                     this.sendSocketNotification("DONE_REPEAT", result)
                 })
             }
-    
+
             if (noti == "SHUFFLE") {
                 this.spotify.shuffle(payload, (code, error, result) => {
                     this.sendSocketNotification("DONE_SHUFFLE", result)
                 })
             }
-    
+
             if (noti == "REPLAY") {
                 this.spotify.replay((code, error, result) => {
                     this.sendSocketNotification("DONE_REPLAY", result)
@@ -186,11 +191,16 @@ module.exports = NodeHelper.create({
 
         if (noti == "SEARCH_AND_PLAY") {
             this.searchAndPlay(payload.query, payload.condition)
+            return
         }
-        
     },
 
     searchAndPlay: function (param, condition) {
+        if (this.spotify == null) {
+            this.findCurrentSpotify()
+            return
+        }
+
         if (!param.type) {
             param.type = "artist,track,album,playlist"
         } else {
@@ -202,13 +212,15 @@ module.exports = NodeHelper.create({
 
         var pickup = (items, random, retType) => {
             var ret = {}
-            var r = null
-            r = (random) ? items[Math.floor(Math.random() * items.length)] : items[0]
+            var r = (random) 
+                ? items[Math.floor(Math.random() * items.length)] 
+                : items[0]
+
             if (r.uri) {
                 ret[retType] = (retType == "uris") ? [r.uri] : r.uri
                 return ret
             } else {
-                console.log("[SPOTIFY] Unplayable item: ", r)
+                //console.log("[SPOTIFY] Unplayable item: ", r)
                 return false
             }
         }
@@ -244,7 +256,7 @@ module.exports = NodeHelper.create({
                     this.sendSocketNotification("DONE_SEARCH_NOTHING")
                 }
             } else { //when fail
-                console.log(code, error, result)
+                //console.log(code, error, result)
                 this.sendSocketNotification("DONE_SEARCH_ERROR")
             }
         })
