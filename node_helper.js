@@ -78,6 +78,7 @@ module.exports = NodeHelper.create({
     updatePulse: function () {
         if (this.spotify == null) {
             this.findCurrentSpotify()
+            return
         }
         this.spotify.getCurrentPlayback((code, error, result) => {
             if (result === "undefined" || code !== 200) {
@@ -132,7 +133,7 @@ module.exports = NodeHelper.create({
             if (noti == "PLAY") {
                 this.spotify.play(payload, (code, error, result) => {
                     if ((code !== 204) && (code !== 202)) {
-                        console.log(error)
+                        //console.log(error)
                         return
                     }
                     this.sendSocketNotification("DONE_PLAY", result)
@@ -195,6 +196,11 @@ module.exports = NodeHelper.create({
     },
 
     searchAndPlay: function (param, condition) {
+        if (this.spotify == null) {
+            this.findCurrentSpotify()
+            return
+        }
+
         if (!param.type) {
             param.type = "artist,track,album,playlist"
         } else {
