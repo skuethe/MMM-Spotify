@@ -24,18 +24,18 @@ module.exports = NodeHelper.create({
         this.spotifyConfigurations = []; // Configuration from spotify.config.json file.
         this.spotify = null;
         this.spotifies = [];
+    },
+
+    initAfterLoading: function (config) {
+        this.config = config
         let file = path.resolve(__dirname, "spotify.config.json");
         if (fs.existsSync(file)) {
             let parsedConfigurations = JSON.parse(fs.readFileSync(file));
             this.spotifyConfigurations = updateOldSingleSpotifyConfigurationToNewMultipleSpotifyConfiguration(parsedConfigurations);
             this.spotifyConfigurations.forEach(configuration => {
-                this.spotifies.push(new Spotify(configuration));
+                this.spotifies.push(new Spotify(configuration, this.config.debug));
             });
         }
-    },
-
-    initAfterLoading: function (config) {
-        this.config = config
         this.findCurrentSpotify().then(r => {
             //console.log('[MMM-Spotify] Starting');
         });
@@ -54,7 +54,7 @@ module.exports = NodeHelper.create({
             }
         }
         if (!playing) {
-            this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
+            this.sendSocketNotification("CURRENT_PLAYBACK_FAIL");
             setTimeout(() => {
                 this.findCurrentSpotify();
             }, this.config.updateInterval);
@@ -84,7 +84,7 @@ module.exports = NodeHelper.create({
             if (result === "undefined" || code !== 200) {
                 this.spotify = null;
                 this.findCurrentSpotify();
-                this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
+                this.sendSocketNotification("CURRENT_PLAYBACK_FAIL");
             } else {
                 this.sendSocketNotification("CURRENT_PLAYBACK", result);
                 setTimeout(() => {

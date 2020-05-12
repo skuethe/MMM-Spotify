@@ -1,11 +1,10 @@
 //
 // Module : MMM-Spotify
 //
-var conected;
-var currentPlayback;
 
 Module.register("MMM-Spotify", {
   defaults: {
+    debug: false,
     style: "default", // "default", "mini" available.
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
@@ -43,7 +42,7 @@ Module.register("MMM-Spotify", {
 
   start: function () {
     this.currentPlayback = null
-    this.conected = false
+    this.disconnected = false
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -102,7 +101,7 @@ Module.register("MMM-Spotify", {
       case "INITIALIZED":
         break
       case "CURRENT_PLAYBACK":
-        this.conected = true
+        this.disconnected = false
         if (
           (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
@@ -115,8 +114,7 @@ Module.register("MMM-Spotify", {
         break
       case "CURRENT_PLAYBACK_FAIL":
         this.updateNoPlayback()
-        if (this.conected) this.sendNotification("SPOTIFY_DISCONNECTED")
-        this.conected = false
+        this.disconnected = true
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
@@ -131,6 +129,7 @@ Module.register("MMM-Spotify", {
   updateNoPlayback: function () {
     var dom = document.getElementById("SPOTIFY")
     dom.classList.add("inactive")
+    if (!this.disconnected) this.sendNotification("SPOTIFY_DISCONNECTED")
   },
 
   updateCurrentPlayback: function (current) {
@@ -143,9 +142,13 @@ Module.register("MMM-Spotify", {
       this.updateRepeat(current.repeat_state)
       this.updateProgress(current.progress_ms, current.item.duration_ms)
     } else {
+      /** for Ads **/
+      if (current.currently_playing_type == "ad") current.is_playing = false
       if (this.currentPlayback.is_playing !== current.is_playing) {
         this.updatePlaying(current.is_playing)
+        if (current.currently_playing_type == "ad") this.currentPlayback.is_playing = false
       }
+      if (!current.item) return
       if (this.currentPlayback.item.id !== current.item.id) {
         this.updateSongInfo(current.item)
       }
@@ -162,7 +165,6 @@ Module.register("MMM-Spotify", {
         this.updateProgress(current.progress_ms, current.item.duration_ms)
       }
     }
-
     this.currentPlayback = current
   },
 

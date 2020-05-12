@@ -11,16 +11,16 @@ if (fs.existsSync(file)) {
         configurations.push(configurator);
     });
 }
+else return console.log("[SPOTIFY] Error: please configure your spotify.config.json file")
 
 function authorize(configuration) {
     return new Promise((resolve, reject) => {
-        let Auth = new Spotify(configuration);
+        let Auth = new Spotify(configuration,true, true);
         Auth.authFlow(() => {
-            console.log(configuration.USERNAME, "\nCurrent accessToken:\n", Auth.accessToken());
-            console.log("First authorization is finished. Check ", configuration.TOKEN);
+            console.log("[SPOTIFY] First authorization is finished for " + configuration.USERNAME + ". Check ", configuration.TOKEN);
             resolve();
         }, () => {
-            console.log("Error in authentication flow!");
+            console.log("[SPOTIFY] Error in authentication flow!");
             reject();
         });
     });
@@ -30,15 +30,15 @@ async function authorizations(configurations) {
     for (const configuration of configurations) {
         try {
             await authorize(configuration);
-            console.log('Authorization finished');
+            console.log('[SPOTIFY] Authorization finished');
         } catch (e) {
-            console.log('ERROR: ', e);
+            console.log('[SPOTIFY] ERROR: ', e);
         }
     }
 }
 
 authorizations(configurations).then(result => {
-    console.log('Authorization process finished!', result);
+    console.log('[SPOTIFY] Authorization process finished!');
 }, reason => {
-    console.log('Authorization process failed!:', reason);
+    console.log('[SPOTIFY] Authorization process failed!:', reason);
 });
