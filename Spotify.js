@@ -11,7 +11,6 @@ const querystring = require("querystring")
 const opn = require("open")
 const express = require("express")
 const app = express()
-//const isInFlight ;
 
 
 class Spotify {
@@ -156,7 +155,7 @@ class Spotify {
 
         request.post(authOptions, (error, response, body) => {
             if (
-                typeof response != 'undefined' && 
+                response !== 'undefined' && 
                 !error && 
                 response.statusCode === 200
             ) {
@@ -201,12 +200,11 @@ class Spotify {
                     }
                 }
                 if (cb) {
-                    if (typeof response != 'undefined' && response.statusCode) {
+                    if (response !== 'undefined' && response.statusCode) {
                         cb(response.statusCode, error, body)
                         //console.log(body)
                     } else {
                         //console.log(`[SPOTIFY] Invalid response`)
-                        //console.log(body)
                         cb('400', error, body)
                     }
 
