@@ -277,10 +277,20 @@ Module.register("MMM-Spotify", {
     sDom.classList.remove("noPlayback")
 
     const cover_img = document.getElementById("SPOTIFY_COVER_IMAGE")
-    cover_img.src = playbackItem.album.images[0].url
+    const img_url = playbackItem.album.images[0].url
 
-    const back = document.getElementById("SPOTIFY_BACKGROUND")
-    back.style.backgroundImage = `url(${playbackItem.album.images[0].url})`
+    if (img_url !== cover_img.src) {
+      const back = document.getElementById("SPOTIFY_BACKGROUND")
+      back.classList.remove('fade-in')
+      back.offsetWidth = cover_img.offsetWidth;
+      back.classList.add('fade-in')
+      back.style.backgroundImage = `url(${img_url})`
+      
+      cover_img.classList.remove('fade-in')
+      cover_img.offsetWidth = cover_img.offsetWidth;
+      cover_img.classList.add('fade-in')
+      cover_img.src = img_url
+    }
 
     const title = document.querySelector("#SPOTIFY_TITLE .text")
     title.textContent = playbackItem.name
@@ -352,6 +362,7 @@ Module.register("MMM-Spotify", {
       case 'CastAudio':
       case 'Speaker':
         return 'fa fa-headphones fa-sm';
+      // check why not working // return 'fab fa-chromecast fa-sm';
       case 'Automobile':
         return 'fas fa-car fa-sm';
       case 'Smartphone':
@@ -503,6 +514,7 @@ Module.register("MMM-Spotify", {
     m.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
 
     const cover_img = this.getHTMLElementWithID('img', "SPOTIFY_COVER_IMAGE")
+    cover_img.className = 'fade-in'
     cover_img.src = "./modules/MMM-Spotify/resources/spotify-xxl.png"
 
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
