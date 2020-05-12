@@ -1,209 +1,195 @@
-:root {
-  --sp-width: 360px;
-}
+/* Magic Mirror Config Sample
+ *
+ * By Michael Teeuw http://michaelteeuw.nl
+ * MIT Licensed.
+ *
+ * For more information on how you can configure this file
+ * See https://github.com/MichMich/MagicMirror#configuration
+ *
+ */
 
-#SPOTIFY {
-  position: relative;
-  width: var(--sp-width);
-  border-radius:10px;
-	box-sizing:border-box;
-  color:#EEE;
-  font-weight:normal;
-  font-size:18px;
-  text-align:left;
-  line-height:120%;
-  text-shadow:black 2px 2px 2px;
-}
+const openWeatherPIKey = "58e67f9d32a07ca53ac378222ed1c66a";
+const dublinWeatherLocationID = "2964574";
 
-#SPOTIFY * {
-  box-sizing: border-box;
-}
+var config = {
+	address: "localhost", // Address to listen on, can be:
+	                      // - "localhost", "127.0.0.1", "::1" to listen on loopback interface
+	                      // - another specific IPv4/6 to listen on a specific interface
+	                      // - "0.0.0.0", "::" to listen on any interface
+	                      // Default, when address config is left out or empty, is "localhost"
+	port: 8080,
+	ipWhitelist: ["127.0.0.1", "::ffff:127.0.0.1", "::1"], // Set [] to allow all IP addresses
+	                                                       // or add a specific IPv4 of 192.168.1.5 :
+	                                                       // ["127.0.0.1", "::ffff:127.0.0.1", "::1", "::ffff:192.168.1.5"],
+	                                                       // or IPv4 range of 192.168.3.0 --> 192.168.3.15 use CIDR format :
+	                                                       // ["127.0.0.1", "::ffff:127.0.0.1", "::1", "::ffff:192.168.3.0/28"],
 
-#SPOTIFY.inactive {
-  display:none;
-}
+	useHttps: false, 		// Support HTTPS or not, default "false" will use HTTP
+	httpsPrivateKey: "", 	// HTTPS private key path, only require when useHttps is true
+	httpsCertificate: "", 	// HTTPS Certificate path, only require when useHttps is true
 
-#SPOTIFY_BACKGROUND {
-  background-size: cover;
-  background-position: center center;
-  filter: blur(16px) opacity(90%) grayscale(33%);
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:0;
-}
+	language: "en",
+	timeFormat: 24,
+	units: "metric",
+	// serverOnly:  true/false/"local" ,
+			     // local for armv6l processors, default
+			     //   starts serveronly and then starts chrome browser
+			     // false, default for all  NON-armv6l devices
+			     // true, force serveronly mode, because you want to.. no UI on this device
 
-#SPOTIFY_FOREGROUND {
-  position:relative;
-  filter:none;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  padding:20px;
-	display:flex;
-	flex-direction:column;
-  box-sizing:border-box
-}
+	modules: [
+		/*{
+			module: "alert",
+		},*/
+		{
+			module: "updatenotification",
+			position: "top_bar"
+		},
+		{
+			module: "clock",
+			position: "top_left",
+			config: {
+				showSunTimes: true,
+				showMoonTimes: true,
+				showPeriodUpper: true,
+				analogPlacement: 'top',
+			}
+		},
+		/*{
+			module: "calendar",
+			header: "US Holidays",
+			position: "top_left",
+			config: {
+				calendars: [
+					{
+						symbol: "calendar-check",
+						url: "webcal://www.calendarlabs.com/ical-calendar/ics/76/US_Holidays.ics"					}
+				]
+			}
+		},*/
+		{
+			module: "currentweather",
+			position: "top_left",
+			config: {
+				iconTable: "wi-night-alt-cloudy-windy",
+				location: "Dublin",
+				locationID: dublinWeatherLocationID,
+				appid: openWeatherPIKey
+			}
+		},
+		{
+			module: 'MMM-GoogleFit',
+			position: 'top_center',
+			config: {
+				stepCountLabel: true,
+				lastSevenDays: true,
+			}
+		},
+		{
+			module: "MMM-Spotify",
+			position: "center",
+			config: {
+				style: "default", // "default" or "mini" available
+				control: "default", //"default", "hidden" available
+				updateInterval: 1000,
+				onStart: null, // disable onStart feature with `null`
+				allowDevices: [], //If you want to limit devices to display info, use this.
+			}
+		},
+		{
+			module: "weatherforecast",
+			position: "top_right",
+			header: "Weather Forecast",
+			config: {
+				location:   "Dublin",
+				maxNumberOfDays: 14,
+				locationID: dublinWeatherLocationID,
+				appid:      openWeatherPIKey
+			}
+		},
+		/*{
+			module: "compliments",
+			position: "middle_center "
+		},*/
+		{
+			module: "newsfeed",
+			position: "middle_center",
+			config: {
+				feeds: [
+					{
+						title: "New York Times",
+						url: "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+					},
+					{
+						title: "CNN",
+						url: "http://rss.cnn.com/rss/cnn_topstories.rss"
+					},
+				],
+				showSourceTitle: true,
+				showPublishDate: true,
+				showDescription: true,
+				broadcastNewsFeeds: true,
+				broadcastNewsUpdates: true
 
-#SPOTIFY_INFO {
-  width: calc(var(--sp-width) - 20px);
-}
+			}
+		},
+		{
+			module: "MMM-COVID19",
+			position: "lower_third",
+			config: {
+				infoRowClass: 'small',
+				updateInterval: 300000,
+				worldStats: true,
+				delta: true,
+				lastUpdateInfo: true,
+				orderCountriesByName: true,
+				countries: ["Ireland", "Portugal", "Romania", "Singapore", "USA"],
+				headerRowClass: "small",
+				rapidapiKey: "578f09444amshb45fa90154aa7f5p13bbd1jsn1d1e46ab6ca1"
+			}
+		},
+		{
+			module: 'MMM-SystemStats',
+			position: 'bottom_left', // This can be any of the regions.
+			classes: 'small', // Add your own styling. OPTIONAL.
+			// header: 'System Stats', // Set the header text OPTIONAL
+			config: {
+				updateInterval: 10000, // every 10 seconds
+				align: 'left', // align labels
+				//header: 'System Stats', // This is optional
+				units: 'metric', // default, metric, imperial
+				view: 'icon',
+			},
+		},
+		{
+			module: 'MMM-pihole-stats',
+			position: 'bottom_center',
+			config: {
+				updateInterval: 5 * 60 * 1000, //600, // every 5 mins
+				animationSpeed: 0,
+			}
+		},
+		{
+			module: 'MMM-WiFiPassword',
+			position: "bottom_right",
+			config: {
+				network: "Ancutza_Kami",
+				password: "Iris94410691",
+			}
+		},
+		{
+			module: 'MMM-NetworkConnection',
+			position: 'bottom_left',
+			config: {
+				displayTextStatus: true,
+				maxTime: 5000,
+				//updateInterval: 1000,
+				animationSpeed: 0,
+				useSmallIcons: true,
+			}
+		},
+	]
+};
 
-#SPOTIFY_INFO > * {
-  display:flex;
-  justify-content: flex-start;
-}
-
-#SPOTIFY_INFO .infoicon {
-  width: 20px;
-  margin-right:10px;
-  text-shadow:black 2px 2px 2px;
-}
-
-#SPOTIFY_INFO .text {
-  width: calc(var(--sp-width) - 70px);
-  overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-  display:inline-block;
-}
-
-#SPOTIFY_TITLE {
-  color:#FFF;
-  font-weight:bold;
-}
-
-#SPOTIFY_COVER {
-  width: calc(var(--sp-width) - 40px);
-  height: calc(var(--sp-width) - 40px);
-  margin-bottom:5px;
-}
-
-#SPOTIFY_COVER_IMAGE {
-  width:100%;
-  height:100%;
-  border-radius:10px;
-  box-shadow:black 2px 2px 2px 2px;
-}
-
-.fade-in {
-	animation: fadeInOpacity 1s 1;
-	animation-timing-function: linear;
-}
-
-@keyframes fadeInOpacity {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-#SPOTIFY.pausing #SPOTIFY_COVER_IMAGE {
-  filter:brightness(50%) grayscale(75%);
-}
-
-#SPOTIFY_PROGRESS_TIME {
-	display:flex;
-	flex-direction:row;
-	justify-content:space-between;
-  font-size:14px;
-}
-
-#SPOTIFY_PROGRESS_END {
-
-}
-
-#SPOTIFY_PROGRESS_CURRENT {
-
-}
-
-#SPOTIFY_PROGRESS_BAR {
-	margin-bottom:10px;
-	background-color:#666;
-	height:10px;
-	position:relative;
-
-}
-
-#SPOTIFY_PROGRESS_BAR_NOW {
-	background-color:#FFF;
-	position:absolute;
-	top:0;
-	left:0;
-	height:10px;
-}
-
-#SPOTIFY_CONTROL {
-  display:flex;
-  flex-direction:row;
-  justify-content: space-around;
-  font-size:32px;
-  color:#FFF;
-}
-
-#SPOTIFY_CONTROL > * {
-  border-radius:4px;
-  background-color:rgba(0,0,0,0.2);
-}
-
-#SPOTIFY_CONTROL .iconify {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* control "hidden" */
-#SPOTIFY.hidden #SPOTIFY_CONTROL{
-  display:none;
-}
-
-/* style "mini" */
-#SPOTIFY.mini {
-	width: var(--sp-width);
-}
-
-#SPOTIFY.mini #SPOTIFY_FOREGROUND {
-	flex-direction:row;
-  padding:0;
-}
-
-#SPOTIFY.mini #SPOTIFY_COVER {
-	width:calc(var(--sp-width) - 220px);
-	height:140px;
-	padding:0;
-}
-
-#SPOTIFY.mini #SPOTIFY_COVER_IMAGE {
-	height:140px;
-}
-
-#SPOTIFY.mini #SPOTIFY_INFO {
-	width:calc(var(--sp-width) - 140px);
-	padding-left:10px;
-  margin-top:5px;
-}
-
-#SPOTIFY.mini #SPOTIFY_PROGRESS_BAR {
-	margin:5px;
-}
-
-#SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
-	display:none;
-}
-
-#SPOTIFY.mini.noPlayback {
-  width:calc(var(--sp-width) - 220px);
-}
-
-#SPOTIFY.noPlayback #SPOTIFY_FOREGROUND > * {
-  display:none;
-}
-
-#SPOTIFY.noPlayback #SPOTIFY_FOREGROUND #SPOTIFY_COVER {
-  display:block;
-}
+/*************** DO NOT EDIT THE LINE BELOW ***************/
+if (typeof module !== "undefined") {module.exports = config;}
