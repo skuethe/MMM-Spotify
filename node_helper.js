@@ -67,7 +67,7 @@ module.exports = NodeHelper.create({
     updateSpotify: function (spotify) {
         return new Promise((resolve, reject) => {
             spotify.getCurrentPlayback((code, error, result) => {
-                if (typeof result == "undefined" || code !== 200) {
+                if (result === "undefined" || code !== 200) {
                     reject();
                 } else {
                     resolve(result);
@@ -78,7 +78,7 @@ module.exports = NodeHelper.create({
 
     updatePulse: function () {
         this.spotify.getCurrentPlayback((code, error, result) => {
-            if (typeof result == "undefined" || code !== 200) {
+            if (result === "undefined" || code !== 200) {
                 this.sendSocketNotification("CURRENT_PLAYBACK_FAIL", null);
                 this.spotify = null;
                 this.findCurrentSpotify();
