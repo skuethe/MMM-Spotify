@@ -12,19 +12,31 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 - Multiple accounts supported
 
 ## New updates
+
+Thanks @eouia for all the hard work you put in for the MagicMirror community
+
+### 1.3.0 (2020-05-XX) **Owner Change**
+- Fixed: on lost internet connexion
+- Added: `SPOTIFY_CONNECTED` `SPOTIFY_DISCONNECTED` notification
+- Added: `debug` mode
+- Added: `deviceDisplay` feature
+- Added: handling for extra device icons
+- Added: debug mode for Hiding console logs (memory leaks)
+- Added: fade in transition on cover
+- Added: box shadow around cover to highlight from background
+
 ### 1.2.1 (2020-02-27)
 - Fixed: Using old configuration error.
 
 ### 1.2 (2020-02-20)
 - Added : `MULTIPLE ACCOUNTS`
 
-
 - How to update from older version
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
 git pull
+npm install
 ```
-
 
 ## Install
 ### 1. module install
@@ -74,14 +86,6 @@ node first_auth.js
 Then, Allowance dialog popup will be opened. You MUST LOG IN IN SAME ORDER YOU PUT YOUR USERS IN CONFIGURATION FILE. Log in(if it is needed) and allow it.
 That's all. `token.json` will be created, if success.
 
-
-### 5. `Error: Cannot find module 'open'` after update(`git pull`).
-```sh
-cd ~/MagicMirror/modules/MMM-Spotify
-npm install open
-```
-
-
 ## Configuration
 ### Simple
 ```js
@@ -100,10 +104,12 @@ npm install open
   module: "MMM-Spotify",
   position: "bottom_left",
   config: {
+    debug: false, // debug mode
     style: "default", // "default" or "mini" available
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
     onStart: null, // disable onStart feature with `null`
+    deviceDisplay: "Listening on", // text to display in the device block (default style only)
     allowDevices: [], //If you want to limit devices to display info, use this.
     // allowDevices: ["RASPOTIFY", "My iPhoneX", "My Home speaker"],
   }
@@ -177,9 +183,15 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 this.sendNotification("SPOTIFY_REPEAT")
 ```
 
+## Notification send
+
+- `SPOTIFY_CONNECTED`: Spotify is connected to a device
+- `SPOTIFY_DISCONNECTED`: Spotify is disconnected
+
+It can be used with MMM-pages for example (for show or hide the module)
+
 ## Usage & Tip
 See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
-
 
 ## Update History
 
@@ -195,8 +207,6 @@ See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 - Device Limitation : Now you can allow or limit devices to display its playing on MM.
 - Some CSS structure is changed.
 - Now this module can emit `SPOTIFY_*` notifications for other module.
-
-
 
 ## Credit
 Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.

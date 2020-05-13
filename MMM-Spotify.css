@@ -6,7 +6,7 @@
   position: relative;
   width: var(--sp-width);
   border-radius:10px;
-	box-sizing:border-box;
+  box-sizing:border-box;
   color:#EEE;
   font-weight:normal;
   font-size:18px;
@@ -43,8 +43,8 @@
   width:100%;
   height:100%;
   padding:20px;
-	display:flex;
-	flex-direction:column;
+  display:flex;
+  flex-direction:column;
   box-sizing:border-box
 }
 
@@ -57,26 +57,22 @@
   justify-content: flex-start;
 }
 
-#SPOTIFY_INFO .iconify {
+#SPOTIFY_INFO .infoicon {
   width: 20px;
   margin-right:10px;
   text-shadow:black 2px 2px 2px;
+  line-height: inherit;
 }
 
 #SPOTIFY_INFO .text {
   width: calc(var(--sp-width) - 70px);
   overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   display:inline-block;
 }
 
 #SPOTIFY_TITLE {
-  color:#FFF;
-  font-weight:bold;
-}
-
-#SPOTIFY_ALBUM {
   color:#FFF;
   font-weight:bold;
 }
@@ -91,6 +87,21 @@
   width:100%;
   height:100%;
   border-radius:10px;
+  box-shadow:black 1px 1px 1px 1px;
+}
+
+.fade-in {
+  animation: fadeInOpacity 1s 1;
+  animation-timing-function: linear;
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 #SPOTIFY.pausing #SPOTIFY_COVER_IMAGE {
@@ -98,9 +109,9 @@
 }
 
 #SPOTIFY_PROGRESS_TIME {
-	display:flex;
-	flex-direction:row;
-	justify-content:space-between;
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
   font-size:14px;
 }
 
@@ -112,21 +123,20 @@
 
 }
 
-
 #SPOTIFY_PROGRESS_BAR {
-	margin-bottom:10px;
-	background-color:#666;
-	height:10px;
-	position:relative;
+  margin-bottom:10px;
+  background-color:#666;
+  height:10px;
+  position:relative;
 
 }
 
 #SPOTIFY_PROGRESS_BAR_NOW {
-	background-color:#FFF;
-	position:absolute;
-	top:0;
-	left:0;
-	height:10px;
+  background-color:#FFF;
+  position:absolute;
+  top:0;
+  left:0;
+  height:10px;
 }
 
 #SPOTIFY_CONTROL {
@@ -142,6 +152,12 @@
   background-color:rgba(0,0,0,0.2);
 }
 
+#SPOTIFY_CONTROL .iconify {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* control "hidden" */
 #SPOTIFY.hidden #SPOTIFY_CONTROL{
   display:none;
@@ -149,40 +165,36 @@
 
 /* style "mini" */
 #SPOTIFY.mini {
-	width: var(--sp-width);
+  width: var(--sp-width);
 }
 
 #SPOTIFY.mini #SPOTIFY_FOREGROUND {
-	flex-direction:row;
+  flex-direction:row;
   padding:0;
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER {
-	width:calc(var(--sp-width) - 220px);
-	height:140px;
-	padding:0;
+  width:calc(var(--sp-width) - 220px);
+  height:140px;
+  padding:0;
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER_IMAGE {
-	height:140px;
+  height:140px;
 }
 
 #SPOTIFY.mini #SPOTIFY_INFO {
-	width:calc(var(--sp-width) - 140px);
-	padding-left:10px;
+  width:calc(var(--sp-width) - 140px);
+  padding-left:10px;
   margin-top:5px;
 }
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_BAR {
-	margin:5px;
+  margin:5px;
 }
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
-	display:none;
-}
-
-#SPOTIFY.mini #SPOTIFY_INFO .fas {
-	margin:0;
+  display:none;
 }
 
 #SPOTIFY.mini.noPlayback {
