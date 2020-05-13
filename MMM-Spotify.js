@@ -44,6 +44,7 @@ Module.register("MMM-Spotify", {
   start: function () {
     this.currentPlayback = null
     this.disconnected = false
+    this.firstLaunch = true
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -252,7 +253,10 @@ Module.register("MMM-Spotify", {
   },
 
   updatePlaying: function (isPlaying) {
-    if (isPlaying) this.sendNotification("SPOTIFY_CONNECTED")
+    if (isPlaying && this.firstLaunch) {
+      this.sendNotification("SPOTIFY_CONNECTED")
+      this.firstLaunch = false
+    }
     const s = document.getElementById("SPOTIFY")
 
     if (isPlaying) {
