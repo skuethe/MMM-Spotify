@@ -14,6 +14,7 @@ Module.register("MMM-Spotify", {
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
 
     onStart: null,
+    deviceDisplay: "Listening on"
     //If you want to play something on start; set like this.
     /*
     onStart: {
@@ -101,7 +102,6 @@ Module.register("MMM-Spotify", {
       case "INITIALIZED":
         break
       case "CURRENT_PLAYBACK":
-        this.disconnected = false
         if (
           (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
@@ -113,7 +113,7 @@ Module.register("MMM-Spotify", {
         }
         break
       case "CURRENT_PLAYBACK_FAIL":
-        this.updateNoPlayback()
+        this.updatePlayback(false)
         this.disconnected = true
     }
     if (noti.search("DONE_") > -1) {
@@ -126,10 +126,11 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
-  updateNoPlayback: function () {
+  updatePlayback: function (status) {
     var dom = document.getElementById("SPOTIFY")
-    dom.classList.add("inactive")
-    if (!this.disconnected) this.sendNotification("SPOTIFY_DISCONNECTED")
+    if (status) dom.classList.remove("inactive")
+    else dom.classList.add("inactive")
+    if (!this.disconnected && !status) this.sendNotification("SPOTIFY_DISCONNECTED")
   },
 
   updateCurrentPlayback: function (current) {
@@ -142,6 +143,12 @@ Module.register("MMM-Spotify", {
       this.updateRepeat(current.repeat_state)
       this.updateProgress(current.progress_ms, current.item.duration_ms)
     } else {
+      if (this.disconnected && current.currently_playing_type) {
+        this.sendNotification("SPOTIFY_CONNECTED")
+        this.disconnected = false
+        this.updatePlayback(true)
+      }
+
       /** for Ads **/
       if (current.currently_playing_type == "ad") current.is_playing = false
       if (this.currentPlayback.is_playing !== current.is_playing) {
@@ -238,15 +245,15 @@ Module.register("MMM-Spotify", {
     const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
     const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
-    deviceContainer.textContent = 'Listening on ' + device.name
+    deviceContainer.textContent = this.config.deviceDisplay +' ' + device.name
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
 
   updatePlaying: function (isPlaying) {
+    if (isPlaying) this.sendNotification("SPOTIFY_CONNECTED")
     const s = document.getElementById("SPOTIFY")
-    s.classList.remove("inactive")
 
     if (isPlaying) {
       s.classList.add("playing")
@@ -268,7 +275,6 @@ Module.register("MMM-Spotify", {
         this.getIconContainer('iconify', "SPOTIFY_CONTROL_PLAY_ICON", icon),
       )
     }
-
     this.sendNotification("SPOTIFY_UPDATE_PLAYING", isPlaying)
   },
 

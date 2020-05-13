@@ -13,10 +13,9 @@ const opn = require("open")
 const express = require("express")
 const app = express()
 var _Debug = (...args) => { /* do nothing */ }
-var _Verbose = (...args) => { /* do nothing */ }
 
 class Spotify {
-  constructor(config = null, debug = false, first = false, verbose = false) {
+  constructor(config = null, debug = false, first = false) {
     if (config == null) {
       config = {
         "USERNAME": "",
@@ -34,7 +33,6 @@ class Spotify {
     this.state = ""
     this.config = config
     if (debug) _Debug = (...args) => { console.log("[SPOTIFY]", ...args) }
-    if (verbose) _Verbose = (...args) => { console.log("[SPOTIFY]", ...args) }
 
     var redirect_uri = this.config.AUTH_DOMAIN
     redirect_uri += ":" + this.config.AUTH_PORT
@@ -75,7 +73,6 @@ class Spotify {
       return;
     }
 
-    _Verbose('Creating server', this.config);
     let server = app.get(this.config.AUTH_PATH, (req, res) => {
       let code = req.query.code || null;
       let authOptions = {
@@ -114,7 +111,6 @@ class Spotify {
         show_dialog: true
       });
 
-    _Verbose('Opening URL.(' + url + ')');
     opn(url).catch(() => {
       console.log('[SPOTIFY] Failed to automatically open the URL. Copy/paste this in your browser:\n', url);
     });
@@ -197,11 +193,12 @@ class Spotify {
           }
         }
         if (cb) {
-          if (response && response !== 'undefined' && response.statusCode) {
+          if (response && response.statusCode) {
             cb(response.statusCode, error, body)
           } else {
-            _Debug("Invalid response")
-            cb('400', error, body)
+            _Debug("Invalid response: " + error)
+            _Debug("Retry in 10 sec...")
+            setTimeout(() => { cb('400', error, body) }, 10000)
           }
         }
       })
