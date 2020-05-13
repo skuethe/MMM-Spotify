@@ -246,7 +246,7 @@ Module.register("MMM-Spotify", {
     const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
     const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
-    deviceContainer.textContent = this.config.deviceDisplay +' ' + device.name
+    deviceContainer.textContent = this.config.style == "default" ? this.config.deviceDisplay + ' ' + device.name : device.name
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
@@ -517,9 +517,6 @@ Module.register("MMM-Spotify", {
     const m = this.getHTMLElementWithID('div', "SPOTIFY")
     if (this.config.style !== "default") {
       m.classList.add(this.config.style)
-    }
-    if (this.config.control !== "default") {
-      m.classList.add(this.config.control)
     }
 
     m.classList.add("noPlayback")
