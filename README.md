@@ -15,7 +15,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
-### 1.3.0 (2020-05-XX) **Owner Change**
+### 1.3.0 (2020-05-13) **Owner Change**
 - Fixed: on lost internet connexion
 - Added: `SPOTIFY_CONNECTED` `SPOTIFY_DISCONNECTED` notification
 - Added: `debug` mode
