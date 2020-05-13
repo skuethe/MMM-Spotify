@@ -18,6 +18,8 @@ Thanks @eouia for all the hard work you put in for the MagicMirror community
 ### 1.3.0 (2020-05-XX) **Owner Change**
 - Fixed: on lost internet connexion
 - Added: `SPOTIFY_CONNECTED` `SPOTIFY_DISCONNECTED` notification
+- Added: `debug` mode
+- Added: `deviceDisplay` feature
 - Added: handling for extra device icons
 - Added: debug mode for Hiding console logs (memory leaks)
 - Added: fade in transition on cover
@@ -102,10 +104,12 @@ That's all. `token.json` will be created, if success.
   module: "MMM-Spotify",
   position: "bottom_left",
   config: {
+    debug: false, // debug mode
     style: "default", // "default" or "mini" available
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
     onStart: null, // disable onStart feature with `null`
+    deviceDisplay: "Listening on", // text to display in the device block (default style only)
     allowDevices: [], //If you want to limit devices to display info, use this.
     // allowDevices: ["RASPOTIFY", "My iPhoneX", "My Home speaker"],
   }
