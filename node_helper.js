@@ -50,7 +50,7 @@ module.exports = NodeHelper.create({
         let result = await this.updateSpotify(spotify);
         this.sendSocketNotification("CURRENT_PLAYBACK", result);
       } catch (e) {
-        console.log("[SPOTIFY] This spotify is not playing:", spotify.config.USERNAME)
+        //console.log("[SPOTIFY] This spotify is not playing:", spotify.config.USERNAME)
       }
     }
     if (!playing) {
