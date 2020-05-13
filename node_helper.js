@@ -19,6 +19,7 @@ let updateOldSingleSpotifyConfigurationToNewMultipleSpotifyConfiguration = funct
 
 module.exports = NodeHelper.create({
   start: function () {
+    console.log("[SPOTIFY] MMM-Spotify Version:",  require('./package.json').version)
     this.config = null; // Configuration come from MM config file.
     this.spotifyConfigurations = []; // Configuration from spotify.config.json file.
     this.spotify = null;
@@ -35,8 +36,8 @@ module.exports = NodeHelper.create({
         this.spotifies.push(new Spotify(configuration, this.config.debug));
       });
     }
-    this.findCurrentSpotify().then(r => {
-      console.log('[MMM-Spotify] Starting', this.findCurrentSpotify());
+    this.findCurrentSpotify().then(() => {
+      console.log("[SPOTIFY] Started");
     });
   },
 
@@ -49,7 +50,7 @@ module.exports = NodeHelper.create({
         let result = await this.updateSpotify(spotify);
         this.sendSocketNotification("CURRENT_PLAYBACK", result);
       } catch (e) {
-        // console.log('This spotify is not playing:', spotify.config.USERNAME)
+        console.log("[SPOTIFY] This spotify is not playing:", spotify.config.USERNAME)
       }
     }
     if (!playing) {
@@ -203,7 +204,7 @@ module.exports = NodeHelper.create({
           ret[retType] = (retType == "uris") ? [r.uri] : r.uri
           return ret
         } else {
-          //console.log("[SPOTIFY] Unplayable item: ", r)
+          console.log("[SPOTIFY] Unplayable item: ", r)
           return false
       }
     }
