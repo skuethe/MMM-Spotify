@@ -80,7 +80,7 @@
 #SPOTIFY_COVER {
   width: calc(var(--sp-width) - 40px);
   height: calc(var(--sp-width) - 40px);
-  margin-bottom:5px;
+  margin-bottom:0.5vh;
 }
 
 #SPOTIFY_COVER_IMAGE {
@@ -115,28 +115,20 @@
   font-size:14px;
 }
 
-#SPOTIFY_PROGRESS_END {
-
-}
-
-#SPOTIFY_PROGRESS_CURRENT {
-
-}
-
 #SPOTIFY_PROGRESS_BAR {
   margin-bottom:10px;
-  background-color:#666;
   height:10px;
+  width: 100%;
   position:relative;
-
+  border: 1px solid #aaaaaa;
 }
 
-#SPOTIFY_PROGRESS_BAR_NOW {
-  background-color:#FFF;
-  position:absolute;
-  top:0;
-  left:0;
-  height:10px;
+progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-value {
+  background-color: #FFF;
+}
+
+progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
+  background-color: #666;
 }
 
 #SPOTIFY_CONTROL {
