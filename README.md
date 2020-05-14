@@ -15,8 +15,11 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
+### 1.3.2
+- Modified: onStart script (Now launched if Spotify initialized)
+
 ### 1.3.1 (2020-05-14)
-- Modifed: 'progress bar'
+- Modified: 'progress bar'
 - Fixed: number of request on idle (depend now of updateInterval config)
 
 ### 1.3.0 (2020-05-13) **Owner Change**

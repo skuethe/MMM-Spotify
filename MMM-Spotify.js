@@ -52,7 +52,6 @@ Module.register("MMM-Spotify", {
       this.sendSocketNotification("INIT", this.config)
       //console.log(this.config)
       //this.loadExternalScript(this.config.iconify)
-      this.onStart()
     }
     switch (noti) {
       case "SPOTIFY_SEARCH":
@@ -120,11 +119,6 @@ Module.register("MMM-Spotify", {
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
     }
-  },
-
-  onStart: function () {
-    if (!this.config.onStart) return
-    this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
   updatePlayback: function (status) {
