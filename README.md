@@ -209,4 +209,5 @@ See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 - Now this module can emit `SPOTIFY_*` notifications for other module.
 
 ## Credit
-Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
+- Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
+- Thanks to @KamisamaPT for helping design
