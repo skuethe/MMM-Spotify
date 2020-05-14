@@ -99,6 +99,7 @@ Module.register("MMM-Spotify", {
   },
 
   socketNotificationReceived: function (noti, payload) {
+       console.log(noti)
     switch (noti) {
       case "INITIALIZED":
         break

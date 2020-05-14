@@ -59,7 +59,9 @@ module.exports = NodeHelper.create({
         this.findCurrentSpotify();
       }, this.config.updateInterval);
     } else {
-      this.updatePulse();
+      setTimeout(() => {
+        this.updatePulse()
+      }, this.config.updateInterval)
     }
   },
 
