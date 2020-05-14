@@ -15,6 +15,10 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
+### 1.3.1 (2020-05-14)
+- Modifed: 'progress bar'
+- Fixed: number of request on idle (depend now of updateInterval config)
+
 ### 1.3.0 (2020-05-13) **Owner Change**
 - Fixed: on lost internet connexion
 - Added: `SPOTIFY_CONNECTED` `SPOTIFY_DISCONNECTED` notification
@@ -24,19 +28,6 @@ Thanks @eouia for all the hard work you put in for the MagicMirror community
 - Added: debug mode for Hiding console logs (memory leaks)
 - Added: fade in transition on cover
 - Added: box shadow around cover to highlight from background
-
-### 1.2.1 (2020-02-27)
-- Fixed: Using old configuration error.
-
-### 1.2 (2020-02-20)
-- Added : `MULTIPLE ACCOUNTS`
-
-- How to update from older version
-```sh
-cd ~/MagicMirror/modules/MMM-Spotify
-git pull
-npm install
-```
 
 ## Install
 ### 1. module install
@@ -195,6 +186,19 @@ See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 
 ## Update History
 
+### 1.2.1 (2020-02-27)
+- Fixed: Using old configuration error.
+
+### 1.2 (2020-02-20)
+- Added : `MULTIPLE ACCOUNTS`
+
+- How to update from older version
+```sh
+cd ~/MagicMirror/modules/MMM-Spotify
+git pull
+npm install
+```
+
 ### 1.1.2 (2019-05-06)
 - Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
 
@@ -209,4 +213,5 @@ See the [wiki](https://github.com/eouia/MMM-Spotify/wiki)
 - Now this module can emit `SPOTIFY_*` notifications for other module.
 
 ## Credit
-Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
+- Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
+- Thanks to @KamisamaPT for helping design

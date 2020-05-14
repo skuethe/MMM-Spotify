@@ -99,6 +99,7 @@ Module.register("MMM-Spotify", {
   },
 
   socketNotificationReceived: function (noti, payload) {
+       console.log(noti)
     switch (noti) {
       case "INITIALIZED":
         break
@@ -194,17 +195,23 @@ Module.register("MMM-Spotify", {
   updateProgress: function (
     progressMS,
     durationMS,
-    end = document.getElementById("SPOTIFY_PROGRESS_END"),
-    curbar = document.getElementById("SPOTIFY_PROGRESS_CURRENT"),
-    now = document.getElementById("SPOTIFY_PROGRESS_BAR_NOW")
   ) {
-    var pros = (progressMS / durationMS) * 100
+    const bar = document.getElementById("SPOTIFY_PROGRESS_BAR");
+    bar.value = progressMS;
 
-    curbar.innerHTML = this.msToTime(progressMS)
-    now.style.width = pros + "%"
+    if (bar.max != durationMS) {
+      bar.max = durationMS;
+    }
 
-    if (end.innerHTML != this.msToTime(durationMS)) {
-      end.innerHTML = this.msToTime(durationMS)
+    if (this.config.style === 'default') {
+      const end = document.getElementById("SPOTIFY_PROGRESS_END");
+      const current = document.getElementById("SPOTIFY_PROGRESS_CURRENT");
+      current.innerHTML = this.msToTime(progressMS);
+      const duration = this.msToTime(durationMS);
+
+      if (end.innerHTML != duration) {
+        end.innerHTML = duration;
+      }
     }
   },
 
@@ -494,20 +501,24 @@ Module.register("MMM-Spotify", {
 
   getProgressContainer() {
     const progress = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS")
-    const currentTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_CURRENT")
-    currentTime.innerHTML = "--:--"
 
-    const songTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_END")
-    songTime.innerHTML = "--:--"
+    if (this.config.style === 'default') {
+      const currentTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_CURRENT")
+      currentTime.innerHTML = "--:--"
 
-    const time = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_TIME")
-    time.appendChild(currentTime)
-    time.appendChild(songTime)
+      const songTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_END")
+      songTime.innerHTML = "--:--"
 
-    progress.appendChild(time)
+      const time = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_TIME")
+      time.appendChild(currentTime)
+      time.appendChild(songTime)
 
-    const bar = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_BAR")
-    bar.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_BAR_NOW"))
+      progress.appendChild(time)
+    }
+
+    const bar = this.getHTMLElementWithID('progress', "SPOTIFY_PROGRESS_BAR")
+    bar.value = 0;
+    bar.max = 100;
 
     progress.appendChild(bar)
     return progress;
