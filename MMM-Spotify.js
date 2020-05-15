@@ -374,8 +374,8 @@ Module.register("MMM-Spotify", {
         return 'mdi mdi-audio-video';
       case 'AudioDongle':
       case 'CastVideo':
+        return 'mdi mdi-cast-connected';
       case 'CastAudio':
-        return 'mdi mdi-cast-connected'
       case 'Speaker':
         return 'mdi mdi-cast-audio';
       case 'Automobile':
@@ -388,7 +388,7 @@ Module.register("MMM-Spotify", {
       case 'Computer':
         return 'fa fa-desktop fa-sm';
       default:
-        return 'fa fa-headphones fa-sm'
+        return 'fa fa-headphones fa-sm';
     }
   },
 
