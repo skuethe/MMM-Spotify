@@ -15,11 +15,9 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
-### 1.3.3
-- Added: Added "Cast" Icons
-
 ### 1.3.2
 - Modified: onStart script (Now launched if Spotify initialized)
+- Added: Added "Cast" Icons
 
 ### 1.3.1 (2020-05-14)
 - Modified: 'progress bar'
