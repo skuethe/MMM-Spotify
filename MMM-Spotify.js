@@ -9,7 +9,7 @@ Module.register("MMM-Spotify", {
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
     allowDevices: [],
-    iconify: "https://code.iconify.design/1/1.0.0-rc7/iconify.min.js",
+    iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
     //iconify: null,
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
 
@@ -30,7 +30,7 @@ Module.register("MMM-Spotify", {
   },
 
   getScripts: function () {
-    r = []
+    r = ["https://cdn.materialdesignicons.com/5.2.45/css/materialdesignicons.min.css"]
     if (this.config.iconify) {
       r.push(this.config.iconify)
     }
@@ -52,7 +52,6 @@ Module.register("MMM-Spotify", {
       this.sendSocketNotification("INIT", this.config)
       //console.log(this.config)
       //this.loadExternalScript(this.config.iconify)
-      this.onStart()
     }
     switch (noti) {
       case "SPOTIFY_SEARCH":
@@ -120,11 +119,6 @@ Module.register("MMM-Spotify", {
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
     }
-  },
-
-  onStart: function () {
-    if (!this.config.onStart) return
-    this.sendSocketNotification("ONSTART", this.config.onStart)
   },
 
   updatePlayback: function (status) {
@@ -362,6 +356,8 @@ Module.register("MMM-Spotify", {
 
   getFAIcon(iconType) {
     switch (iconType) {
+      case 'Spotify':
+        return 'fab fa-spotify fa-sm';
       case 'Title':
         return 'fa fa-music fa-sm';
       case 'Artist':
@@ -375,12 +371,13 @@ Module.register("MMM-Spotify", {
         return 'fas fa-gamepad fa-sm';
       case 'AVR':
       case 'STB':
+        return 'mdi mdi-audio-video';
       case 'AudioDongle':
       case 'CastVideo':
+        return 'mdi mdi-cast-connected';
       case 'CastAudio':
       case 'Speaker':
-        return 'fa fa-headphones fa-sm';
-      // check why not working // return 'fab fa-chromecast fa-sm';
+        return 'mdi mdi-cast-audio';
       case 'Automobile':
         return 'fas fa-car fa-sm';
       case 'Smartphone':
