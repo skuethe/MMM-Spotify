@@ -15,7 +15,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
-### 1.4.0
+### 1.4.0 (2020-05-16)
 - Added & Modified: New multi-account management by notification (memory leaks)
 
 ### 1.3.2 (2020-05-15)
@@ -105,6 +105,7 @@ That's all. `token.json` will be created, if success.
     debug: false, // debug mode
     style: "default", // "default" or "mini" available
     control: "default", //"default", "hidden" available
+    accountDefault: 0, // default account number, attention : 0 is the first account
     updateInterval: 1000,
     onStart: null, // disable onStart feature with `null`
     deviceDisplay: "Listening on", // text to display in the device block (default style only)
@@ -179,6 +180,14 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 - `SPOTIFY_REPEAT` : change repeat mode. (`off` -> `track` -> `context`)
 ```
 this.sendNotification("SPOTIFY_REPEAT")
+```
+- `SPOTIFY_ACCOUNT`: change account. payload is the `USERNAME` defined in your account in `spotify.config.json` file
+```
+this.sendNotification("SPOTIFY_ACCOUNT", "premium")
+```
+payload could be the number of the account. attention: for first account, number is `0`
+```
+this.sendNotification("SPOTIFY_ACCOUNT", 0)
 ```
 
 ## Notification send
