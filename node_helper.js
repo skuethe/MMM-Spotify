@@ -23,7 +23,7 @@ module.exports = NodeHelper.create({
       return configuration[account] // only wanted account or first
     }
     if (Array.isArray(configuration)) {
-      var found
+      let found
       configuration.forEach((jsAccount,number) => {
         if (jsAccount.USERNAME == account) found = number
       })
@@ -52,7 +52,7 @@ module.exports = NodeHelper.create({
     }
     else return console.log("[SPOTIFY] ERROR: spotify.config.json file missing !")
     this.updatePulse().then(() => {
-      console.log("[SPOTIFY] Started with Account:", (this.spotify.config.USERNAME ? this.spotify.config.USERNAME : "default"))
+      if (this.config.debug) console.log("[SPOTIFY] Started with Account:", (this.spotify.config.USERNAME ? this.spotify.config.USERNAME : "default"))
       if (this.firstStart && this.config.onStart) this.onStart()
       this.firstStart = false
     })
