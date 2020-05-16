@@ -16,7 +16,10 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
 ### 1.4.0 (2020-05-16)
-- Added & Modified: New multi-account management by notification (memory leaks)
+- Added & Modified: Multi-account management by notification `SPOTIFY_ACCOUNT`
+- Fixed: Loop CONNECTED/DISCONNECTED on multi-account
+- Fixed: Less CPU time, Less DNS request
+- Fixed: Maybe RPI crashed  when using multi-account (memory leaks)
 
 ### 1.3.2 (2020-05-15)
 - Modified: onStart script (Now launched if Spotify initialized)
