@@ -116,6 +116,7 @@ Module.register("MMM-Spotify", {
       case "CURRENT_PLAYBACK_FAIL":
         this.updatePlayback(false)
         this.disconnected = true
+        break
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
@@ -576,10 +577,10 @@ Module.register("MMM-Spotify", {
 
     if (this.config.style === 'default') {
       const currentTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_CURRENT")
-      currentTime.innerHTML = "--:--"
+      currentTime.innerText = "--:--"
 
       const songTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_END")
-      songTime.innerHTML = "--:--"
+      songTime.innerText = "--:--"
 
       const time = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_TIME")
       time.appendChild(currentTime)
