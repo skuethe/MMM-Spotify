@@ -9,61 +9,66 @@ const Spotify = require("./Spotify.js")
 
 var NodeHelper = require("node_helper")
 
-let updateOldSingleSpotifyConfigurationToNewMultipleSpotifyConfiguration = function (configuration) {
-    if (Array.isArray(configuration)) {
-      // not update required
-      return configuration;
-    }
-    return [configuration];
-};
-
 module.exports = NodeHelper.create({
   start: function () {
-    console.log("[SPOTIFY] MMM-Spotify Version:",  require('./package.json').version)
-    this.config = null; // Configuration come from MM config file.
-    this.spotifyConfigurations = []; // Configuration from spotify.config.json file.
-    this.spotify = null;
-    this.spotifies = [];
+    this.config = null
+    this.spotifyConfig = null
+    this.spotify = null
+    this.timer = null
+    this.firstStart = true
   },
 
-  initAfterLoading: function (config) {
+  doSpotifyConfig: function (configuration, account) {
+    if (!isNaN(account) && Array.isArray(configuration)) {
+      return configuration[account] // only wanted account or first
+    }
+    if (Array.isArray(configuration)) {
+      let found
+      configuration.forEach((jsAccount,number) => {
+        if (jsAccount.USERNAME == account) found = number
+      })
+      if (typeof found !== "undefined") return configuration[found]
+      else return configuration[0]
+    }
+    // not update required not an array (single account)
+    return configuration
+  },
+
+  initAfterLoading: function (config, account) {
     this.config = config
-    let file = path.resolve(__dirname, "spotify.config.json");
-    if (fs.existsSync(file)) {
-      let parsedConfigurations = JSON.parse(fs.readFileSync(file));
-      this.spotifyConfigurations = updateOldSingleSpotifyConfigurationToNewMultipleSpotifyConfiguration(parsedConfigurations);
-      this.spotifyConfigurations.forEach(configuration => {
-        this.spotifies.push(new Spotify(configuration, this.config.debug));
-      });
+    if (!account) {
+      account = this.config.accountDefault
+      console.log("[SPOTIFY] MMM-Spotify Version:",  require('./package.json').version)
     }
-    this.findCurrentSpotify().then(() => {
-      console.log("[SPOTIFY] Started")
-      if (this.config.onStart) this.onStart()
-    });
+    let file = path.resolve(__dirname, "spotify.config.json")
+    if (fs.existsSync(file)) {
+      try {
+        this.spotifyConfig = this.doSpotifyConfig(JSON.parse(fs.readFileSync(file)), account)
+      } catch (e) {
+        return console.log("[SPOTIFY] ERROR: spotify.config.json", e.name)
+      }
+      if (!this.spotifyConfig) return console.log("[SPOTIFY] ERROR: Account not found")
+      this.spotify = new Spotify(this.spotifyConfig, this.config.debug)
+    }
+    else return console.log("[SPOTIFY] ERROR: spotify.config.json file missing !")
+    this.updatePulse().then(() => {
+      if (this.config.debug) console.log("[SPOTIFY] Started with Account:", (this.spotify.config.USERNAME ? this.spotify.config.USERNAME : "default"))
+      if (this.firstStart && this.config.onStart) this.onStart()
+      this.firstStart = false
+    })
   },
 
-  findCurrentSpotify: async function () {
-    let playing = false;
-    for (let spotify of this.spotifies) {
-      this.spotify = spotify;
-      playing = true;
-      try {
-        let result = await this.updateSpotify(spotify);
-        this.sendSocketNotification("CURRENT_PLAYBACK", result);
-      } catch (e) {
-        //console.log("[SPOTIFY] This spotify is not playing:", spotify.config.USERNAME)
-      }
+  updatePulse: async function () {
+    if (!this.spotify) return console.log("[SPOTIFY] updatePulse ERROR: Account not found")
+    try {
+      let result = await this.updateSpotify(this.spotify)
+      this.sendSocketNotification("CURRENT_PLAYBACK", result)
+    } catch (e) {
+      this.sendSocketNotification("CURRENT_NOPLAYBACK")
     }
-    if (!playing) {
-      this.sendSocketNotification("CURRENT_PLAYBACK_FAIL");
-      setTimeout(() => {
-        this.findCurrentSpotify();
-      }, this.config.updateInterval);
-    } else {
-      setTimeout(() => {
-        this.updatePulse()
-      }, this.config.updateInterval)
-    }
+    this.timer = setTimeout(() => {
+      this.updatePulse()
+    }, this.config.updateInterval)
   },
 
   updateSpotify: function (spotify) {
@@ -74,26 +79,7 @@ module.exports = NodeHelper.create({
         } else {
           resolve(result);
         }
-      });
-    });
-  },
-
-  updatePulse: function () {
-    if (this.spotify == null) {
-      this.findCurrentSpotify()
-      return
-    }
-    this.spotify.getCurrentPlayback((code, error, result) => {
-      if (result === "undefined" || code !== 200) {
-        this.spotify = null;
-        this.findCurrentSpotify();
-        this.sendSocketNotification("CURRENT_PLAYBACK_FAIL");
-      } else {
-        this.sendSocketNotification("CURRENT_PLAYBACK", result);
-        setTimeout(() => {
-          this.updatePulse()
-        }, this.config.updateInterval)
-      }
+      })
     })
   },
 
@@ -118,11 +104,23 @@ module.exports = NodeHelper.create({
     if (onStart.deviceName) this.spotify.transferByName(onStart.deviceName)
   },
 
+  account: function(account) {
+    this.sendSocketNotification("CURRENT_NOPLAYBACK")
+    clearTimeout(this.timer)
+    this.timer= null
+    this.spotifyConfig = null
+    this.spotify = null
+    this.initAfterLoading(this.config, account)
+  },
+
   socketNotificationReceived: function (noti, payload) {
     if (noti == "INIT") {
       this.initAfterLoading(payload)
       this.sendSocketNotification("INITIALIZED")
       return
+    }
+    if (noti == "ACCOUNT") {
+      this.account(payload)
     }
     if(this.spotify){
       if (noti == "GET_DEVICES") {
