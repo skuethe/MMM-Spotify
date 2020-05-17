@@ -62,15 +62,20 @@
 }
 
 .infoicon {
-  font-size: 24px;
+  width: 20px;
+  margin-right:10px;
   text-shadow:black 2px 2px 2px;
+  align-items:center;
   line-height: inherit;
+}
+
+.mdi {
+  font-size: 24px;
 }
 
 #SPOTIFY_INFO .text {
   width: calc(var(--sp-width) - 70px);
   overflow: hidden;
-  margin-left: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
   display:inline-block;
@@ -223,7 +228,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 
 #SPOTIFY.minimalistBar .text {
   width: inherit;
-  margin-right: 1em;
+  margin-right: 0.5em;
   white-space: nowrap;
   display:inline-block;
   font-size: 1em;
@@ -233,6 +238,11 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   display: inline-block;
   width: var(--minimalist-button-size);
   height: var(--minimalist-button-size);
+  margin-right: 0px;
+}
+
+#SPOTIFY.minimalistBar .infoicon {
+  margin-right: 8px;
 }
 
 #SPOTIFY.minimalistBar #SPOTIFY_PROGRESS_BAR {
@@ -331,11 +341,4 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   flex-direction:row;
   justify-content: space-between;
   align-content: flex-end;
-}
-
-#SPOTIFY.minimalistBar #SPOTIFY_DEVICE .text,
-#SPOTIFY.minimalistBar #SPOTIFY_VOLUME .text,
-#SPOTIFY.minimalistBar #SPOTIFY_LOGO .text,
-#SPOTIFY.minimalistBar #SPOTIFY_INFO_FOOTER .text {
-  margin-left: 0.5em;
 }
