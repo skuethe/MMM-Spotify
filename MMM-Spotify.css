@@ -69,10 +69,6 @@
   line-height: inherit;
 }
 
-.mdi {
-  font-size: 24px;
-}
-
 #SPOTIFY_INFO .text {
   width: calc(var(--sp-width) - 70px);
   overflow: hidden;
@@ -243,6 +239,10 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 
 #SPOTIFY.minimalistBar .infoicon {
   margin-right: 8px;
+}
+
+#SPOTIFY_VOLUME .mdi {
+  font-size: 24px;
 }
 
 #SPOTIFY.minimalistBar #SPOTIFY_PROGRESS_BAR {
