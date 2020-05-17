@@ -5,9 +5,11 @@
 Module.register("MMM-Spotify", {
   defaults: {
     debug: false,
-    style: "default", // "default", "mini" available.
+    style: "default", // "default", "mini", "minimalistBar" available.
     control: "default", //"default", "hidden" available
+    logoMinimalist: "hidden", // "hidden", "center"
     updateInterval: 1000,
+    accountDefault: 0, // default account number, attention : 0 is the first account
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
     //iconify: null,
@@ -94,6 +96,9 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_TOGGLE":
         this.clickPlay()
         break
+      case "SPOTIFY_ACCOUNT":
+        this.sendSocketNotification("ACCOUNT", payload)
+        break
     }
   },
 
@@ -112,9 +117,10 @@ Module.register("MMM-Spotify", {
           this.updateDom()
         }
         break
-      case "CURRENT_PLAYBACK_FAIL":
+      case "CURRENT_NOPLAYBACK":
         this.updatePlayback(false)
         this.disconnected = true
+        break
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
@@ -134,6 +140,7 @@ Module.register("MMM-Spotify", {
       this.updateSongInfo(current.item)
       this.updatePlaying(current.is_playing)
       this.updateDevice(current.device)
+      this.updateVolume(current.device.volume_percent)
       this.updateShuffle(current.shuffle_state)
       this.updateRepeat(current.repeat_state)
       this.updateProgress(current.progress_ms, current.item.duration_ms)
@@ -156,6 +163,9 @@ Module.register("MMM-Spotify", {
       }
       if (this.currentPlayback.device.id !== current.device.id) {
         this.updateDevice(current.device)
+      }
+      if (this.currentPlayback.device.volume_percent !== current.device.volume_percent) {
+        this.updateVolume(current.device.volume_percent)
       }
       if (this.currentPlayback.repeat_state !== current.repeat_state) {
         this.updateRepeat(current.repeat_state)
@@ -184,7 +194,6 @@ Module.register("MMM-Spotify", {
     return ret + minutes + ":" + seconds
   },
 
-
   updateProgress: function (
     progressMS,
     durationMS,
@@ -196,20 +205,27 @@ Module.register("MMM-Spotify", {
       bar.max = durationMS;
     }
 
+    if (this.config.style === 'minimalistBar') {
+      const current = document.getElementById("SPOTIFY_PROGRESS_COMBINED");
+      current.innerText = this.msToTime(progressMS) + ' / ' + this.msToTime(durationMS);
+      return;
+    }
+
     if (this.config.style === 'default') {
-      const end = document.getElementById("SPOTIFY_PROGRESS_END");
       const current = document.getElementById("SPOTIFY_PROGRESS_CURRENT");
-      current.innerHTML = this.msToTime(progressMS);
+      current.innerText = this.msToTime(progressMS);
+
+      const end = document.getElementById("SPOTIFY_PROGRESS_END");
       const duration = this.msToTime(durationMS);
 
-      if (end.innerHTML != duration) {
-        end.innerHTML = duration;
+      if (end.innerText != duration) {
+        end.innerText = duration;
       }
     }
   },
 
   updateShuffle: function (shuffleState) {
-    if (this.config.control === "hidden") return;
+    if (this.config.control === "hidden" || this.config.style === "minimalistBar") return;
 
     const shuffle = document.getElementById("SPOTIFY_CONTROL_SHUFFLE")
     shuffle.className = shuffleState
@@ -227,7 +243,7 @@ Module.register("MMM-Spotify", {
   },
 
   updateRepeat: function (repeatState) {
-    if (this.config.control === "hidden") return;
+    if (this.config.control === "hidden" || this.config.style === "minimalistBar") return;
 
     const repeat = document.getElementById("SPOTIFY_CONTROL_REPEAT")
     repeat.className = repeatState
@@ -251,6 +267,33 @@ Module.register("MMM-Spotify", {
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
+
+  updateVolume: function (volume_percent) {
+    if (this.config.style !== "minimalistBar") return
+    const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
+    const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
+
+    volumeContainer.textContent = volume_percent + "%"
+    volumeIcon.className = this.getVolumeIconClass(volume_percent)
+
+    this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
+  },
+
+  getVolumeIconClass(volume_percent) {
+    let iconClass = 'VOL_OFF';
+    if (volume_percent === 0) {
+      return this.getFAIconClass(iconClass);
+    }
+
+    if (volume_percent < 40) {
+      iconClass = 'VOL_LOW';
+    } else {
+      iconClass = volume_percent > 70 ? 'VOL_HIGH' : 'VOL_MID'
+    }
+
+    return this.getFAIconClass(iconClass);
+  },
+
 
   updatePlaying: function (isPlaying) {
     if (isPlaying && this.firstLaunch) {
@@ -289,7 +332,13 @@ Module.register("MMM-Spotify", {
     sDom.classList.remove("noPlayback")
 
     const cover_img = document.getElementById("SPOTIFY_COVER_IMAGE")
-    const img_url = playbackItem.album.images[0].url
+    let img_index = 0
+    // cover data is stored in 3 sizes. let's fetch the appropriate size to reduce 
+    // bandwidth usage bsed on player style
+    if (this.config.style !== "default") {
+      img_index = this.config.style === "minimalistBar" ? 2 : 1
+    }
+    const img_url = playbackItem.album.images[img_index].url
 
     if (img_url !== cover_img.src) {
       const back = document.getElementById("SPOTIFY_BACKGROUND")
@@ -364,6 +413,15 @@ Module.register("MMM-Spotify", {
         return 'fa fa-user fa-sm';
       case 'Album':
         return 'fa fa-folder fa-sm';
+      // Volume Icons
+      case 'VOL_HIGH':
+        return 'mdi mdi-volume-high';
+      case 'VOL_MID':
+        return 'mdi mdi-volume-medium';
+      case 'VOL_LOW':
+        return 'mdi mdi-volume-low';
+      case 'VOL_OFF':
+        return 'mdi mdi-volume-off';
       // Device Icons
       case 'Tablet':
         return 'fas fa-tablet fa-sm';
@@ -428,6 +486,29 @@ Module.register("MMM-Spotify", {
     device.appendChild(this.getEmptyTextHTMLElement())
 
     return device;
+  },
+
+  getVolumeContainer() {
+    const volume = this.getHTMLElementWithID('div', "SPOTIFY_VOLUME")
+    volume.appendChild(
+      this.getIconContainer(this.getFAIconClass('VOL_OFF'), "SPOTIFY_VOLUME_ICON"),
+    )
+    volume.appendChild(this.getEmptyTextHTMLElement())
+
+    return volume;
+  },
+
+  getSpotifyLogoContainer() {
+    const logo = this.getHTMLElementWithID('div', "SPOTIFY_LOGO")
+    logo.appendChild(
+      this.getIconContainer(this.getFAIconClass('Spotify'), "SPOTIFY_LOGO_ICON"),
+    )
+    const text = document.createElement("span")
+    text.className = "text"
+    text.textContent = "Spotify"
+    logo.appendChild(text)
+
+    return logo;
   },
 
   getControlButton(id, icon, action) {
@@ -520,6 +601,70 @@ Module.register("MMM-Spotify", {
     return progress;
   },
 
+  getCoverContainer: function () {
+    const cover_img = this.getHTMLElementWithID('img', "SPOTIFY_COVER_IMAGE")
+    cover_img.className = 'fade-in'
+    cover_img.src = "./modules/MMM-Spotify/resources/spotify-xxl.png"
+
+    const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
+    cover.appendChild(cover_img)
+    return cover
+  },
+
+  getMinimalistBarDom: function (container) {
+    container.appendChild(this.getProgressContainer())
+
+    const misc = this.getHTMLElementWithID('div', "SPOTIFY_MISC")
+    misc.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
+    misc.appendChild(this.getDeviceContainer())
+
+    const info = this.getHTMLElementWithID('div', "SPOTIFY_INFO")
+    info.className = 'marquee';
+
+    const infoElements = [
+      "SPOTIFY_TITLE",
+      "SPOTIFY_ALBUM",
+      "SPOTIFY_ARTIST",
+    ]
+
+    infoElements.forEach(key => {
+      const element = this.getHTMLElementWithID('div', key)
+      element.appendChild(this.getEmptyTextHTMLElement())
+      info.appendChild(element)
+    })
+
+    misc.appendChild(info)
+
+    const infoFooter = this.getHTMLElementWithID('div', "SPOTIFY_INFO_FOOTER")
+    infoFooter.appendChild(this.getVolumeContainer())
+
+    if (this.config.logoMinimalist === "center") {
+      infoFooter.appendChild(this.getSpotifyLogoContainer())
+    }
+
+    const totalTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_COMBINED")
+    totalTime.className = 'text'
+    totalTime.innerText = "--:-- / --:--"
+
+    infoFooter.appendChild(totalTime)
+
+    misc.appendChild(infoFooter)
+
+    const foreground = this.getHTMLElementWithID('div', "SPOTIFY_FOREGROUND")
+    foreground.appendChild(this.getCoverContainer())
+    foreground.appendChild(misc)
+    foreground.appendChild(
+      this.getControlButton(
+        "SPOTIFY_CONTROL_PLAY",
+        'mdi:play-circle-outline', () => { this.clickPlay() },
+      ),
+    )
+
+    container.appendChild(foreground)
+
+    return container
+  },
+
   getDom: function () {
     const m = this.getHTMLElementWithID('div', "SPOTIFY")
     if (this.config.style !== "default") {
@@ -527,6 +672,11 @@ Module.register("MMM-Spotify", {
     }
 
     m.classList.add("noPlayback")
+
+    if (this.config.style === 'minimalistBar') {
+      return this.getMinimalistBarDom(m)
+    }
+
     m.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
 
     const cover_img = this.getHTMLElementWithID('img', "SPOTIFY_COVER_IMAGE")
