@@ -61,7 +61,7 @@
   justify-content: flex-start;
 }
 
-.infoicon {
+#SPOTIFY_INFO .infoicon {
   width: 20px;
   margin-right:10px;
   text-shadow:black 2px 2px 2px;
