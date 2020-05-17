@@ -230,6 +230,13 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   font-size: 1em;
 }
 
+#SPOTIFY.minimalistBar #TEXT_BULLET {
+  margin-right: 0.5em;
+  white-space: nowrap;
+  display:inline-block;
+  color: grey;
+}
+
 #SPOTIFY.minimalistBar .iconify {
   display: inline-block;
   width: var(--minimalist-button-size);
