@@ -9,7 +9,6 @@ Module.register("MMM-Spotify", {
     control: "default", //"default", "hidden" available
     logoMinimalist: "hidden", // "hidden", "center"
     updateInterval: 1000,
-    accountDefault: 0, // default account number, attention : 0 is the first account
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
     //iconify: null,
@@ -96,9 +95,6 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_TOGGLE":
         this.clickPlay()
         break
-      case "SPOTIFY_ACCOUNT":
-        this.sendSocketNotification("ACCOUNT", payload)
-        break
     }
   },
 
@@ -117,7 +113,7 @@ Module.register("MMM-Spotify", {
           this.updateDom()
         }
         break
-      case "CURRENT_NOPLAYBACK":
+      case "CURRENT_PLAYBACK_FAIL":
         this.updatePlayback(false)
         this.disconnected = true
         break
