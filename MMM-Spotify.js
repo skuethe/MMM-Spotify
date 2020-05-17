@@ -116,7 +116,6 @@ Module.register("MMM-Spotify", {
       case "CURRENT_PLAYBACK_FAIL":
         this.updatePlayback(false)
         this.disconnected = true
-        break
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
