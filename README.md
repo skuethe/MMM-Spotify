@@ -4,7 +4,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 ## Screenshot
 - ![default](screenshots/spotify_default.png)
 - ![mini](screenshots/spotify_mini.png)
-- ![minimalistBar](screenshoots/miniature_bar.PNG)
+- ![minimalistBar](screenshots/miniature_bar.PNG)
 
 ## Main Features
 - Showing Current playback on any devices
