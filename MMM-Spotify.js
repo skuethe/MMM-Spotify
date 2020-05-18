@@ -156,7 +156,7 @@ Module.register("MMM-Spotify", {
       this.updateSongInfo(current.item)
       this.updatePlaying(current.is_playing)
       this.updateDevice(current.device)
-      this.updateVolume(current.device.volume_percent)
+      if (current.device) this.updateVolume(current.device.volume_percent)
       this.updateShuffle(current.shuffle_state)
       this.updateRepeat(current.repeat_state)
       if (current.is_playing && current.item) this.updateProgress(current.progress_ms, current.item.duration_ms)
@@ -170,7 +170,6 @@ Module.register("MMM-Spotify", {
 
       /** for Ads **/
       if (current.currently_playing_type == "ad") current.is_playing = false
-      console.log(this.currentPlayback.is_playing, current.is_playing)
       if (this.currentPlayback.is_playing !== current.is_playing) {
         this.updatePlaying(current.is_playing)
         if (current.currently_playing_type == "ad") {
@@ -179,16 +178,18 @@ Module.register("MMM-Spotify", {
           return
         }
       }
-      //if (!current.item || !this.currentPlayback.item) return
-      // test with prevent crash for device change
-      if (current.item && (this.currentPlayback.item.id !== current.item.id)) {
-        this.updateSongInfo(current.item)
+      // prevent crash for device change and after ads
+      if (current.item && this.currentPlayback.item &&
+        (this.currentPlayback.item.id !== current.item.id)) {
+          this.updateSongInfo(current.item)
       }
-      if (current.device && (this.currentPlayback.device.id !== current.device.id)) {
-        this.updateDevice(current.device)
+      if (current.device && this.currentPlayback.device &&
+        (this.currentPlayback.device.id !== current.device.id)) {
+          this.updateDevice(current.device)
       }
-      if (current.device && (this.currentPlayback.device.volume_percent !== current.device.volume_percent)) {
-        this.updateVolume(current.device.volume_percent)
+      if (current.device && this.currentPlayback.device &&
+        (this.currentPlayback.device.volume_percent !== current.device.volume_percent)) {
+          this.updateVolume(current.device.volume_percent)
       }
       if (this.currentPlayback.repeat_state !== current.repeat_state) {
         this.updateRepeat(current.repeat_state)
@@ -325,8 +326,6 @@ Module.register("MMM-Spotify", {
       this.firstLaunch = false
     }
     const s = document.getElementById("SPOTIFY")
-
-    console.log("playing", isPlaying)
 
     if (isPlaying) {
       s.classList.add("playing")
