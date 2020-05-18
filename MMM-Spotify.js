@@ -49,6 +49,7 @@ Module.register("MMM-Spotify", {
     this.disconnected = false
     this.firstLaunch = true
     this.timer = null
+    this.ads = false
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -169,16 +170,25 @@ Module.register("MMM-Spotify", {
       }
 
       /** for Ads **/
-      if (current.currently_playing_type == "ad") current.is_playing = false
+      if (current.currently_playing_type == "ad") {
+        this.ads = true
+        current.is_playing = false
+      }
       if (this.currentPlayback.is_playing !== current.is_playing) {
         this.updatePlaying(current.is_playing)
-        if (current.currently_playing_type == "ad") {
-          // simulate pause for ads
-          this.currentPlayback.is_playing = false
-          return
-        }
       }
-      // prevent crash for device change and after ads
+      if (current.currently_playing_type == "ad") {
+        // simulate pause for ads
+        this.currentPlayback.is_playing = false
+        return
+      }
+      if (this.ads) {
+        // end of ads -> reset currentPlayback
+        this.currentPlayback = null
+        this.ads = false
+        return
+      }
+      // prevent crash for device change
       if (current.item && this.currentPlayback.item &&
         (this.currentPlayback.item.id !== current.item.id)) {
           this.updateSongInfo(current.item)
