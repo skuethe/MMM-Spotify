@@ -48,13 +48,12 @@ Module.register("MMM-Spotify", {
     this.currentPlayback = null
     this.disconnected = false
     this.firstLaunch = true
+    this.timer = null
   },
 
   notificationReceived: function (noti, payload, sender) {
     if (noti === "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.config)
-      //console.log(this.config)
-      //this.loadExternalScript(this.config.iconify)
     }
     switch (noti) {
       case "SPOTIFY_SEARCH":
@@ -130,8 +129,24 @@ Module.register("MMM-Spotify", {
 
   updatePlayback: function (status) {
     var dom = document.getElementById("SPOTIFY")
-    if (status) dom.classList.remove("inactive")
-    else dom.classList.add("inactive")
+    if (this.enableMiniBar) {
+      this.timer = null
+      clearTimeout(this.timer)
+      let pos = ((this.myPosition === "bottom_bar") ? "bottom" : "top")
+      if (status) {
+        dom.classList.remove(pos+"Out")
+        dom.classList.add(pos+"In")
+        dom.classList.remove("inactive")
+      }
+      else {
+        dom.classList.remove(pos+"In")
+        dom.classList.add(pos+"Out")
+        this.timer = setTimeout(() => dom.classList.add("inactive") , 500)
+      }
+    } else {
+      if (status) dom.classList.remove("inactive")
+      else dom.classList.add("inactive")
+    }
     if (!this.disconnected && !status) this.sendNotification("SPOTIFY_DISCONNECTED")
   },
 
@@ -144,7 +159,8 @@ Module.register("MMM-Spotify", {
       this.updateVolume(current.device.volume_percent)
       this.updateShuffle(current.shuffle_state)
       this.updateRepeat(current.repeat_state)
-      if (current.is_playing) this.updateProgress(current.progress_ms, current.item.duration_ms)
+      if (current.is_playing && current.item) this.updateProgress(current.progress_ms, current.item.duration_ms)
+      this.updatePlayback(current.is_playing)
     } else {
       if (this.disconnected && current.currently_playing_type) {
         this.sendNotification("SPOTIFY_CONNECTED")
@@ -154,18 +170,24 @@ Module.register("MMM-Spotify", {
 
       /** for Ads **/
       if (current.currently_playing_type == "ad") current.is_playing = false
+      console.log(this.currentPlayback.is_playing, current.is_playing)
       if (this.currentPlayback.is_playing !== current.is_playing) {
         this.updatePlaying(current.is_playing)
-        if (current.currently_playing_type == "ad") this.currentPlayback.is_playing = false
+        if (current.currently_playing_type == "ad") {
+          // simulate pause for ads
+          this.currentPlayback.is_playing = false
+          return
+        }
       }
-      if (!current.item) return
-      if (this.currentPlayback.item.id !== current.item.id) {
+      //if (!current.item || !this.currentPlayback.item) return
+      // test with prevent crash for device change
+      if (current.item && (this.currentPlayback.item.id !== current.item.id)) {
         this.updateSongInfo(current.item)
       }
-      if (this.currentPlayback.device.id !== current.device.id) {
+      if (current.device && (this.currentPlayback.device.id !== current.device.id)) {
         this.updateDevice(current.device)
       }
-      if (this.currentPlayback.device.volume_percent !== current.device.volume_percent) {
+      if (current.device && (this.currentPlayback.device.volume_percent !== current.device.volume_percent)) {
         this.updateVolume(current.device.volume_percent)
       }
       if (this.currentPlayback.repeat_state !== current.repeat_state) {
@@ -174,8 +196,9 @@ Module.register("MMM-Spotify", {
       if (this.currentPlayback.shuffle_state !== current.shuffle_state) {
         this.updateShuffle(current.shuffle_state)
       }
-      if (this.currentPlayback.progress_ms !== current.progress_ms) {
-        this.updateProgress(current.progress_ms, current.item.duration_ms)
+      if (current.progress_ms && current.item && current.item.duration_ms && 
+        (this.currentPlayback.progress_ms !== current.progress_ms)) {
+          this.updateProgress(current.progress_ms, current.item.duration_ms)
       }
     }
     this.currentPlayback = current
@@ -303,6 +326,8 @@ Module.register("MMM-Spotify", {
     }
     const s = document.getElementById("SPOTIFY")
 
+    console.log("playing", isPlaying)
+
     if (isPlaying) {
       s.classList.add("playing")
       s.classList.remove("pausing")
@@ -336,7 +361,7 @@ Module.register("MMM-Spotify", {
     let img_index = 0
     // cover data is stored in 3 sizes. let's fetch the appropriate size to reduce 
     // bandwidth usage bsed on player style
-    if (this.config.style !== "default") { //
+    if (this.config.style !== "default") {
       img_index = this.enbaleMiniBar ? 2 : 1
     }
     const img_url = playbackItem.album.images[img_index].url
@@ -673,9 +698,10 @@ Module.register("MMM-Spotify", {
     }
 
     m.classList.add("noPlayback")
-
     if (this.enableMiniBar) {
       m.classList.add("minimalistBar")
+      m.classList.add("inactive")
+      //m.classList.add("out")
       return this.getMinimalistBarDom(m)
     }
 
@@ -702,11 +728,11 @@ Module.register("MMM-Spotify", {
   },
   scanConfig: function () {
     this.enableMiniBar = false
-    let myPosition = null
-    const myConfig = config.modules.find( name => {
+    this.myPosition = null
+    let myConfig = config.modules.find( name => {
       if (name.module == 'MMM-Spotify') return name
     })
-    myPosition = myConfig.position
-    if (myPosition == "bottom_bar" || myPosition == "top_bar") this.enableMiniBar = true
+    this.myPosition = myConfig.position
+    if (this.myPosition == "bottom_bar" || this.myPosition == "top_bar") this.enableMiniBar = true
   }
 })

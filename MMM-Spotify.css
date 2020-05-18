@@ -211,6 +211,76 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   height: calc(var(--minimalist-height) + 1px);
 }
 
+#SPOTIFY.minimalistBar.bottomIn {
+  animation-duration: 1s;
+  animation-name: fadeInBottom;
+}
+
+#SPOTIFY.minimalistBar.bottomOut {
+  animation-duration: 1s;
+  animation-name: fadeOutBottom;
+  animation-fill-mode: forwards;
+}
+
+#SPOTIFY.minimalistBar.topIn {
+  animation-duration: 1s;
+  animation-name: fadeInTop;
+}
+
+#SPOTIFY.minimalistBar.topOut {
+  animation-duration: 1s;
+  animation-name: fadeOutTop;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeInBottom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 200%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeOutBottom {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, 200%, 0);
+  }
+}
+
+@keyframes fadeInTop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeOutTop {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
 #SPOTIFY.minimalistBar.noPlayback #SPOTIFY_FOREGROUND,
 #SPOTIFY.minimalistBar.noPlayback #SPOTIFY_PROGRESS_BAR,
 #SPOTIFY.minimalistBar #SPOTIFY_BACKGROUND {
