@@ -345,7 +345,7 @@ Module.register("MMM-Spotify", {
       s.classList.remove("playing")
     }
 
-    if (this.config.control !== "hidden") {
+    if (this.config.control !== "hidden" || this.enableMiniBar) {
       const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
       p.className = isPlaying ? "playing" : "pausing"
       const icon = isPlaying
@@ -392,7 +392,7 @@ Module.register("MMM-Spotify", {
     title.textContent = playbackItem.name
 
     const album = document.querySelector("#SPOTIFY_ALBUM .text")
-    album.textContent = playbackItem.album.name
+    album.textContent = this.enableMiniBar ? "- " + playbackItem.album.name + " -": playbackItem.album.name
 
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
     const artists = playbackItem.artists
@@ -710,7 +710,6 @@ Module.register("MMM-Spotify", {
     if (this.enableMiniBar) {
       m.classList.add("minimalistBar")
       m.classList.add("inactive")
-      //m.classList.add("out")
       return this.getMinimalistBarDom(m)
     }
 
