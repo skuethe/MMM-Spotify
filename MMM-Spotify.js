@@ -5,7 +5,7 @@
 Module.register("MMM-Spotify", {
   defaults: {
     debug: false,
-    style: "default", // "default", "mini", "minimalistBar" available.
+    style: "default", // "default", "mini" available.
     control: "default", //"default", "hidden" available
     logoMinimalist: "center", // "hidden", "center"
     updateInterval: 1000,
@@ -32,6 +32,7 @@ Module.register("MMM-Spotify", {
   },
 
   getScripts: function () {
+    this.scanConfig()
     r = ["https://cdn.materialdesignicons.com/5.2.45/css/materialdesignicons.min.css"]
     if (this.config.iconify) {
       r.push(this.config.iconify)
@@ -205,13 +206,13 @@ Module.register("MMM-Spotify", {
       bar.max = durationMS;
     }
 
-    if (this.config.style === 'minimalistBar') {
+    if (this.enableMiniBar) {
       const current = document.getElementById("SPOTIFY_PROGRESS_COMBINED");
       current.innerText = this.msToTime(progressMS) + ' / ' + this.msToTime(durationMS);
       return;
     }
 
-    if (this.config.style === 'default') {
+    if (this.config.style === 'default' && !this.enableMiniBar) {
       const current = document.getElementById("SPOTIFY_PROGRESS_CURRENT");
       current.innerText = this.msToTime(progressMS);
 
@@ -225,7 +226,7 @@ Module.register("MMM-Spotify", {
   },
 
   updateShuffle: function (shuffleState) {
-    if (this.config.control === "hidden" || this.config.style === "minimalistBar") return;
+    if (this.config.control === "hidden" || this.enableMiniBar) return;
 
     const shuffle = document.getElementById("SPOTIFY_CONTROL_SHUFFLE")
     shuffle.className = shuffleState
@@ -243,7 +244,7 @@ Module.register("MMM-Spotify", {
   },
 
   updateRepeat: function (repeatState) {
-    if (this.config.control === "hidden" || this.config.style === "minimalistBar") return;
+    if (this.config.control === "hidden" || this.enableMiniBar) return;
 
     const repeat = document.getElementById("SPOTIFY_CONTROL_REPEAT")
     repeat.className = repeatState
@@ -262,14 +263,14 @@ Module.register("MMM-Spotify", {
     const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
     const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
-    deviceContainer.textContent = this.config.style == "default" ? this.config.deviceDisplay + ' ' + device.name : device.name
+    deviceContainer.textContent = (this.config.style == "default" && !this.enableMiniBar) ? this.config.deviceDisplay + ' ' + device.name : device.name
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
 
   updateVolume: function (volume_percent) {
-    if (this.config.style !== "minimalistBar") return
+    if (!this.enableMiniBar) return
     const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
     const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
 
@@ -335,8 +336,8 @@ Module.register("MMM-Spotify", {
     let img_index = 0
     // cover data is stored in 3 sizes. let's fetch the appropriate size to reduce 
     // bandwidth usage bsed on player style
-    if (this.config.style !== "default") {
-      img_index = this.config.style === "minimalistBar" ? 2 : 1
+    if (this.config.style !== "default") { //
+      img_index = this.enbaleMiniBar ? 2 : 1
     }
     const img_url = playbackItem.album.images[img_index].url
 
@@ -579,7 +580,7 @@ Module.register("MMM-Spotify", {
   getProgressContainer() {
     const progress = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS")
 
-    if (this.config.style === 'default') {
+    if (this.config.style === 'default' && !this.enableMiniBar) {
       const currentTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_CURRENT")
       currentTime.innerText = "--:--"
 
@@ -667,13 +668,14 @@ Module.register("MMM-Spotify", {
 
   getDom: function () {
     const m = this.getHTMLElementWithID('div', "SPOTIFY")
-    if (this.config.style !== "default") {
+    if (this.config.style !== "default" && !this.enableMiniBar) {
       m.classList.add(this.config.style)
     }
 
     m.classList.add("noPlayback")
 
-    if (this.config.style === 'minimalistBar') {
+    if (this.enableMiniBar) {
+      m.classList.add("minimalistBar")
       return this.getMinimalistBarDom(m)
     }
 
@@ -698,4 +700,13 @@ Module.register("MMM-Spotify", {
     m.appendChild(fore)
     return m
   },
+  scanConfig: function () {
+    this.enableMiniBar = false
+    let myPosition = null
+    const myConfig = config.modules.find( name => {
+      if (name.module == 'MMM-Spotify') return name
+    })
+    myPosition = myConfig.position
+    if (myPosition == "bottom_bar" || myPosition == "top_bar") this.enableMiniBar = true
+  }
 })
