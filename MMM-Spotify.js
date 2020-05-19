@@ -298,7 +298,7 @@ Module.register("MMM-Spotify", {
     const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
     const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
 
-    deviceContainer.textContent = (this.config.style == "default" && !this.enableMiniBar) ? this.config.deviceDisplay + ' ' + device.name : device.name
+    deviceContainer.textContent = (this.config.style == "default" || this.enableMiniBar) ? this.config.deviceDisplay + ' ' + device.name : device.name
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
