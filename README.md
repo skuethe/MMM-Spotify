@@ -20,6 +20,8 @@ Thanks @eouia for all the hard work you put in for the MagicMirror community
 - Added: new style MiniBar
 - Added: niniBar Set automatically with position `top_bar` or `bottom_bar`
 - Added: some Features for MiniBar displaying
+- Fixed (more): Advertising for free account (simulate pausing)
+- Fixed: stability of the main code check
 
 ### 1.4.0 (2020-05-16)
 - Added & Modified: Multi-account management by notification `SPOTIFY_ACCOUNT`
