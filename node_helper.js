@@ -185,10 +185,6 @@ module.exports = NodeHelper.create({
   },
 
   searchAndPlay: function (param, condition) {
-    if (this.spotify == null) {
-      this.findCurrentSpotify()
-      return
-    }
     if (!param.type) {
       param.type = "artist,track,album,playlist"
     } else {
