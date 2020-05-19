@@ -7,16 +7,17 @@ Module.register("MMM-Spotify", {
     debug: false,
     style: "default", // "default", "mini" available.
     control: "default", //"default", "hidden" available
-    logoMinimalist: "center", // "hidden", "center"
     updateInterval: 1000,
     accountDefault: 0, // default account number, attention : 0 is the first account
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
     //iconify: null,
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
-
     onStart: null,
-    deviceDisplay: "Listening on"
+    deviceDisplay: "Listening on",
+    miniBarAlbum: true,
+    miniBarScroll: true,
+    miniBarLogo: true,
     //If you want to play something on start; set like this.
     /*
     onStart: {
@@ -392,8 +393,7 @@ Module.register("MMM-Spotify", {
     title.textContent = playbackItem.name
 
     const album = document.querySelector("#SPOTIFY_ALBUM .text")
-    album.textContent = this.enableMiniBar ? "- " + playbackItem.album.name + " -": playbackItem.album.name
-
+    album.textContent = this.enableMiniBar ? (this.config.miniBarAlbum ? "- " + playbackItem.album.name + " -" : "-") : playbackItem.album.name
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
     const artists = playbackItem.artists
     let artistName = ""
@@ -654,7 +654,7 @@ Module.register("MMM-Spotify", {
     misc.appendChild(this.getDeviceContainer())
 
     const info = this.getHTMLElementWithID('div', "SPOTIFY_INFO")
-    info.className = 'marquee';
+    if (this.config.miniBarScroll) info.className = 'marquee';
 
     const infoElements = [
       "SPOTIFY_TITLE",
@@ -673,7 +673,7 @@ Module.register("MMM-Spotify", {
     const infoFooter = this.getHTMLElementWithID('div', "SPOTIFY_INFO_FOOTER")
     infoFooter.appendChild(this.getVolumeContainer())
 
-    if (this.config.logoMinimalist === "center") {
+    if (this.config.miniBarLogo) {
       infoFooter.appendChild(this.getSpotifyLogoContainer())
     }
 
@@ -709,6 +709,7 @@ Module.register("MMM-Spotify", {
     m.classList.add("noPlayback")
     if (this.enableMiniBar) {
       m.classList.add("minimalistBar")
+      m.classList.add(this.config.miniBarScroll ? "Scroll" : "noScroll")
       m.classList.add("inactive")
       return this.getMinimalistBarDom(m)
     }
