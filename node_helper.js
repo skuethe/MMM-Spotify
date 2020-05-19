@@ -85,23 +85,25 @@ module.exports = NodeHelper.create({
 
   onStart: function () {
     let onStart = this.config.onStart
-    onStart.position_ms = 0
-    if (onStart.search) {
-      var param = {
-        q: onStart.search.keyword,
-        type: onStart.search.type,
-      }
-      var condition = {
-        random: onStart.search.random,
-        autoplay: true,
-      }
-      this.searchAndPlay(param, condition)
-    } else if (onStart.spotifyUri.match("track")) {
-      this.spotify.play({uris: [onStart.spotifyUri]})
-    } else if (onStart.spotifyUri) {
-      this.spotify.play({context_uri: onStart.spotifyUri})
-    }
     if (onStart.deviceName) this.spotify.transferByName(onStart.deviceName)
+    setTimeout(() => {
+      onStart.position_ms = 0
+      if (onStart.search) {
+        var param = {
+          q: onStart.search.keyword,
+          type: onStart.search.type,
+        }
+        var condition = {
+          random: onStart.search.random,
+          autoplay: true,
+        }
+        this.searchAndPlay(param, condition)
+      } else if (onStart.spotifyUri.match("track")) {
+        this.spotify.play({uris: [onStart.spotifyUri]})
+      } else if (onStart.spotifyUri) {
+        this.spotify.play({context_uri: onStart.spotifyUri})
+      }
+    }, 5000)
   },
 
   account: function(account) {
