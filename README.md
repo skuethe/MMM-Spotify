@@ -22,6 +22,7 @@ Thanks @eouia for all the hard work you put in for the MagicMirror community
 - Added: some Features for MiniBar displaying
 - Fixed (more): Advertising for free account (simulate pausing)
 - Fixed: stability of the main code check
+- Fixed: onStart code
 
 ### 1.4.0 (2020-05-16)
 - Added & Modified: Multi-account management by notification `SPOTIFY_ACCOUNT`
@@ -134,7 +135,7 @@ You can control Spotify on start of MagicMirror (By example; Autoplay specific p
 ```js
   onStart: {
     deviceName: "RASPOTIFY", //if null, current(last) activated device will be.
-    spotifyUri: "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ"
+    spotifyUri: "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ",
     //when search is set, sportifyUri will be ignored.
     search: {
       type: "playlist", // `artist`, track`, `album`, `playlist` and its combination(`artist,playlist,album`) be available
