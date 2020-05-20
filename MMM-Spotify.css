@@ -361,14 +361,24 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   display: flex;
   flex-direction:column;
   justify-content: space-between;
-  width:calc(
-    var(--minimalist-width) - 
-    var(--minimalist-cover-size) - 
-    var(--minimalist-button-size)
-  );
   margin-left: 0.5vw;
   margin-right: 0.5vw;
   overflow: hidden;
+}
+
+#SPOTIFY_MISC.control  {
+  width:calc(
+    var(--minimalist-width) -
+    var(--minimalist-cover-size) -
+    var(--minimalist-button-size)
+  );
+}
+
+#SPOTIFY_MISC.nocontrol {
+  width:calc(
+    var(--minimalist-width) -
+    var(--minimalist-cover-size)
+  );
 }
 
 #SPOTIFY.minimalistBar #SPOTIFY_INFO {
@@ -437,4 +447,11 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   flex-direction:row;
   justify-content: space-between;
   align-content: flex-end;
+}
+
+#SPOTIFY.minimalistBar #TEXT_BULLET {
+  margin-right: 0.5em;
+  white-space: nowrap;
+  display:inline-block;
+  color: grey;
 }

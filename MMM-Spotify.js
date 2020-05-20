@@ -15,9 +15,11 @@ Module.register("MMM-Spotify", {
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
     onStart: null,
     deviceDisplay: "Listening on",
-    miniBarAlbum: true,
-    miniBarScroll: true,
-    miniBarLogo: true,
+    miniBarConfig: {
+      album: true,
+      scroll: true,
+      logo: true,
+    }
     //If you want to play something on start; set like this.
     /*
     onStart: {
@@ -346,7 +348,7 @@ Module.register("MMM-Spotify", {
       s.classList.remove("playing")
     }
 
-    if (this.config.control !== "hidden" || this.enableMiniBar) {
+    if (this.config.control !== "hidden") {
       const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
       p.className = isPlaying ? "playing" : "pausing"
       const icon = isPlaying
@@ -392,8 +394,11 @@ Module.register("MMM-Spotify", {
     const title = document.querySelector("#SPOTIFY_TITLE .text")
     title.textContent = playbackItem.name
 
-    const album = document.querySelector("#SPOTIFY_ALBUM .text")
-    album.textContent = this.enableMiniBar ? (this.config.miniBarAlbum ? "- " + playbackItem.album.name + " -" : "-") : playbackItem.album.name
+    if ((this.enableMiniBar && this.config.miniBarConfig.album) || !this.enableMiniBar) {
+      const album = document.querySelector("#SPOTIFY_ALBUM .text")
+      album.textContent = playbackItem.album.name
+    }
+
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
     const artists = playbackItem.artists
     let artistName = ""
@@ -616,7 +621,7 @@ Module.register("MMM-Spotify", {
 
     if (this.config.style === 'default' && !this.enableMiniBar) {
       const currentTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_CURRENT")
-      currentTime.innerText = "--:--"
+      currentTime.innerTexttrue = "--:--"
 
       const songTime = this.getHTMLElementWithID('div', "SPOTIFY_PROGRESS_END")
       songTime.innerText = "--:--"
@@ -650,11 +655,12 @@ Module.register("MMM-Spotify", {
     container.appendChild(this.getProgressContainer())
 
     const misc = this.getHTMLElementWithID('div', "SPOTIFY_MISC")
+    misc.classList.add(this.config.control == "hidden" ? "nocontrol" : "control")
     misc.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
     misc.appendChild(this.getDeviceContainer())
 
     const info = this.getHTMLElementWithID('div', "SPOTIFY_INFO")
-    if (this.config.miniBarScroll) info.className = 'marquee';
+    if (this.config.miniBarConfig.scroll) info.className = 'marquee';
 
     const infoElements = [
       "SPOTIFY_TITLE",
@@ -662,7 +668,13 @@ Module.register("MMM-Spotify", {
       "SPOTIFY_ARTIST",
     ]
 
-    infoElements.forEach(key => {
+    infoElements.forEach((key, index) => {
+      if (key == "SPOTIFY_ALBUM" && !this.config.miniBarConfig.album) return
+      if (index > 0) {
+        const bulletElement = this.getHTMLElementWithID("span", "TEXT_BULLET");
+        bulletElement.innerHTML = "&#8226;"
+        info.appendChild(bulletElement)
+      }
       const element = this.getHTMLElementWithID('div', key)
       element.appendChild(this.getEmptyTextHTMLElement())
       info.appendChild(element)
@@ -673,7 +685,7 @@ Module.register("MMM-Spotify", {
     const infoFooter = this.getHTMLElementWithID('div', "SPOTIFY_INFO_FOOTER")
     infoFooter.appendChild(this.getVolumeContainer())
 
-    if (this.config.miniBarLogo) {
+    if (this.config.miniBarConfig.logo) {
       infoFooter.appendChild(this.getSpotifyLogoContainer())
     }
 
@@ -688,12 +700,14 @@ Module.register("MMM-Spotify", {
     const foreground = this.getHTMLElementWithID('div', "SPOTIFY_FOREGROUND")
     foreground.appendChild(this.getCoverContainer())
     foreground.appendChild(misc)
-    foreground.appendChild(
-      this.getControlButton(
-        "SPOTIFY_CONTROL_PLAY",
-        'mdi:play-circle-outline', () => { this.clickPlay() },
-      ),
-    )
+    if (this.config.control !== "hidden") {
+      foreground.appendChild(
+        this.getControlButton(
+          "SPOTIFY_CONTROL_PLAY",
+          'mdi:play-circle-outline', () => { this.clickPlay() },
+        ),
+      )
+    }
 
     container.appendChild(foreground)
 
@@ -709,7 +723,7 @@ Module.register("MMM-Spotify", {
     m.classList.add("noPlayback")
     if (this.enableMiniBar) {
       m.classList.add("minimalistBar")
-      m.classList.add(this.config.miniBarScroll ? "Scroll" : "noScroll")
+      m.classList.add(this.config.miniBarConfig.scroll ? "Scroll" : "noScroll")
       m.classList.add("inactive")
       return this.getMinimalistBarDom(m)
     }
