@@ -1,5 +1,9 @@
 :root {
   --sp-width: 360px;
+  --minimalist-height: 75px;
+  --minimalist-width: 100%;
+  --minimalist-cover-size: var(--minimalist-height);
+  --minimalist-button-size: 50px;
 }
 
 #SPOTIFY {
@@ -13,10 +17,6 @@
   text-align:left;
   line-height:120%;
   text-shadow:black 2px 2px 2px;
-}
-
-#SPOTIFY * {
-  box-sizing: border-box;
 }
 
 #SPOTIFY.inactive {
@@ -61,6 +61,8 @@
   width: 20px;
   margin-right:10px;
   text-shadow:black 2px 2px 2px;
+  align-items:center;
+  text-align: center;
   line-height: inherit;
 }
 
@@ -145,9 +147,8 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 }
 
 #SPOTIFY_CONTROL .iconify {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  justify-self: center;
+  align-self: center;
 }
 
 /* control "hidden" */
@@ -158,11 +159,20 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 /* style "mini" */
 #SPOTIFY.mini {
   width: var(--sp-width);
+  font-size: 16px;
 }
 
 #SPOTIFY.mini #SPOTIFY_FOREGROUND {
   flex-direction:row;
   padding:0;
+}
+
+#SPOTIFY.mini .mdi {
+  font-size: 14px;
+}
+
+#SPOTIFY.mini .infoicon {
+  margin-right: 6px;
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER {
@@ -183,6 +193,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_BAR {
   margin:5px;
+  width: 95%;
 }
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
@@ -199,4 +210,254 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 
 #SPOTIFY.noPlayback #SPOTIFY_FOREGROUND #SPOTIFY_COVER {
   display:block;
+}
+
+/* style "minimalistBar" */
+#SPOTIFY.minimalistBar {
+  width: var(--minimalist-width);
+  height: calc(var(--minimalist-height) + 1px);
+}
+
+#SPOTIFY.minimalistBar.bottomIn {
+  animation-duration: 1s;
+  animation-name: fadeInBottom;
+}
+
+#SPOTIFY.minimalistBar.bottomOut {
+  animation-duration: 1s;
+  animation-name: fadeOutBottom;
+  animation-fill-mode: forwards;
+}
+
+#SPOTIFY.minimalistBar.topIn {
+  animation-duration: 1s;
+  animation-name: fadeInTop;
+}
+
+#SPOTIFY.minimalistBar.topOut {
+  animation-duration: 1s;
+  animation-name: fadeOutTop;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeInBottom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 200%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeOutBottom {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, 200%, 0);
+  }
+}
+
+@keyframes fadeInTop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeOutTop {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+#SPOTIFY.minimalistBar.noPlayback #SPOTIFY_FOREGROUND,
+#SPOTIFY.minimalistBar.noPlayback #SPOTIFY_PROGRESS_BAR,
+#SPOTIFY.minimalistBar #SPOTIFY_BACKGROUND {
+  display: none;
+}
+
+#SPOTIFY.minimalistBar.pausing #SPOTIFY_PROGRESS_BAR, 
+#SPOTIFY.minimalistBar.pausing #SPOTIFY_MISC {
+  filter:brightness(50%) grayscale(75%);
+}
+
+#SPOTIFY.minimalistBar .text {
+  width: inherit;
+  margin-right: 0.5em;
+  white-space: nowrap;
+  display:inline-block;
+  font-size: 1em;
+}
+
+#SPOTIFY.minimalistBar #TEXT_BULLET {
+  margin-right: 0.5em;
+  white-space: nowrap;
+  display:inline-block;
+  color: grey;
+}
+
+#SPOTIFY.minimalistBar .iconify {
+  display: inline-block;
+  width: var(--minimalist-button-size);
+  height: var(--minimalist-button-size);
+  margin-right: 0px;
+}
+
+#SPOTIFY.minimalistBar .infoicon {
+  margin-right: 8px;
+}
+
+#SPOTIFY_VOLUME .mdi {
+  font-size: 20px;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_PROGRESS_BAR {
+  position: relative;
+  width: var(--minimalist-width);
+  height: 1px;
+  border: 0px transparent;
+  margin-bottom: 4px;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_FOREGROUND {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+  padding:0;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_COVER {
+  position: relative;
+  width:var(--minimalist-cover-size);
+  height:var(--minimalist-height);
+  padding:0;
+  z-index:1;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_COVER_IMAGE {
+  height:var(--minimalist-height);
+  border-radius:0px;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_CONTROL_PLAY {
+  display: inline-block;
+  margin: auto;
+  width: var(--minimalist-button-size);
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_MISC {
+  display: flex;
+  flex-direction:column;
+  justify-content: space-between;
+  margin-left: 0.5vw;
+  margin-right: 0.5vw;
+  overflow: hidden;
+}
+
+#SPOTIFY_MISC.control  {
+  width:calc(
+    var(--minimalist-width) -
+    var(--minimalist-cover-size) -
+    var(--minimalist-button-size)
+  );
+}
+
+#SPOTIFY_MISC.nocontrol {
+  width:calc(
+    var(--minimalist-width) -
+    var(--minimalist-cover-size)
+  );
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_INFO {
+  display: flex;
+  flex-direction:row;
+  justify-content: flex-start;
+  align-items: center;
+  width: inherit;
+  height: 70%;
+}
+
+#SPOTIFY.minimalistBar.Scroll #SPOTIFY_INFO {
+  justify-content: flex-start;
+  align-items: center;
+  width: inherit;
+  height: 70%;
+}
+
+#SPOTIFY.minimalistBar.noScroll #SPOTIFY_INFO {
+  justify-content: center;
+  align-items: center;
+  width: initial;
+}
+
+.marquee {
+  display: inline-block;
+  padding-left: 100%;
+  will-change: transform;
+  animation: marquee 60s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-100%, 0);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+#SPOTIFY.minimalistBar.pausing .marquee {
+  animation-play-state: paused;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_TITLE {
+  font-weight: bold;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_ALBUM {
+  color: grey;
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_INFO_FOOTER > #SPOTIFY_LOGO {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+#SPOTIFY.minimalistBar #SPOTIFY_INFO_FOOTER {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+  align-content: flex-end;
+}
+
+#SPOTIFY.minimalistBar #TEXT_BULLET {
+  margin-right: 0.5em;
+  white-space: nowrap;
+  display:inline-block;
+  color: grey;
 }

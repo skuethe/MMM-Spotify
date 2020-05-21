@@ -4,6 +4,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 ## Screenshot
 - ![default](screenshots/spotify_default.png)
 - ![mini](screenshots/spotify_mini.png)
+- ![minimalistBar](screenshots/miniature_bar.PNG)
 
 ## Main Features
 - Showing Current playback on any devices
@@ -14,6 +15,14 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 ## New updates
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
+
+### 1.4.1
+- Added: new style miniBar
+- Added: miniBar Set automatically with position `top_bar` or `bottom_bar`
+- Added: some Features for MiniBar displaying
+- Fixed (more): Advertising for free account (simulate pausing)
+- Fixed: stability of the main code check
+- Fixed: onStart code
 
 ### 1.4.0 (2020-05-16)
 - Added & Modified: Multi-account management by notification `SPOTIFY_ACCOUNT`
@@ -103,17 +112,22 @@ That's all. `token.json` will be created, if success.
 ```js
 {
   module: "MMM-Spotify",
-  position: "bottom_left",
+  position: "bottom_left", // "bottom_bar" or "top_bar" for miniBar
   config: {
     debug: false, // debug mode
-    style: "default", // "default" or "mini" available
-    control: "default", //"default", "hidden" available
+    style: "default", // "default" or "mini" available (inactive for miniBar)
+    control: "default",
     accountDefault: 0, // default account number, attention : 0 is the first account
     updateInterval: 1000,
     onStart: null, // disable onStart feature with `null`
     deviceDisplay: "Listening on", // text to display in the device block (default style only)
     allowDevices: [], //If you want to limit devices to display info, use this.
     // allowDevices: ["RASPOTIFY", "My iPhoneX", "My Home speaker"],
+    miniBarConfig: {
+      album: true, // display Album name in miniBar style
+      scroll: true, // scroll title / artist / album in miniBar style
+      logo: true, // display Spotify logo in miniBar style
+    }
   }
 }
 ```
@@ -123,7 +137,7 @@ You can control Spotify on start of MagicMirror (By example; Autoplay specific p
 ```js
   onStart: {
     deviceName: "RASPOTIFY", //if null, current(last) activated device will be.
-    spotifyUri: "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ"
+    spotifyUri: "spotify:track:3ENXjRhFPkH8YSH3qBXTfQ",
     //when search is set, sportifyUri will be ignored.
     search: {
       type: "playlist", // `artist`, track`, `album`, `playlist` and its combination(`artist,playlist,album`) be available
