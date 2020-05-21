@@ -19,10 +19,6 @@
   text-shadow:black 2px 2px 2px;
 }
 
-#SPOTIFY * {
-  box-sizing: border-box;
-}
-
 #SPOTIFY.inactive {
   display:none;
 }
@@ -163,11 +159,20 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 /* style "mini" */
 #SPOTIFY.mini {
   width: var(--sp-width);
+  font-size: 16px;
 }
 
 #SPOTIFY.mini #SPOTIFY_FOREGROUND {
   flex-direction:row;
   padding:0;
+}
+
+#SPOTIFY.mini .mdi {
+  font-size: 14px;
+}
+
+#SPOTIFY.mini .infoicon {
+  margin-right: 6px;
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER {
@@ -188,6 +193,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_BAR {
   margin:5px;
+  width: 95%;
 }
 
 #SPOTIFY.mini #SPOTIFY_PROGRESS_TIME {
@@ -320,7 +326,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 }
 
 #SPOTIFY_VOLUME .mdi {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 #SPOTIFY.minimalistBar #SPOTIFY_PROGRESS_BAR {

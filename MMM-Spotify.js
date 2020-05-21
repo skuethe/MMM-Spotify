@@ -751,11 +751,7 @@ Module.register("MMM-Spotify", {
   },
   scanConfig: function () {
     this.enableMiniBar = false
-    this.myPosition = null
-    let myConfig = config.modules.find( name => {
-      if (name.module == 'MMM-Spotify') return name
-    })
-    this.myPosition = myConfig.position
+    this.myPosition = this.data.position
     if (this.myPosition == "bottom_bar" || this.myPosition == "top_bar") this.enableMiniBar = true
   }
 })
