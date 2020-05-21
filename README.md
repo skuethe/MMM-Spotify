@@ -16,7 +16,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
-### 1.4.1
+### 1.4.1 (2020-05-21)
 - Added: new style miniBar
 - Added: miniBar Set automatically with position `top_bar` or `bottom_bar`
 - Added: some Features for MiniBar displaying
