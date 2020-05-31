@@ -16,6 +16,10 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
+### 1.4.2 (2020-05-31)
+- Added: idleInterval Feature
+- Fixed: Crash on with mismake Token file
+
 ### 1.4.1 (2020-05-21)
 - Added: new style miniBar
 - Added: miniBar Set automatically with position `top_bar` or `bottom_bar`
@@ -118,7 +122,8 @@ That's all. `token.json` will be created, if success.
     style: "default", // "default" or "mini" available (inactive for miniBar)
     control: "default",
     accountDefault: 0, // default account number, attention : 0 is the first account
-    updateInterval: 1000,
+    updateInterval: 1000, // update interval when playing
+    idleInterval: 30000, // update interval on idle
     onStart: null, // disable onStart feature with `null`
     deviceDisplay: "Listening on", // text to display in the device block (default style only)
     allowDevices: [], //If you want to limit devices to display info, use this.
