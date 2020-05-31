@@ -167,6 +167,11 @@ class Spotify {
   }
 
   doRequest(api, type, qsParam, bodyParam, cb) {
+    if (!this.token) {
+      console.log("[SPOTIFY:ERROR] USERNAME:", this.config.USERNAME)
+      console.log("[SPOTIFY:ERROR] Token Error !", this.config.TOKEN)
+      return
+    }
     var authOptions = {
       url: "https://api.spotify.com" + api,
       method: type,

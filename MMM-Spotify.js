@@ -8,6 +8,7 @@ Module.register("MMM-Spotify", {
     style: "default", // "default", "mini" available.
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
+    idleInterval: 30000,
     accountDefault: 0, // default account number, attention : 0 is the first account
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",

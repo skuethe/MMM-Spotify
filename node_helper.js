@@ -59,16 +59,18 @@ module.exports = NodeHelper.create({
   },
 
   updatePulse: async function () {
+    let idle = false
     if (!this.spotify) return console.log("[SPOTIFY] updatePulse ERROR: Account not found")
     try {
       let result = await this.updateSpotify(this.spotify)
       this.sendSocketNotification("CURRENT_PLAYBACK", result)
     } catch (e) {
+      idle = true
       this.sendSocketNotification("CURRENT_NOPLAYBACK")
     }
     this.timer = setTimeout(() => {
       this.updatePulse()
-    }, this.config.updateInterval)
+    }, idle ? this.config.idleInterval : this.config.updateInterval)
   },
 
   updateSpotify: function (spotify) {
