@@ -217,7 +217,10 @@ class Spotify {
   }
 
   getCurrentPlayback(cb) {
-    this.doRequest("/v1/me/player", "GET", null, null, cb)
+    var params = {
+      'additional_types': 'episode,track'
+    }
+    this.doRequest("/v1/me/player", "GET", params, null, cb)
   }
 
   getDevices(cb) {
