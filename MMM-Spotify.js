@@ -417,13 +417,16 @@ Module.register("MMM-Spotify", {
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
     
     let artistName = ""
-
+    if(playbackItem.album){
     for (let x = 0; x < artists.length; x++) {
       if (!artistName) {
         artistName = artists[x].name
       } else {
         artistName += ", " + artists[x].name
       }
+    }}
+    else{
+      artistName = playbackItem.show.publisher
     }
     artist.textContent = artistName
     this.sendNotification("SPOTIFY_UPDATE_SONG_INFO", playbackItem)
