@@ -76,7 +76,6 @@ module.exports = NodeHelper.create({
   updateSpotify: function (spotify) {
     return new Promise((resolve, reject) => {
       spotify.getCurrentPlayback((code, error, result) => {
-        console.log(result.item);
         if (result === "undefined" || code !== 200) {
           reject();
         } else {
