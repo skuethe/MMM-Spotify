@@ -379,16 +379,13 @@ Module.register("MMM-Spotify", {
     }
     var img_url
     var display_name
-    var  artists
     if (playbackItem.album){
       img_url = playbackItem.album.images[img_index].url
       display_name = playbackItem.album.name
-      artists = playbackItem.artists
     }
     else{
       img_url = playbackItem.images[img_index].url
       display_name = playbackItem.show.name
-      artists =  playbackItem.show.publisher
     }
 
     
@@ -415,7 +412,7 @@ Module.register("MMM-Spotify", {
     }
 
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
-    
+    const artists = playbackItem.artists
     let artistName = ""
     if(playbackItem.album){
     for (let x = 0; x < artists.length; x++) {
