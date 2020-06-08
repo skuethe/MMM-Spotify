@@ -104,6 +104,7 @@ node first_auth.js
 ```
 Then, Allowance dialog popup will be opened. You MUST LOG IN IN SAME ORDER YOU PUT YOUR USERS IN CONFIGURATION FILE. Log in(if it is needed) and allow it.
 That's all. `token.json` will be created, if success.
+**Note**: Change `TOKEN` file name, if you use multiple account.
 
 ## Configuration
 ### Simple
