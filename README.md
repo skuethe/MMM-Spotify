@@ -16,6 +16,10 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
+### 1.4.3 (2020-06-08)
+- Fixed: First_auth process
+- Added: Podcast Support
+
 ### 1.4.2 (2020-05-31)
 - Added: idleInterval Feature
 - Fixed: Crash on with mismake Token file
@@ -53,6 +57,10 @@ Thanks @eouia for all the hard work you put in for the MagicMirror community
 - Added: box shadow around cover to highlight from background
 
 ## Install
+
+### 0. Prevent
+Do not install MagicMirror or this module as root user ! (`sudo`)
+
 ### 1. module install
 ```sh
 cd ~/MagicMirror/modules
@@ -83,16 +91,13 @@ Or any editor as your wish be ok. Open the `spotify.config.json` then modify it.
       "USERNAME": "USERNAME",
       "CLIENT_ID" : "YOUR_CLIENT_ID",
       "CLIENT_SECRET" : "YOUR_CLIENT_SECRET",
-      "AUTH_DOMAIN" : "http://localhost",
-      "AUTH_PATH" : "/callback",
-      "AUTH_PORT" : "8888",
-      "SCOPE" : "user-read-private playlist-read-private streaming user-read-playback-state user-modify-playback-state",
       "TOKEN" : "./token.json"
   }
 ]
 ```
 
 ### 4. Get Auth
+In RPI Desktop, log in in a Terminal (you can use VNC)
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
 node first_auth.js
@@ -107,7 +112,6 @@ That's all. `token.json` will be created, if success.
   module: "MMM-Spotify",
   position: "bottom_left",
   config: {
-
   }
 }
 ```

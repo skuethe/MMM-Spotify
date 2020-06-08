@@ -411,15 +411,15 @@ Module.register("MMM-Spotify", {
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
     const artists = playbackItem.artists
     let artistName = ""
-    if(playbackItem.album){
-    for (let x = 0; x < artists.length; x++) {
-      if (!artistName) {
-        artistName = artists[x].name
-      } else {
-        artistName += ", " + artists[x].name
+    if (playbackItem.album){
+      for (let x = 0; x < artists.length; x++) {
+        if (!artistName) {
+          artistName = artists[x].name
+        } else {
+          artistName += ", " + artists[x].name
+        }
       }
-    }}
-    else{
+    } else{
       artistName = playbackItem.show.publisher
     }
     artist.textContent = artistName
