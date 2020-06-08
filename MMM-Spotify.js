@@ -374,7 +374,18 @@ Module.register("MMM-Spotify", {
     if (this.config.style !== "default") {
       img_index = this.enbaleMiniBar ? 2 : 1
     }
-    const img_url = playbackItem.album.images[img_index].url
+    var img_url
+    var display_name
+    if (playbackItem.album){
+      img_url = playbackItem.album.images[img_index].url
+      display_name = playbackItem.album.name
+    }
+    else{
+      img_url = playbackItem.images[img_index].url
+      display_name = playbackItem.show.name
+    }
+
+    
 
     if (img_url !== cover_img.src) {
       const back = document.getElementById("SPOTIFY_BACKGROUND")
@@ -394,19 +405,22 @@ Module.register("MMM-Spotify", {
 
     if ((this.enableMiniBar && this.config.miniBarConfig.album) || !this.enableMiniBar) {
       const album = document.querySelector("#SPOTIFY_ALBUM .text")
-      album.textContent = playbackItem.album.name
+      album.textContent = display_name
     }
 
     const artist = document.querySelector("#SPOTIFY_ARTIST .text")
     const artists = playbackItem.artists
     let artistName = ""
-
+    if(playbackItem.album){
     for (let x = 0; x < artists.length; x++) {
       if (!artistName) {
         artistName = artists[x].name
       } else {
         artistName += ", " + artists[x].name
       }
+    }}
+    else{
+      artistName = playbackItem.show.publisher
     }
     artist.textContent = artistName
     this.sendNotification("SPOTIFY_UPDATE_SONG_INFO", playbackItem)
