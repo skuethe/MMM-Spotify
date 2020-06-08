@@ -4,7 +4,6 @@
 //              bugsounet (bugsounet@bugsnana.fr)
 //
 
-
 const fs = require("fs")
 const path = require("path")
 const request = require("request")
@@ -16,29 +15,20 @@ var _Debug = (...args) => { /* do nothing */ }
 
 class Spotify {
   constructor(config = null, debug = false, first = false) {
-    if (config == null) {
-      config = {
-        "USERNAME": "",
-        "CLIENT_ID": "",
-        "CLIENT_SECRET": "",
-        "AUTH_DOMAIN": "http://localhost",
-        "AUTH_PATH": "/callback",
-        "AUTH_PORT": "8888",
-        "SCOPE": "user-read-private app-remote-control playlist-read-private streaming user-read-playback-state user-modify-playback-state",
-        "TOKEN": "./token.json",
-      }
+    this.default = {
+      "USERNAME": "",
+      "CLIENT_ID": "",
+      "CLIENT_SECRET": "",
+      "AUTH_DOMAIN": "http://localhost",
+      "AUTH_PATH": "/callback",
+      "AUTH_PORT": "8888",
+      "SCOPE": "user-read-private app-remote-control playlist-read-private streaming user-read-playback-state user-modify-playback-state",
+      "TOKEN": "./token.json",
     }
-    this.redirect_uri = null
     this.token = null
-    this.state = ""
-    this.config = config
+    this.config = Object.assign({}, this.default, config)
     if (debug) _Debug = (...args) => { console.log("[SPOTIFY]", ...args) }
 
-    var redirect_uri = this.config.AUTH_DOMAIN
-    redirect_uri += ":" + this.config.AUTH_PORT
-    redirect_uri += this.config.AUTH_PATH
-    this.redirect_uri = redirect_uri
-    this.state = Date.now()
     this.authorizationSeed = 'Basic ' + (
       Buffer.from(
         this.config.CLIENT_ID + ':' + this.config.CLIENT_SECRET
@@ -61,6 +51,8 @@ class Spotify {
   }
 
   authFlow(afterCallback = () => {}, error = () => {}) {
+    var redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
+
     if (!this.config.CLIENT_ID) {
       let msg = `[SPOTIFY_AUTH] CLIENT_ID doesn't exist.`;
       error(msg);
@@ -79,7 +71,7 @@ class Spotify {
         url: 'https://accounts.spotify.com/api/token',
         form: {
           code: code,
-          redirect_uri: this.redirect_uri,
+          redirect_uri: redirect_uri,
           grant_type: 'authorization_code'
         },
         headers: {
@@ -106,11 +98,12 @@ class Spotify {
         response_type: 'code',
         client_id: this.config.CLIENT_ID,
         scope: this.config.SCOPE,
-        redirect_uri: this.redirect_uri,
-        state: this.state,
+        redirect_uri: redirect_uri,
+        state: Date.now(),
         show_dialog: true
       });
 
+    _Debug("Opening the browser for authentication on Spotify with account " + this.config.USERNAME + "...")
     opn(url).catch(() => {
       console.log('[SPOTIFY] Failed to automatically open the URL. Copy/paste this in your browser:\n', url);
     });

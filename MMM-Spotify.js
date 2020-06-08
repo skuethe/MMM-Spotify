@@ -233,10 +233,7 @@ Module.register("MMM-Spotify", {
     return ret + minutes + ":" + seconds
   },
 
-  updateProgress: function (
-    progressMS,
-    durationMS,
-  ) {
+  updateProgress: function ( progressMS, durationMS ) {
     const bar = document.getElementById("SPOTIFY_PROGRESS_BAR");
     bar.value = progressMS;
 
@@ -750,6 +747,7 @@ Module.register("MMM-Spotify", {
     m.appendChild(fore)
     return m
   },
+
   scanConfig: function () {
     this.enableMiniBar = false
     this.myPosition = this.data.position
