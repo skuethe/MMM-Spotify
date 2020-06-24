@@ -11,10 +11,11 @@ const querystring = require("querystring")
 const opn = require("open")
 const express = require("express")
 const app = express()
+const moment = require("moment")
 var _Debug = (...args) => { /* do nothing */ }
 
 class Spotify {
-  constructor(config = null, debug = false, first = false) {
+  constructor(config = null, debug = false) {
     this.default = {
       "USERNAME": "",
       "CLIENT_ID": "",
@@ -34,7 +35,7 @@ class Spotify {
         this.config.CLIENT_ID + ':' + this.config.CLIENT_SECRET
       ).toString('base64')
     )
-    if (!first) this.initFromToken()
+    this.initFromToken()
     _Debug("Initialized")
   }
 
@@ -45,9 +46,8 @@ class Spotify {
     var file = path.resolve(__dirname, this.config.TOKEN)
     fs.writeFileSync(file, JSON.stringify(token))
     _Debug("Token is written.")
-    if (cb) {
-      cb()
-    }
+    console.log("[SPOTIFY] Token expire", moment(this.token.expires_at).format("LLLL"))
+    if (cb) cb()
   }
 
   authFlow(afterCallback = () => {}, error = () => {}) {
@@ -113,12 +113,7 @@ class Spotify {
     var file = path.resolve(__dirname, this.config.TOKEN)
     if (fs.existsSync(file)) {
       this.token = JSON.parse(fs.readFileSync(file))
-      if (this.isExpired()) {
-        _Debug("Token is expired. It will be refreshed")
-        this.refreshToken()
-      } else {
-        _Debug("Token is fresh.")
-      }
+      console.log("[SPOTIFY] Token expire", moment(this.token.expires_at).format("LLLL"))
     }
   }
 
@@ -195,8 +190,8 @@ class Spotify {
             cb(response.statusCode, error, body)
           } else {
             _Debug("Invalid response: " + error)
-            _Debug("Retry in 10 sec...")
-            setTimeout(() => { cb('400', error, body) }, 10000)
+            _Debug("Retry in 5 sec...")
+            setTimeout(() => { cb('400', error, body) }, 5000)
           }
         }
       })
