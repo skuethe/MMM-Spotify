@@ -1,6 +1,6 @@
 {
   "name": "MMM-Spotify",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "description": "MM module for Spotify",
   "main": "MMM-Spotify.js",
   "keywords": [
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Spotify",
   "dependencies": {
+    "@bugsounet/spotify": "^1.0.2",
     "open": "^6.3.0",
     "querystring": "^0.2.0"
   }

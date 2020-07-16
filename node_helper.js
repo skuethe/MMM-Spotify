@@ -5,7 +5,7 @@
 "use strict"
 const fs = require("fs")
 const path = require("path")
-const Spotify = require("./Spotify.js")
+const Spotify = require("@bugsounet/spotify")
 
 var NodeHelper = require("node_helper")
 
@@ -48,6 +48,7 @@ module.exports = NodeHelper.create({
         return console.log("[SPOTIFY] ERROR: spotify.config.json", e.name)
       }
       if (!this.spotifyConfig) return console.log("[SPOTIFY] ERROR: Account not found")
+      this.spotifyConfig.PATH = "../../../", // Needed Don't modify it !
       this.spotify = new Spotify(this.spotifyConfig, this.config.debug)
     }
     else return console.log("[SPOTIFY] ERROR: spotify.config.json file missing !")

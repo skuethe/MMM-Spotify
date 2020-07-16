@@ -50,7 +50,7 @@ Module.register("MMM-Spotify", {
 
   start: function () {
     this.currentPlayback = null
-    this.disconnected = false
+    this.connected = false
     this.firstLaunch = true
     this.timer = null
     this.ads = false
@@ -124,7 +124,6 @@ Module.register("MMM-Spotify", {
         break
       case "CURRENT_NOPLAYBACK":
         this.updatePlayback(false)
-        this.disconnected = true
         break
     }
     if (noti.search("DONE_") > -1) {
@@ -152,7 +151,14 @@ Module.register("MMM-Spotify", {
       if (status) dom.classList.remove("inactive")
       else dom.classList.add("inactive")
     }
-    if (!this.disconnected && !status) this.sendNotification("SPOTIFY_DISCONNECTED")
+    if (this.connected && !status) {
+      this.connected = false
+      this.sendNotification("SPOTIFY_DISCONNECTED")
+    }
+    if (!this.connected && status) {
+      this.connected = true
+      this.sendNotification("SPOTIFY_CONNECTED")
+    }
   },
 
   updateCurrentPlayback: function (current) {
@@ -161,18 +167,15 @@ Module.register("MMM-Spotify", {
       this.updateSongInfo(current.item)
       this.updatePlaying(current.is_playing)
       this.updateDevice(current.device)
+      this.updatePlayback(current.is_playing)
       if (current.device) this.updateVolume(current.device.volume_percent)
       this.updateShuffle(current.shuffle_state)
       this.updateRepeat(current.repeat_state)
       if (current.is_playing && current.item) this.updateProgress(current.progress_ms, current.item.duration_ms)
-      this.updatePlayback(current.is_playing)
     } else {
-      if (this.disconnected && current.currently_playing_type) {
-        this.sendNotification("SPOTIFY_CONNECTED")
-        this.disconnected = false
+      if (!this.connected && current.is_playing) {
         this.updatePlayback(true)
       }
-
       /** for Ads **/
       if (current.currently_playing_type == "ad") {
         this.ads = true
@@ -192,18 +195,19 @@ Module.register("MMM-Spotify", {
         this.ads = false
         return
       }
-      // prevent crash for device change
-      if (current.item && this.currentPlayback.item &&
-        (this.currentPlayback.item.id !== current.item.id)) {
-          this.updateSongInfo(current.item)
+
+      /** prevent all error -> reset currentPlayback **/
+      if (!current.item || !current.device || !current.progress_ms || !current.item.duration_ms) return this.currentPlayback = null
+
+      /** All is good so ... live update **/
+      if (this.currentPlayback.item.id !== current.item.id) {
+        this.updateSongInfo(current.item)
       }
-      if (current.device && this.currentPlayback.device &&
-        (this.currentPlayback.device.id !== current.device.id)) {
-          this.updateDevice(current.device)
+      if (this.currentPlayback.device.id !== current.device.id) {
+        this.updateDevice(current.device)
       }
-      if (current.device && this.currentPlayback.device &&
-        (this.currentPlayback.device.volume_percent !== current.device.volume_percent)) {
-          this.updateVolume(current.device.volume_percent)
+      if (this.currentPlayback.device.volume_percent !== current.device.volume_percent) {
+        this.updateVolume(current.device.volume_percent)
       }
       if (this.currentPlayback.repeat_state !== current.repeat_state) {
         this.updateRepeat(current.repeat_state)
@@ -211,9 +215,8 @@ Module.register("MMM-Spotify", {
       if (this.currentPlayback.shuffle_state !== current.shuffle_state) {
         this.updateShuffle(current.shuffle_state)
       }
-      if (current.progress_ms && current.item && current.item.duration_ms && 
-        (this.currentPlayback.progress_ms !== current.progress_ms)) {
-          this.updateProgress(current.progress_ms, current.item.duration_ms)
+      if (this.currentPlayback.progress_ms !== current.progress_ms) {
+        this.updateProgress(current.progress_ms, current.item.duration_ms)
       }
     }
     this.currentPlayback = current
