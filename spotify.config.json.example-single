@@ -1,0 +1,8 @@
+[
+  {
+      "USERNAME": "AN NAME TO IDENTIFY THIS ACCOUNT",
+      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN" : "./username_token.json"
+  }
+]

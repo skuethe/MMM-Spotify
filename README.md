@@ -85,9 +85,10 @@ npm install
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
 ### 3. Setup your module.
+#### Single-Account
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
-cp spotify.config.json.example spotify.config.json
+cp spotify.config.json.example-single spotify.config.json
 nano spotify.config.json
 ```
 Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.
@@ -101,6 +102,29 @@ Or any editor as your wish be ok. Open the `spotify.config.json` then modify it.
   }
 ]
 ```
+#### Multi-Account
+```sh
+cd ~/MagicMirror/modules/MMM-Spotify
+cp spotify.config.json.example-multi spotify.config.json
+nano spotify.config.json
+```
+Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.
+```json
+[
+  {
+      "USERNAME": "AN NAME TO IDENTIFY THIS ACCOUNT",
+      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN" : "./username_token.json"
+  },
+  {
+      "USERNAME": "ANOTHER NAME TO IDENTIFY THIS ACCOUNT",
+      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN" : "./another_token.json"
+  }
+]
+```
 
 ### 4. Get Auth
 In RPI Desktop, log in in a Terminal (you can use VNC)
@@ -108,7 +132,7 @@ In RPI Desktop, log in in a Terminal (you can use VNC)
 cd ~/MagicMirror/modules/MMM-Spotify
 node first_auth.js
 ```
-Then, Allowance dialog popup will be opened. You MUST LOG IN IN SAME ORDER YOU PUT YOUR USERS IN CONFIGURATION FILE. Log in(if it is needed) and allow it.<br>
+Then, Allowance dialog popup will be opened. You MUST LOG IN IN SAME ORDER YOU PUT YOUR USERS IN CONFIGURATION FILE (only on multi-account). Log in(if it is needed) and allow it.<br>
 That's all. `token.json` will be created, if success.<br>
 **Note**: Change `TOKEN` file name, if you use multiple account.
 
