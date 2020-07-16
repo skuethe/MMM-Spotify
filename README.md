@@ -70,7 +70,7 @@ Do not install MagicMirror or this module as root user ! (`sudo`)
 ### 1. module install
 ```sh
 cd ~/MagicMirror/modules
-git clone https://github.com/eouia/MMM-Spotify
+git clone https://github.com/bugsounet/MMM-Spotify
 cd MMM-Spotify
 npm install
 ```
@@ -91,7 +91,7 @@ cd ~/MagicMirror/modules/MMM-Spotify
 cp spotify.config.json.example-single spotify.config.json
 nano spotify.config.json
 ```
-Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.
+Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You need to just fill `CLIENT_ID` and `CLIENT_SECRET`. Then, save it.
 ```json
 [
   {
@@ -143,6 +143,7 @@ That's all. `token.json` will be created, if success.<br>
   module: "MMM-Spotify",
   position: "bottom_left",
   config: {
+    debug: false,
   }
 }
 ```
