@@ -16,6 +16,9 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
+### 1.5.1 (2020-07-17)
+- Fixed: forget modify `first_auth.js` with new Spotify library (thx to wirdman@MagicMirror forum)
+
 ### 1.5.0 (2020-07-16)
 - Fixed: Displayed ui (connect/disconnect)
 - Fixed: Another error with ads when playing
