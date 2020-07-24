@@ -16,6 +16,9 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Thanks @eouia for all the hard work you put in for the MagicMirror community
 
+### 1.5.2 (2020-07-24)
+- Fixed: broadcast volume change
+
 ### 1.5.1 (2020-07-17)
 - Fixed: forget modify `first_auth.js` with new Spotify library (thx to wirdman@MagicMirror forum)
 
