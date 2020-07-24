@@ -308,14 +308,13 @@ Module.register("MMM-Spotify", {
   },
 
   updateVolume: function (volume_percent) {
+    this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
     if (!this.enableMiniBar) return
     const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
     const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
 
     volumeContainer.textContent = volume_percent + "%"
     volumeIcon.className = this.getVolumeIconClass(volume_percent)
-
-    this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
   },
 
   getVolumeIconClass(volume_percent) {
