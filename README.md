@@ -295,3 +295,6 @@ npm install
 ## Credit
 - Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
 - Thanks to @KamisamaPT for helping design
+
+## Donate
+ [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), if you love this module !
