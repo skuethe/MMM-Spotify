@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Spotify",
   "dependencies": {
-    "@bugsounet/spotify": "^1.0.2",
     "open": "^6.3.0",
     "querystring": "^0.2.0"
   }
