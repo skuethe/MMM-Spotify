@@ -336,7 +336,6 @@ Module.register("MMM-Spotify", {
     return this.getFAIconClass(iconClass);
   },
 
-
   updatePlaying: function (isPlaying) {
     if (isPlaying && this.firstLaunch) {
       this.sendNotification("SPOTIFY_CONNECTED")
@@ -772,5 +771,16 @@ Module.register("MMM-Spotify", {
     this.enableMiniBar = false
     this.myPosition = this.data.position
     if (this.myPosition == "bottom_bar" || this.myPosition == "top_bar") this.enableMiniBar = true
-  }
+  },
+
+  suspend: function() {
+    console.log(this.name + " is suspended.");
+    this.sendSocketNotification("SUSPENDING")
+  },
+
+  resume: function() {
+    console.log(this.name + " is resumed.");
+    this.sendSocketNotification("INIT", this.config)
+  },
+
 })

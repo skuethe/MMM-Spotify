@@ -17,6 +17,7 @@ module.exports = NodeHelper.create({
     this.timer = null
     this.firstStart = true
     this.unallowedDevice = false
+    this.suspended = false
   },
 
   doSpotifyConfig: function (configuration, account) {
@@ -36,6 +37,7 @@ module.exports = NodeHelper.create({
   },
 
   initAfterLoading: function (config, account) {
+    this.suspended = false
     this.config = config
     if (!account) {
       account = this.config.accountDefault
@@ -63,6 +65,7 @@ module.exports = NodeHelper.create({
     let idle = false
     if (!this.spotify) return console.log("[SPOTIFY] updatePulse ERROR: Account not found")
     console.info("SPOTIFY --- DEBUG --- unallowedDevice: " + this.unallowedDevice)
+    console.info("SPOTIFY --- DEBUG --- suspended: " + this.suspended)
     try {
       let result = await this.updateSpotify(this.spotify)
       this.sendSocketNotification("CURRENT_PLAYBACK", result)
@@ -71,9 +74,13 @@ module.exports = NodeHelper.create({
       idle = true
       this.sendSocketNotification("CURRENT_NOPLAYBACK")
     }
-    this.timer = setTimeout(() => {
-      this.updatePulse()
-    }, idle ? this.config.idleInterval : this.config.updateInterval)
+    // Only re-run if moudle is NOT suspended
+    // This breaks multi module instances, but saves performance and power consumption, so we reduce heat
+    if (!this.suspended) {
+      this.timer = setTimeout(() => {
+        this.updatePulse()
+      }, idle ? this.config.idleInterval : this.config.updateInterval)
+    }
   },
 
   updateSpotify: function (spotify) {
@@ -131,6 +138,9 @@ module.exports = NodeHelper.create({
     }
     if (noti == "UNALLOWED_DEVICE") {
       this.unallowedDevice = payload
+    }
+    if (noti == "SUSPENDING") {
+      this.suspended = true
     }
     if(this.spotify){
       if (noti == "GET_DEVICES") {
