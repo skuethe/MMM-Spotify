@@ -64,8 +64,6 @@ module.exports = NodeHelper.create({
   updatePulse: async function () {
     let idle = false
     if (!this.spotify) return console.log("[SPOTIFY] updatePulse ERROR: Account not found")
-    console.info("SPOTIFY --- DEBUG --- unallowedDevice: " + this.unallowedDevice)
-    console.info("SPOTIFY --- DEBUG --- suspended: " + this.suspended)
     try {
       let result = await this.updateSpotify(this.spotify)
       this.sendSocketNotification("CURRENT_PLAYBACK", result)
@@ -142,7 +140,7 @@ module.exports = NodeHelper.create({
     if (noti == "SUSPENDING") {
       this.suspended = true
     }
-    if(this.spotify){
+    if(this.spotify && !this.unallowedDevice){
       if (noti == "GET_DEVICES") {
         this.spotify.getDevices((code, error, result) => {
           this.sendSocketNotification("LIST_DEVICES", result)

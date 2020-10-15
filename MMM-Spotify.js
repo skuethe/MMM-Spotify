@@ -15,7 +15,10 @@ Module.register("MMM-Spotify", {
     //iconify: null,
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
     onStart: null,
+    notificationsOnSuspend: [],
+    notificationsOnResume: [],
     deviceDisplay: "Listening on",
+    volumeSteps: 5, // in percent, the steps you want to increase or decrese volume when using the "SPOTIFY_VOLUME_{UP,DOWN}" notifications
     miniBarConfig: {
       album: true,
       scroll: true,
@@ -54,6 +57,7 @@ Module.register("MMM-Spotify", {
     this.firstLaunch = true
     this.timer = null
     this.ads = false
+    this.volume = 50
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -89,6 +93,16 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_VOLUME":
         this.sendSocketNotification("VOLUME", payload)
         break
+      case "SPOTIFY_VOLUME_UP":
+        var volume = (this.volume + this.config.volumeSteps);
+        (volume > 100) ? volume = 100 : volume
+        this.sendSocketNotification("VOLUME", volume)
+        break
+      case "SPOTIFY_VOLUME_DOWN":
+        var volume = (this.volume - this.config.volumeSteps);
+        (volume < 0) ? volume = 0 : volume
+        this.sendSocketNotification("VOLUME", volume)
+        break
       case "SPOTIFY_TRANSFER":
         this.sendSocketNotification("TRANSFER", payload)
         break
@@ -108,7 +122,6 @@ Module.register("MMM-Spotify", {
   },
 
   socketNotificationReceived: function (noti, payload) {
-    console.info(" SPOTIFY --- DEBUG --- notification received: " + noti);
     switch (noti) {
       case "INITIALIZED":
         break
@@ -117,13 +130,12 @@ Module.register("MMM-Spotify", {
           (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
         ) {
+          this.volume = payload.device.volume_percent
           this.sendSocketNotification("UNALLOWED_DEVICE", false)
           this.updateCurrentPlayback(payload)
         } else {
           this.sendSocketNotification("UNALLOWED_DEVICE", true)
           this.updatePlayback(false)
-          //this.currentPlayback = null
-          //this.updateDom()
         }
         break
       case "CURRENT_NOPLAYBACK":
@@ -313,7 +325,7 @@ Module.register("MMM-Spotify", {
 
   updateVolume: function (volume_percent) {
     this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
-    if (!this.enableMiniBar) return
+    //if (!this.enableMiniBar) return
     const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
     const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
 
@@ -629,6 +641,7 @@ Module.register("MMM-Spotify", {
       info.appendChild(element)
     }
 
+    info.appendChild(this.getVolumeContainer())
     info.appendChild(this.getDeviceContainer())
     return info;
   },
@@ -774,13 +787,23 @@ Module.register("MMM-Spotify", {
   },
 
   suspend: function() {
-    console.log(this.name + " is suspended.");
+    console.log(this.name + " is suspended.")
     this.sendSocketNotification("SUSPENDING")
+    if (typeof this.config.notificationsOnSuspend === "object" && this.config.notificationsOnSuspend.length > 0) {
+      for (let i = 0; i < this.config.notificationsOnSuspend.length; i++) {
+        this.sendNotification(this.config.notificationsOnSuspend[i].notification, this.config.notificationsOnSuspend[i].payload)
+      }
+    }
   },
 
   resume: function() {
-    console.log(this.name + " is resumed.");
+    console.log(this.name + " is resumed.")
     this.sendSocketNotification("INIT", this.config)
+    if (typeof this.config.notificationsOnResume === "object" && this.config.notificationsOnResume.length > 0) {
+      for (let i = 0; i < this.config.notificationsOnResume.length; i++) {
+        this.sendNotification(this.config.notificationsOnResume[i].notification, this.config.notificationsOnResume[i].payload)
+      }
+    }
   },
 
 })
