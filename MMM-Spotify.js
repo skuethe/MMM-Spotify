@@ -108,6 +108,7 @@ Module.register("MMM-Spotify", {
   },
 
   socketNotificationReceived: function (noti, payload) {
+    console.info(" SPOTIFY --- DEBUG --- notification received: " + noti);
     switch (noti) {
       case "INITIALIZED":
         break
@@ -116,10 +117,13 @@ Module.register("MMM-Spotify", {
           (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
         ) {
+          this.sendSocketNotification("UNALLOWED_DEVICE", false)
           this.updateCurrentPlayback(payload)
         } else {
-          this.currentPlayback = null
-          this.updateDom()
+          this.sendSocketNotification("UNALLOWED_DEVICE", true)
+          this.updatePlayback(false)
+          //this.currentPlayback = null
+          //this.updateDom()
         }
         break
       case "CURRENT_NOPLAYBACK":

@@ -16,6 +16,7 @@ module.exports = NodeHelper.create({
     this.spotify = null
     this.timer = null
     this.firstStart = true
+    this.unallowedDevice = false
   },
 
   doSpotifyConfig: function (configuration, account) {
@@ -61,9 +62,11 @@ module.exports = NodeHelper.create({
   updatePulse: async function () {
     let idle = false
     if (!this.spotify) return console.log("[SPOTIFY] updatePulse ERROR: Account not found")
+    console.info("SPOTIFY --- DEBUG --- unallowedDevice: " + this.unallowedDevice)
     try {
       let result = await this.updateSpotify(this.spotify)
       this.sendSocketNotification("CURRENT_PLAYBACK", result)
+      if (this.unallowedDevice) idle = true
     } catch (e) {
       idle = true
       this.sendSocketNotification("CURRENT_NOPLAYBACK")
@@ -125,6 +128,9 @@ module.exports = NodeHelper.create({
     }
     if (noti == "ACCOUNT") {
       this.account(payload)
+    }
+    if (noti == "UNALLOWED_DEVICE") {
+      this.unallowedDevice = payload
     }
     if(this.spotify){
       if (noti == "GET_DEVICES") {
