@@ -367,8 +367,8 @@ Module.register("MMM-Spotify", {
       const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
       p.className = isPlaying ? "playing" : "pausing"
       const icon = isPlaying
-        ? "mdi:play-circle-outline"
-        : "mdi:pause-circle-outline";
+        ? "mdi:play"
+        : "mdi:pause";
 
       p.innerHTML = ""
       p.appendChild(
@@ -604,7 +604,7 @@ Module.register("MMM-Spotify", {
         action: () => { this.clickBackward() },
       },
       "SPOTIFY_CONTROL_PLAY": {
-        icon: 'mdi:play-circle-outline',
+        icon: 'mdi:play',
         action: () => { this.clickPlay() },
       },
       "SPOTIFY_CONTROL_FORWARD": {
