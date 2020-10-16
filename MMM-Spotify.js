@@ -144,6 +144,9 @@ Module.register("MMM-Spotify", {
       case "CURRENT_NOPLAYBACK":
         this.updatePlayback(false)
         break
+      case "LIST_DEVICES":
+        this.updateDeviceList(payload)
+        break
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
@@ -177,6 +180,7 @@ Module.register("MMM-Spotify", {
     if (!this.connected && status) {
       this.connected = true
       this.sendNotification("SPOTIFY_CONNECTED")
+      this.sendSocketNotification("GET_DEVICES")
     }
   },
 
@@ -324,6 +328,32 @@ Module.register("MMM-Spotify", {
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
+  },
+
+  updateDeviceList: function (payload) {
+    const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+
+    if (payload.devices.length > 0) {
+      for (var i = 0; i < payload.devices.length; i++) {
+        if(payload.devices[i].is_restricted) continue
+        if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
+
+        var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
+
+        var text = document.createElement("span")
+        text.className = "text"
+        text.textContent = payload.devices[i].name
+        if (payload.devices[i].is_active) text.textContent += " (active)"
+
+        device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
+        device.appendChild(text)
+        var transferPayload = { device_ids: [ payload.devices[i].id ] }
+        device.addEventListener("click", () => { this.clickDeviceTransfer(transferPayload) })
+
+        modalList.appendChild(device)
+      }
+    }
+
   },
 
   updateVolume: function (volume_percent) {
@@ -476,8 +506,15 @@ Module.register("MMM-Spotify", {
   },
 
   clickDeviceList: function() {
-    const dl = document.getElementById("SPOTIFY_DEVICE_LIST")
-    dl.classList.toggle("hidden")
+    const modal = document.getElementById("SPOTIFY_MODAL")
+    modal.classList.toggle("hidden")
+    const main = document.getElementById("SPOTIFY")
+    main.classList.toggle("modal")
+  },
+
+  clickDeviceTransfer: function(deviceid) {
+    this.sendSocketNotification("TRANSFERBYID", deviceid)
+    this.clickDeviceList()
   },
 
   getFAIcon(iconType) {
@@ -699,17 +736,12 @@ Module.register("MMM-Spotify", {
     return cover
   },
 
-  getAccountListContainer: function() {
+  getModalContainer: function() {
+    const modal = this.getHTMLElementWithID('div', "SPOTIFY_MODAL")
+    modal.classList.add("hidden")
+    modal.appendChild(this.getHTMLElementWithID("div", "SPOTIFY_MODAL_LIST"))
 
-  },
-
-  getDeviceListContainer: function() {
-    const deviceList = this.getHTMLElementWithID('div', "SPOTIFY_DEVICE_LIST")
-    deviceList.classList.add("hidden")
-    deviceList.innerHTML = "DEVICE LIST"
-    deviceList.appendChild(this.getEmptyTextHTMLElement())
-
-    return deviceList;
+    return modal;
   },
 
   getMinimalistBarDom: function (container) {
@@ -781,16 +813,16 @@ Module.register("MMM-Spotify", {
       m.classList.add(this.config.style)
     }
 
-    if (this.config.moduleWidth !== "undefined" && (this.config.moduleWidth > 0 && this.config.moduleWidth != 360)) {
-      m.style.setProperty("--sp-width", this.config.moduleWidth + "px");
-    }
-
     m.classList.add("noPlayback")
     if (this.enableMiniBar) {
       m.classList.add("minimalistBar")
       m.classList.add(this.config.miniBarConfig.scroll ? "Scroll" : "noScroll")
       m.classList.add("inactive")
       return this.getMinimalistBarDom(m)
+    }
+
+    if (this.config.moduleWidth !== "undefined" && (this.config.moduleWidth > 0 && this.config.moduleWidth != 360)) {
+      m.style.setProperty("--sp-width", this.config.moduleWidth + "px");
     }
 
     m.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
@@ -801,8 +833,8 @@ Module.register("MMM-Spotify", {
 
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
     cover.appendChild(cover_img)
-    if (this.config.showDeviceButton) {
-      cover.appendChild(this.getDeviceListContainer());
+    if (this.config.showDeviceButton || this.config.showAccountButton) {
+      cover.appendChild(this.getModalContainer());
     }
 
 

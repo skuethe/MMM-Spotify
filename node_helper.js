@@ -180,6 +180,11 @@ module.exports = NodeHelper.create({
           this.sendSocketNotification("DONE_TRANSFER", result)
         })
       }
+      if (noti == "TRANSFERBYID") {
+        this.spotify.transfer(payload, (code, error, result) => {
+          this.sendSocketNotification("DONE_TRANSFERBYID", result)
+        })
+      }
       if (noti == "REPEAT") {
         this.spotify.repeat(payload, (code, error, result) => {
           this.sendSocketNotification("DONE_REPEAT", result)

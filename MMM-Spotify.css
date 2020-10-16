@@ -110,6 +110,10 @@
   filter:brightness(50%) grayscale(75%);
 }
 
+#SPOTIFY.modal #SPOTIFY_COVER_IMAGE {
+  filter:brightness(30%) blur(5px);
+}
+
 #SPOTIFY_PROGRESS_TIME {
   display:flex;
   flex-direction:row;
@@ -151,12 +155,34 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   align-self: center;
 }
 
-#SPOTIFY_DEVICE_LIST {
-  position: fixed;
-  right: -150px;
+#SPOTIFY_MODAL {
+  position: relative;
+  transform: translateY(-100%);
+  width: inherit;
+  height: inherit;
 }
 
-#SPOTIFY_DEVICE_LIST.hidden {
+#SPOTIFY_MODAL_LIST {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: max-content;
+  padding: 8px 18px;
+  background: rgba(0,0,0, 0.8);
+  border-radius: 10px;
+}
+
+#SPOTIFY_MODAL_LIST > * {
+  padding: 10px 0;
+}
+
+#SPOTIFY_MODAL_LIST span {
+    padding-left: 10px;
+}
+
+
+#SPOTIFY_MODAL.hidden {
   display:none;
 }
 
