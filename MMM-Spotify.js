@@ -6,6 +6,7 @@ Module.register("MMM-Spotify", {
   defaults: {
     debug: false,
     style: "default", // "default", "mini" available.
+    moduleWidth: 360, // width of the module
     control: "default", //"default", "hidden" available
     updateInterval: 1000,
     idleInterval: 10000,
@@ -748,6 +749,10 @@ Module.register("MMM-Spotify", {
     const m = this.getHTMLElementWithID('div', "SPOTIFY")
     if (this.config.style !== "default" && !this.enableMiniBar) {
       m.classList.add(this.config.style)
+    }
+
+    if (this.config.moduleWidth !== "undefined" && (this.config.moduleWidth > 0 && this.config.moduleWidth != 360)) {
+      m.style.setProperty("--sp-width", this.config.moduleWidth + "px");
     }
 
     m.classList.add("noPlayback")
