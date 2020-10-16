@@ -8,6 +8,8 @@ Module.register("MMM-Spotify", {
     style: "default", // "default", "mini" available.
     moduleWidth: 360, // width of the module
     control: "default", //"default", "hidden" available
+    showAccountButton: true,
+    showDeviceButton: true,
     updateInterval: 1000,
     idleInterval: 10000,
     accountDefault: 0, // default account number, attention : 0 is the first account
@@ -473,6 +475,11 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("NEXT")
   },
 
+  clickDeviceList: function() {
+    const dl = document.getElementById("SPOTIFY_DEVICE_LIST")
+    dl.classList.toggle("hidden")
+  },
+
   getFAIcon(iconType) {
     switch (iconType) {
       case 'Spotify':
@@ -596,6 +603,10 @@ Module.register("MMM-Spotify", {
     if (this.config.control === "hidden") return control;
     
     const orderedButtonConfig = {
+      "SPOTIFY_CONTROL_ACCOUNTS": {
+        icon: 'mdi:account-switch',
+        action: () => { alert("Menu clicked") },
+      },
       "SPOTIFY_CONTROL_SHUFFLE" : {
         icon: 'mdi:shuffle',
         action: () => { this.clickShuffle() },
@@ -615,10 +626,16 @@ Module.register("MMM-Spotify", {
       "SPOTIFY_CONTROL_REPEAT": {
         icon: 'mdi:repeat-off',
         action: () => { this.clickRepeat() },
+      },
+      "SPOTIFY_CONTROL_DEVICES": {
+        icon: 'mdi:speaker-wireless',
+        action: () => { this.clickDeviceList() },
       }
     }
 
     for (const [key, config] of Object.entries(orderedButtonConfig)) {
+      if (!this.config.showAccountButton && key === "SPOTIFY_CONTROL_ACCOUNTS") continue
+      if (!this.config.showDeviceButton && key === "SPOTIFY_CONTROL_DEVICES") continue
       control.appendChild(
         this.getControlButton(key, config['icon'], config['action'])
       );
@@ -680,6 +697,19 @@ Module.register("MMM-Spotify", {
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
     cover.appendChild(cover_img)
     return cover
+  },
+
+  getAccountListContainer: function() {
+
+  },
+
+  getDeviceListContainer: function() {
+    const deviceList = this.getHTMLElementWithID('div', "SPOTIFY_DEVICE_LIST")
+    deviceList.classList.add("hidden")
+    deviceList.innerHTML = "DEVICE LIST"
+    deviceList.appendChild(this.getEmptyTextHTMLElement())
+
+    return deviceList;
   },
 
   getMinimalistBarDom: function (container) {
@@ -771,6 +801,10 @@ Module.register("MMM-Spotify", {
 
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
     cover.appendChild(cover_img)
+    if (this.config.showDeviceButton) {
+      cover.appendChild(this.getDeviceListContainer());
+    }
+
 
     const misc = this.getHTMLElementWithID('div', "SPOTIFY_MISC")
     misc.appendChild(this.getInfoContainer())

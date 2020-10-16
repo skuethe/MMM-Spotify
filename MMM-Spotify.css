@@ -151,6 +151,15 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   align-self: center;
 }
 
+#SPOTIFY_DEVICE_LIST {
+  position: fixed;
+  right: -150px;
+}
+
+#SPOTIFY_DEVICE_LIST.hidden {
+  display:none;
+}
+
 /* control "hidden" */
 #SPOTIFY.hidden #SPOTIFY_CONTROL{
   display:none;
