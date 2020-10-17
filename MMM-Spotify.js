@@ -228,6 +228,7 @@ Module.register("MMM-Spotify", {
       }
       if (this.currentPlayback.device.id !== current.device.id) {
         this.updateDevice(current.device)
+        this.sendSocketNotification("GET_DEVICES")
       }
       if (this.currentPlayback.device.volume_percent !== current.device.volume_percent) {
         this.updateVolume(current.device.volume_percent)
@@ -332,6 +333,12 @@ Module.register("MMM-Spotify", {
 
   updateDeviceList: function (payload) {
     const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+    var self = this
+
+    // let's start clean
+    while (modalList.hasChildNodes()) {
+      modalList.removeChild(modalList.firstChild);
+    }
 
     if (payload.devices.length > 0) {
       for (var i = 0; i < payload.devices.length; i++) {
@@ -347,8 +354,8 @@ Module.register("MMM-Spotify", {
 
         device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
         device.appendChild(text)
-        var transferPayload = { device_ids: [ payload.devices[i].id ] }
-        device.addEventListener("click", () => { this.clickDeviceTransfer(transferPayload) })
+        device.deviceId = payload.devices[i].id
+        device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
 
         modalList.appendChild(device)
       }
@@ -512,8 +519,9 @@ Module.register("MMM-Spotify", {
     main.classList.toggle("modal")
   },
 
-  clickDeviceTransfer: function(deviceid) {
-    this.sendSocketNotification("TRANSFERBYID", deviceid)
+  clickDeviceTransfer: function(deviceId) {
+    var transferPayload = { device_ids: [ deviceId ] }
+    this.sendSocketNotification("TRANSFERBYID", transferPayload)
     this.clickDeviceList()
   },
 

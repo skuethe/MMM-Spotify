@@ -150,6 +150,11 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   background-color:rgba(0,0,0,0.2);
 }
 
+#SPOTIFY_CONTROL > *:hover, #SPOTIFY_CONTROL > *:active {
+  background-color:rgba(255,255,255,0.2);
+}
+
+
 #SPOTIFY_CONTROL .iconify {
   justify-self: center;
   align-self: center;
@@ -168,13 +173,18 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   left: 50%;
   transform: translate(-50%,-50%);
   width: max-content;
-  padding: 8px 18px;
+  padding: 8px 10px;
   background: rgba(0,0,0, 0.8);
   border-radius: 10px;
 }
 
 #SPOTIFY_MODAL_LIST > * {
-  padding: 10px 0;
+  padding: 10px;
+}
+
+#SPOTIFY_MODAL_LIST > *:hover, #SPOTIFY_MODAL_LIST > *:active {
+  background-color:rgba(255,255,255,0.2);
+  border-radius: 6px;
 }
 
 #SPOTIFY_MODAL_LIST span {
