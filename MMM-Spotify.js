@@ -181,6 +181,7 @@ Module.register("MMM-Spotify", {
       this.connected = true
       this.sendNotification("SPOTIFY_CONNECTED")
       this.sendSocketNotification("GET_DEVICES")
+      this.updateAccountList()
     }
   },
 
@@ -331,13 +332,38 @@ Module.register("MMM-Spotify", {
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
 
-  updateDeviceList: function (payload) {
-    const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+  updateAccountList: function () {
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
     var self = this
 
     // let's start clean
-    while (modalList.hasChildNodes()) {
-      modalList.removeChild(modalList.firstChild);
+    while (accountList.hasChildNodes()) {
+      accountList.removeChild(accountList.firstChild);
+    }
+
+    var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT0")
+
+    var text = document.createElement("span")
+    text.className = "text"
+    text.textContent = "TESTACCOUNT"
+    text.textContent += " (active)"
+
+    account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT0_ICON"))
+    account.appendChild(text)
+    account.accountId = 0
+    account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+
+    accountList.appendChild(account)
+
+  },
+
+  updateDeviceList: function (payload) {
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+    var self = this
+
+    // let's start clean
+    while (deviceList.hasChildNodes()) {
+      deviceList.removeChild(deviceList.firstChild);
     }
 
     if (payload.devices.length > 0) {
@@ -357,7 +383,7 @@ Module.register("MMM-Spotify", {
         device.deviceId = payload.devices[i].id
         device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
 
-        modalList.appendChild(device)
+        deviceList.appendChild(device)
       }
     }
 
@@ -512,11 +538,41 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("NEXT")
   },
 
-  clickDeviceList: function() {
-    const modal = document.getElementById("SPOTIFY_MODAL")
-    modal.classList.toggle("hidden")
+  clickAccountList: function() {
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
     const main = document.getElementById("SPOTIFY")
-    main.classList.toggle("modal")
+
+    deviceList.classList.add("hidden")
+
+    if (accountList.classList.contains("hidden")) {
+      accountList.classList.remove("hidden")
+      main.classList.add("modal")
+    } else {
+      accountList.classList.add("hidden")
+      main.classList.remove("modal")
+    }
+  },
+
+  clickDeviceList: function() {
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+    const main = document.getElementById("SPOTIFY")
+
+    accountList.classList.add("hidden")
+
+    if (deviceList.classList.contains("hidden")) {
+      deviceList.classList.remove("hidden")
+      main.classList.add("modal")
+    } else {
+      deviceList.classList.add("hidden")
+      main.classList.remove("modal")
+    }
+  },
+
+  clickAccountTransfer: function(accountId) {
+    console.info("SPOTIFY --- DEBUG --- clickAccountTransfer(" + accountId + ")")
+    this.clickAccountList()
   },
 
   clickDeviceTransfer: function(deviceId) {
@@ -535,6 +591,9 @@ Module.register("MMM-Spotify", {
         return 'fa fa-user fa-sm';
       case 'Album':
         return 'fa fa-folder fa-sm';
+      // Account Icons
+      case 'Account':
+        return 'mdi mdi-account';
       // Volume Icons
       case 'VOL_HIGH':
         return 'mdi mdi-volume-high';
@@ -650,7 +709,7 @@ Module.register("MMM-Spotify", {
     const orderedButtonConfig = {
       "SPOTIFY_CONTROL_ACCOUNTS": {
         icon: 'mdi:account-switch',
-        action: () => { alert("Menu clicked") },
+        action: () => { this.clickAccountList() },
       },
       "SPOTIFY_CONTROL_SHUFFLE" : {
         icon: 'mdi:shuffle',
@@ -746,8 +805,16 @@ Module.register("MMM-Spotify", {
 
   getModalContainer: function() {
     const modal = this.getHTMLElementWithID('div', "SPOTIFY_MODAL")
-    modal.classList.add("hidden")
-    modal.appendChild(this.getHTMLElementWithID("div", "SPOTIFY_MODAL_LIST"))
+    //modal.classList.add("hidden")
+
+    const accountList = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT_LIST")
+    accountList.classList.add("hidden")
+
+    const deviceList = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE_LIST")
+    deviceList.classList.add("hidden")
+
+    modal.appendChild(accountList)
+    modal.appendChild(deviceList)
 
     return modal;
   },

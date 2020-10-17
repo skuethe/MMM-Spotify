@@ -167,7 +167,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   height: inherit;
 }
 
-#SPOTIFY_MODAL_LIST {
+#SPOTIFY_ACCOUNT_LIST, #SPOTIFY_DEVICE_LIST {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -178,21 +178,20 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   border-radius: 10px;
 }
 
-#SPOTIFY_MODAL_LIST > * {
+#SPOTIFY_ACCOUNT_LIST > *, #SPOTIFY_DEVICE_LIST > * {
   padding: 10px;
 }
 
-#SPOTIFY_MODAL_LIST > *:hover, #SPOTIFY_MODAL_LIST > *:active {
+#SPOTIFY_ACCOUNT_LIST > *:hover, #SPOTIFY_ACCOUNT_LIST > *:active, #SPOTIFY_DEVICE_LIST > *:hover, #SPOTIFY_DEVICE_LIST > *:active {
   background-color:rgba(255,255,255,0.2);
   border-radius: 6px;
 }
 
-#SPOTIFY_MODAL_LIST span {
+#SPOTIFY_ACCOUNT_LIST span, #SPOTIFY_DEVICE_LIST span {
     padding-left: 10px;
 }
 
-
-#SPOTIFY_MODAL.hidden {
+#SPOTIFY_MODAL > .hidden {
   display:none;
 }
 
