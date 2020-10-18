@@ -12,7 +12,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 - Showing Current playback on any devices
 - Playing Controllable by Notification & touch (Play, pause, next, previous, volume)
-- Spotify Controllable by Notification (change device, search and play)
+- Spotify Controllable by Notification & touch (change device, change account, search and play)
 - Multiple accounts supported
 
 ## Install
@@ -129,6 +129,8 @@ That's all. `token.json` will be created, if success.
     style: "default", // "default" or "mini" available (inactive for miniBar)
     moduleWidth: 360, // width of the module in px
     control: "default", // "default" or "hidden"
+    showAccountButton: true, // if you want to show the "switch account" control button
+    showDeviceButton: true, // if you want to show the "switch device" control button
     accountDefault: 0, // default account number, attention : 0 is the first account
     updateInterval: 1000, // update interval when playing
     idleInterval: 30000, // update interval on idle
@@ -187,7 +189,7 @@ When `search` field exists, `spotifyUri` will be ignored.
 - `SPOTIFY_SEARCH` : search items with query and play it. `type`, `query`, `random` be payloads
 
 ```json
-  this.sendNotification("SPOTIFY_SEARCH", {type:"artist,playlist", query:"michael+jackson", random:false})
+  this.sendNotification("SPOTIFY_SEARCH", {"type": "artist,playlist", "query": "michael+jackson", "random": false})
 ```
 
 - `SPOTIFY_PLAY` : playing specific SpotifyUri. There could be two types of uri - `context_uri` and `uris`. 
@@ -284,6 +286,10 @@ this.sendNotification("SPOTIFY_ACCOUNT", 0)
 It can be used with MMM-pages for example (for show or hide the module)
 
 ## Update History
+
+### 1.6.1 (2020-10-18)
+
+- Added: buttons for swichting accounts and devices (for better touch support) - only tested in "mini" and "default" view
 
 ### 1.6.0 (2020-10-15)
 
