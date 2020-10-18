@@ -61,6 +61,7 @@ Module.register("MMM-Spotify", {
     this.timer = null
     this.ads = false
     this.volume = 50
+    this.currentAccount = this.config.accountDefault
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -144,8 +145,14 @@ Module.register("MMM-Spotify", {
       case "CURRENT_NOPLAYBACK":
         this.updatePlayback(false)
         break
+      case "CURRENT_ACCOUNT":
+        this.currentAccount = payload
+        break
       case "LIST_DEVICES":
         this.updateDeviceList(payload)
+        break
+      case "LIST_ACCOUNTS":
+        this.updateAccountList(payload)
         break
     }
     if (noti.search("DONE_") > -1) {
@@ -180,8 +187,12 @@ Module.register("MMM-Spotify", {
     if (!this.connected && status) {
       this.connected = true
       this.sendNotification("SPOTIFY_CONNECTED")
-      this.sendSocketNotification("GET_DEVICES")
-      this.updateAccountList()
+      if (this.config.showDeviceButton) {
+        this.sendSocketNotification("GET_DEVICES")
+      }
+      if (this.config.showAccountButton) {
+        this.sendSocketNotification("GET_ACCOUNTS")
+      }
     }
   },
 
@@ -229,7 +240,9 @@ Module.register("MMM-Spotify", {
       }
       if (this.currentPlayback.device.id !== current.device.id) {
         this.updateDevice(current.device)
-        this.sendSocketNotification("GET_DEVICES")
+        if (this.config.showDeviceButton) {
+          this.sendSocketNotification("GET_DEVICES")
+        }
       }
       if (this.currentPlayback.device.volume_percent !== current.device.volume_percent) {
         this.updateVolume(current.device.volume_percent)
@@ -322,17 +335,7 @@ Module.register("MMM-Spotify", {
     )
   },
 
-  updateDevice: function (device) {
-    const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
-    const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
-
-    deviceContainer.textContent = (this.config.style == "default" || this.enableMiniBar) ? this.config.deviceDisplay + ' ' + device.name : device.name
-    deviceIcon.className = this.getFAIconClass(device.type)
-
-    this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
-  },
-
-  updateAccountList: function () {
+  updateAccountList: function (payload) {
     const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
     var self = this
 
@@ -341,20 +344,34 @@ Module.register("MMM-Spotify", {
       accountList.removeChild(accountList.firstChild);
     }
 
-    var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT0")
+    if (payload.length > 0) {
+      for (var i = 0; i < payload.length; i++) {
+        var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
 
-    var text = document.createElement("span")
-    text.className = "text"
-    text.textContent = "TESTACCOUNT"
-    text.textContent += " (active)"
+        var text = document.createElement("span")
+        text.className = "text"
+        text.textContent = payload[i].name
+        if (payload[i].id == this.currentAccount) text.textContent += " (active)"
 
-    account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT0_ICON"))
-    account.appendChild(text)
-    account.accountId = 0
-    account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+        account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
+        account.appendChild(text)
+        account.accountId = payload[i].id
+        account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
 
-    accountList.appendChild(account)
+        accountList.appendChild(account)
+      }
+    }
 
+  },
+
+  updateDevice: function (device) {
+    const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
+    const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
+
+    deviceContainer.textContent = (this.config.style == "default" || this.enableMiniBar) ? this.config.deviceDisplay + ' ' + device.name : device.name
+    deviceIcon.className = this.getFAIconClass(device.type)
+
+    this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
 
   updateDeviceList: function (payload) {
@@ -554,6 +571,11 @@ Module.register("MMM-Spotify", {
     }
   },
 
+  clickAccountTransfer: function(accountId) {
+    this.sendSocketNotification("ACCOUNT", accountId)
+    this.clickAccountList()
+  },
+
   clickDeviceList: function() {
     const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
     const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
@@ -568,11 +590,6 @@ Module.register("MMM-Spotify", {
       deviceList.classList.add("hidden")
       main.classList.remove("modal")
     }
-  },
-
-  clickAccountTransfer: function(accountId) {
-    console.info("SPOTIFY --- DEBUG --- clickAccountTransfer(" + accountId + ")")
-    this.clickAccountList()
   },
 
   clickDeviceTransfer: function(deviceId) {
@@ -805,16 +822,18 @@ Module.register("MMM-Spotify", {
 
   getModalContainer: function() {
     const modal = this.getHTMLElementWithID('div', "SPOTIFY_MODAL")
-    //modal.classList.add("hidden")
 
-    const accountList = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT_LIST")
-    accountList.classList.add("hidden")
+    if (this.config.showAccountButton) {
+      const accountList = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT_LIST")
+      accountList.classList.add("hidden")
+      modal.appendChild(accountList)
+    }
 
-    const deviceList = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE_LIST")
-    deviceList.classList.add("hidden")
-
-    modal.appendChild(accountList)
-    modal.appendChild(deviceList)
+    if (this.config.showDeviceButton) {
+      const deviceList = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE_LIST")
+      deviceList.classList.add("hidden")
+      modal.appendChild(deviceList)
+    }
 
     return modal;
   },

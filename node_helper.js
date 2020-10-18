@@ -22,6 +22,7 @@ module.exports = NodeHelper.create({
 
   doSpotifyConfig: function (configuration, account) {
     if (!isNaN(account) && Array.isArray(configuration)) {
+      this.sendSocketNotification("CURRENT_ACCOUNT", account)
       return configuration[account] // only wanted account or first
     }
     if (Array.isArray(configuration)) {
@@ -29,8 +30,9 @@ module.exports = NodeHelper.create({
       configuration.forEach((jsAccount,number) => {
         if (jsAccount.USERNAME == account) found = number
       })
-      if (typeof found !== "undefined") return configuration[found]
-      else return configuration[0]
+      if (typeof found === "undefined") found = 0
+      this.sendSocketNotification("CURRENT_ACCOUNT", found)
+      return configuration[found]
     }
     // not update required not an array (single account)
     return configuration
@@ -125,6 +127,25 @@ module.exports = NodeHelper.create({
     this.initAfterLoading(this.config, account)
   },
 
+  getAccounts: function(cb) {
+    let file = path.resolve(__dirname, "spotify.config.json")
+    if (fs.existsSync(file)) {
+      try {
+        let result = []
+        let configuration = JSON.parse(fs.readFileSync(file))
+        if (Array.isArray(configuration)) {
+          configuration.forEach((jsAccount,number) => {
+            let accountEntry = { "name": jsAccount.USERNAME, "id": number }
+            result.push(accountEntry)
+          })
+          if (typeof result !== "undefined" && result.length > 0) cb(result)
+        }
+      } catch (e) {
+        return console.log("[SPOTIFY] ERROR fetching accounts from spotify.config.json", e.name)
+      }
+    }
+  },
+
   socketNotificationReceived: function (noti, payload) {
     if (noti == "INIT") {
       this.initAfterLoading(payload)
@@ -133,6 +154,11 @@ module.exports = NodeHelper.create({
     }
     if (noti == "ACCOUNT") {
       this.account(payload)
+    }
+    if (noti == "GET_ACCOUNTS") {
+      this.getAccounts((result) => {
+        this.sendSocketNotification("LIST_ACCOUNTS", result)
+      })
     }
     if (noti == "UNALLOWED_DEVICE") {
       this.unallowedDevice = payload
