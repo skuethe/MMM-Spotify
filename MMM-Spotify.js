@@ -344,7 +344,7 @@ Module.register("MMM-Spotify", {
       accountList.removeChild(accountList.firstChild);
     }
 
-    if (payload.length > 0) {
+    if (typeof payload !== "undefined" && payload.length > 0) {
       for (var i = 0; i < payload.length; i++) {
         var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
 
@@ -383,7 +383,7 @@ Module.register("MMM-Spotify", {
       deviceList.removeChild(deviceList.firstChild);
     }
 
-    if (payload.devices.length > 0) {
+    if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
       for (var i = 0; i < payload.devices.length; i++) {
         if(payload.devices[i].is_restricted) continue
         if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
