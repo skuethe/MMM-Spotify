@@ -1,11 +1,8 @@
 {
   "name": "MMM-Spotify",
-  "version": "1.5.3",
+  "version": "1.5.2",
   "description": "MM module for Spotify",
   "main": "MMM-Spotify.js",
-  "scripts": {
-    "preinstall": "installer/redirect.sh"
-  },
   "keywords": [
     "magic mirror",
     "module",
@@ -24,5 +21,10 @@
     "type": "git",
     "url": "https://github.com/bugsounet/MMM-Spotify"
   },
-  "homepage": "https://github.com/bugsounet/MMM-Spotify"
+  "homepage": "https://github.com/bugsounet/MMM-Spotify",
+  "dependencies": {
+    "@bugsounet/spotify": "^1.0.2",
+    "open": "^6.3.0",
+    "querystring": "^0.2.0"
+  }
 }

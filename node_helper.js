@@ -36,9 +36,6 @@ module.exports = NodeHelper.create({
 
   initAfterLoading: function (config, account) {
     this.config = config
-    console.error("[SPOTIFY] This project is now discontinued and now maintened by @skuethe")
-    console.error("[SPOTIFY] Please to do `npm install` in this module directory, for installing new sources!")
-    this.sendSocketNotification("REDIRECT")
     if (!account) {
       account = this.config.accountDefault
       console.log("[SPOTIFY] MMM-Spotify Version:",  require('./package.json').version)
