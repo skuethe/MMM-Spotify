@@ -5,7 +5,7 @@
 "use strict"
 const fs = require("fs")
 const path = require("path")
-const Spotify = require("@bugsounet/spotify")
+const Spotify = require("./Spotify.js")
 
 var NodeHelper = require("node_helper")
 
@@ -16,10 +16,13 @@ module.exports = NodeHelper.create({
     this.spotify = null
     this.timer = null
     this.firstStart = true
+    this.unallowedDevice = false
+    this.suspended = false
   },
 
   doSpotifyConfig: function (configuration, account) {
     if (!isNaN(account) && Array.isArray(configuration)) {
+      this.sendSocketNotification("CURRENT_ACCOUNT", account)
       return configuration[account] // only wanted account or first
     }
     if (Array.isArray(configuration)) {
@@ -27,14 +30,16 @@ module.exports = NodeHelper.create({
       configuration.forEach((jsAccount,number) => {
         if (jsAccount.USERNAME == account) found = number
       })
-      if (typeof found !== "undefined") return configuration[found]
-      else return configuration[0]
+      if (typeof found === "undefined") found = 0
+      this.sendSocketNotification("CURRENT_ACCOUNT", found)
+      return configuration[found]
     }
     // not update required not an array (single account)
     return configuration
   },
 
   initAfterLoading: function (config, account) {
+    this.suspended = false
     this.config = config
     console.error("[SPOTIFY] This project is now discontinued and now maintened by @skuethe")
     console.error("[SPOTIFY] Please to do `npm install` in this module directory, for installing new sources!")
@@ -51,7 +56,6 @@ module.exports = NodeHelper.create({
         return console.log("[SPOTIFY] ERROR: spotify.config.json", e.name)
       }
       if (!this.spotifyConfig) return console.log("[SPOTIFY] ERROR: Account not found")
-      this.spotifyConfig.PATH = "../../../", // Needed Don't modify it !
       this.spotify = new Spotify(this.spotifyConfig, this.config.debug)
     }
     else return console.log("[SPOTIFY] ERROR: spotify.config.json file missing !")
@@ -68,13 +72,18 @@ module.exports = NodeHelper.create({
     try {
       let result = await this.updateSpotify(this.spotify)
       this.sendSocketNotification("CURRENT_PLAYBACK", result)
+      if (this.unallowedDevice) idle = true
     } catch (e) {
       idle = true
       this.sendSocketNotification("CURRENT_NOPLAYBACK")
     }
-    this.timer = setTimeout(() => {
-      this.updatePulse()
-    }, idle ? this.config.idleInterval : this.config.updateInterval)
+    // Only re-run if moudle is NOT suspended
+    // This breaks multi module instances, but saves performance and power consumption, so we reduce heat
+    if (!this.suspended) {
+      this.timer = setTimeout(() => {
+        this.updatePulse()
+      }, idle ? this.config.idleInterval : this.config.updateInterval)
+    }
   },
 
   updateSpotify: function (spotify) {
@@ -121,6 +130,25 @@ module.exports = NodeHelper.create({
     this.initAfterLoading(this.config, account)
   },
 
+  getAccounts: function(cb) {
+    let file = path.resolve(__dirname, "spotify.config.json")
+    if (fs.existsSync(file)) {
+      try {
+        let result = []
+        let configuration = JSON.parse(fs.readFileSync(file))
+        if (Array.isArray(configuration)) {
+          configuration.forEach((jsAccount,number) => {
+            let accountEntry = { "name": jsAccount.USERNAME, "id": number }
+            result.push(accountEntry)
+          })
+          if (typeof result !== "undefined" && result.length > 0) cb(result)
+        }
+      } catch (e) {
+        return console.log("[SPOTIFY] ERROR fetching accounts from spotify.config.json", e.name)
+      }
+    }
+  },
+
   socketNotificationReceived: function (noti, payload) {
     if (noti == "INIT") {
       this.initAfterLoading(payload)
@@ -130,7 +158,18 @@ module.exports = NodeHelper.create({
     if (noti == "ACCOUNT") {
       this.account(payload)
     }
-    if(this.spotify){
+    if (noti == "GET_ACCOUNTS") {
+      this.getAccounts((result) => {
+        this.sendSocketNotification("LIST_ACCOUNTS", result)
+      })
+    }
+    if (noti == "UNALLOWED_DEVICE") {
+      this.unallowedDevice = payload
+    }
+    if (noti == "SUSPENDING") {
+      this.suspended = true
+    }
+    if(this.spotify && !this.unallowedDevice){
       if (noti == "GET_DEVICES") {
         this.spotify.getDevices((code, error, result) => {
           this.sendSocketNotification("LIST_DEVICES", result)
@@ -168,6 +207,11 @@ module.exports = NodeHelper.create({
       if (noti == "TRANSFER") {
         this.spotify.transferByName(payload, (code, error, result) => {
           this.sendSocketNotification("DONE_TRANSFER", result)
+        })
+      }
+      if (noti == "TRANSFERBYID") {
+        this.spotify.transfer(payload, (code, error, result) => {
+          this.sendSocketNotification("DONE_TRANSFERBYID", result)
         })
       }
       if (noti == "REPEAT") {
