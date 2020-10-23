@@ -1,15 +1,8 @@
 {
   "name": "MMM-Spotify",
-<<<<<<< HEAD
-  "version": "1.5.3",
-=======
   "version": "1.6.1",
->>>>>>> 8d581fc9c289e51afd9560118b2c1f6fad44963f
   "description": "MM module for Spotify",
   "main": "MMM-Spotify.js",
-  "scripts": {
-    "preinstall": "installer/redirect.sh"
-  },
   "keywords": [
     "magic mirror",
     "module",
