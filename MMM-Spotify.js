@@ -125,13 +125,6 @@ Module.register("MMM-Spotify", {
       case "CURRENT_NOPLAYBACK":
         this.updatePlayback(false)
         break
-      case "REDIRECT":
-        this.sendNotification("SHOW_ALERT", {
-          type: "notification" ,
-          message: "[SPOTIFY] Please use `npm install` in MMM-Spotify directory",
-          title: "MMM-Spotify",
-          timer: 5*60*1000
-        })
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)

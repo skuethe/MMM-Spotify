@@ -1,11 +1,4 @@
 # MMM-Spotify
-
-This module is now not maintened !
-
-Please use `git pull && npm install` for upgrading to new owner (@skuethe) and new features !
-
-@bugsounet
-
 Spotify controller for MagicMirror. Multiples accounts supported!
 
 ## Screenshot
