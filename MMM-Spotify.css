@@ -110,6 +110,10 @@
   filter:brightness(50%) grayscale(75%);
 }
 
+#SPOTIFY.modal #SPOTIFY_COVER_IMAGE {
+  filter:brightness(30%) blur(5px);
+}
+
 #SPOTIFY_PROGRESS_TIME {
   display:flex;
   flex-direction:row;
@@ -146,9 +150,52 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   background-color:rgba(0,0,0,0.2);
 }
 
+#SPOTIFY_CONTROL > *:hover, #SPOTIFY_CONTROL > *:active {
+  background-color:rgba(255,255,255,0.2);
+}
+
+
 #SPOTIFY_CONTROL .iconify {
   justify-self: center;
   align-self: center;
+}
+
+#SPOTIFY_MODAL {
+  position: relative;
+  transform: translateY(-100%);
+  width: inherit;
+  height: inherit;
+}
+
+#SPOTIFY_ACCOUNT_LIST, #SPOTIFY_DEVICE_LIST {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: inherit;
+  max-width: max-content;
+  background: rgba(0,0,0, 0.8);
+  border-radius: 6px;
+}
+
+#SPOTIFY_ACCOUNT_LIST > *, #SPOTIFY_DEVICE_LIST > * {
+  padding: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#SPOTIFY_ACCOUNT_LIST > *:hover, #SPOTIFY_ACCOUNT_LIST > *:active, #SPOTIFY_DEVICE_LIST > *:hover, #SPOTIFY_DEVICE_LIST > *:active {
+  background-color:rgba(255,255,255,0.2);
+  border-radius: 6px;
+}
+
+#SPOTIFY_ACCOUNT_LIST .text, #SPOTIFY_DEVICE_LIST .text {
+  padding-left: 5px;
+}
+
+#SPOTIFY_MODAL > .hidden {
+  display:none;
 }
 
 /* control "hidden" */
@@ -176,17 +223,17 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER {
-  width:calc(var(--sp-width) - 220px);
-  height:140px;
+  width:calc(var(--sp-width) - 240px);
+  height:calc(var(--sp-width) - 240px);
   padding:0;
 }
 
 #SPOTIFY.mini #SPOTIFY_COVER_IMAGE {
-  height:140px;
+  height:calc(var(--sp-width) - 240px);
 }
 
 #SPOTIFY.mini #SPOTIFY_INFO {
-  width:calc(var(--sp-width) - 140px);
+  width: 240px;
   padding-left:10px;
   margin-top:5px;
 }
@@ -201,7 +248,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 }
 
 #SPOTIFY.mini.noPlayback {
-  width:calc(var(--sp-width) - 220px);
+  width:calc(var(--sp-width) - 240px);
 }
 
 #SPOTIFY.noPlayback #SPOTIFY_FOREGROUND > * {

@@ -6,7 +6,10 @@ Module.register("MMM-Spotify", {
   defaults: {
     debug: false,
     style: "default", // "default", "mini" available.
+    moduleWidth: 360, // width of the module
     control: "default", //"default", "hidden" available
+    showAccountButton: true,
+    showDeviceButton: true,
     updateInterval: 1000,
     idleInterval: 10000,
     accountDefault: 0, // default account number, attention : 0 is the first account
@@ -15,7 +18,10 @@ Module.register("MMM-Spotify", {
     //iconify: null,
     //When you use this module with `MMM-CalendarExt` or any other `iconify` used modules together, Set this null.
     onStart: null,
+    notificationsOnSuspend: [],
+    notificationsOnResume: [],
     deviceDisplay: "Listening on",
+    volumeSteps: 5, // in percent, the steps you want to increase or decrese volume when using the "SPOTIFY_VOLUME_{UP,DOWN}" notifications
     miniBarConfig: {
       album: true,
       scroll: true,
@@ -54,6 +60,8 @@ Module.register("MMM-Spotify", {
     this.firstLaunch = true
     this.timer = null
     this.ads = false
+    this.volume = 50
+    this.currentAccount = this.config.accountDefault
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -89,6 +97,16 @@ Module.register("MMM-Spotify", {
       case "SPOTIFY_VOLUME":
         this.sendSocketNotification("VOLUME", payload)
         break
+      case "SPOTIFY_VOLUME_UP":
+        var volume = (this.volume + this.config.volumeSteps);
+        (volume > 100) ? volume = 100 : volume
+        this.sendSocketNotification("VOLUME", volume)
+        break
+      case "SPOTIFY_VOLUME_DOWN":
+        var volume = (this.volume - this.config.volumeSteps);
+        (volume < 0) ? volume = 0 : volume
+        this.sendSocketNotification("VOLUME", volume)
+        break
       case "SPOTIFY_TRANSFER":
         this.sendSocketNotification("TRANSFER", payload)
         break
@@ -116,22 +134,26 @@ Module.register("MMM-Spotify", {
           (this.config.allowDevices.length === 0)
           || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
         ) {
+          this.volume = payload.device.volume_percent
+          this.sendSocketNotification("UNALLOWED_DEVICE", false)
           this.updateCurrentPlayback(payload)
         } else {
-          this.currentPlayback = null
-          this.updateDom()
+          this.sendSocketNotification("UNALLOWED_DEVICE", true)
+          this.updatePlayback(false)
         }
         break
       case "CURRENT_NOPLAYBACK":
         this.updatePlayback(false)
         break
-      case "REDIRECT":
-        this.sendNotification("SHOW_ALERT", {
-          type: "notification" ,
-          message: "[SPOTIFY] Please use `npm install` in MMM-Spotify directory",
-          title: "MMM-Spotify",
-          timer: 5*60*1000
-        })
+      case "CURRENT_ACCOUNT":
+        this.currentAccount = payload
+        break
+      case "LIST_DEVICES":
+        this.updateDeviceList(payload)
+        break
+      case "LIST_ACCOUNTS":
+        this.updateAccountList(payload)
+        break
     }
     if (noti.search("DONE_") > -1) {
       this.sendNotification(noti)
@@ -165,6 +187,12 @@ Module.register("MMM-Spotify", {
     if (!this.connected && status) {
       this.connected = true
       this.sendNotification("SPOTIFY_CONNECTED")
+      if (this.config.showDeviceButton) {
+        this.sendSocketNotification("GET_DEVICES")
+      }
+      if (this.config.showAccountButton) {
+        this.sendSocketNotification("GET_ACCOUNTS")
+      }
     }
   },
 
@@ -212,6 +240,9 @@ Module.register("MMM-Spotify", {
       }
       if (this.currentPlayback.device.id !== current.device.id) {
         this.updateDevice(current.device)
+        if (this.config.showDeviceButton) {
+          this.sendSocketNotification("GET_DEVICES")
+        }
       }
       if (this.currentPlayback.device.volume_percent !== current.device.volume_percent) {
         this.updateVolume(current.device.volume_percent)
@@ -304,6 +335,35 @@ Module.register("MMM-Spotify", {
     )
   },
 
+  updateAccountList: function (payload) {
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+    var self = this
+
+    // let's start clean
+    while (accountList.hasChildNodes()) {
+      accountList.removeChild(accountList.firstChild);
+    }
+
+    if (typeof payload !== "undefined" && payload.length > 0) {
+      for (var i = 0; i < payload.length; i++) {
+        var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
+
+        var text = document.createElement("span")
+        text.className = "text"
+        text.textContent = payload[i].name
+        if (payload[i].id == this.currentAccount) text.textContent += " (active)"
+
+        account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
+        account.appendChild(text)
+        account.accountId = payload[i].id
+        account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+
+        accountList.appendChild(account)
+      }
+    }
+
+  },
+
   updateDevice: function (device) {
     const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
     const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
@@ -314,9 +374,41 @@ Module.register("MMM-Spotify", {
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
   },
 
+  updateDeviceList: function (payload) {
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+    var self = this
+
+    // let's start clean
+    while (deviceList.hasChildNodes()) {
+      deviceList.removeChild(deviceList.firstChild);
+    }
+
+    if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
+      for (var i = 0; i < payload.devices.length; i++) {
+        if(payload.devices[i].is_restricted) continue
+        if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
+
+        var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
+
+        var text = document.createElement("span")
+        text.className = "text"
+        text.textContent = payload.devices[i].name
+        if (payload.devices[i].is_active) text.textContent += " (active)"
+
+        device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
+        device.appendChild(text)
+        device.deviceId = payload.devices[i].id
+        device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+
+        deviceList.appendChild(device)
+      }
+    }
+
+  },
+
   updateVolume: function (volume_percent) {
     this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
-    if (!this.enableMiniBar) return
+    //if (!this.enableMiniBar) return
     const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
     const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
 
@@ -339,7 +431,6 @@ Module.register("MMM-Spotify", {
     return this.getFAIconClass(iconClass);
   },
 
-
   updatePlaying: function (isPlaying) {
     if (isPlaying && this.firstLaunch) {
       this.sendNotification("SPOTIFY_CONNECTED")
@@ -359,8 +450,8 @@ Module.register("MMM-Spotify", {
       const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
       p.className = isPlaying ? "playing" : "pausing"
       const icon = isPlaying
-        ? "mdi:play-circle-outline"
-        : "mdi:pause-circle-outline";
+        ? "mdi:play"
+        : "mdi:pause";
 
       p.innerHTML = ""
       p.appendChild(
@@ -464,6 +555,49 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("NEXT")
   },
 
+  clickAccountList: function() {
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+    const main = document.getElementById("SPOTIFY")
+
+    deviceList.classList.add("hidden")
+
+    if (accountList.classList.contains("hidden")) {
+      accountList.classList.remove("hidden")
+      main.classList.add("modal")
+    } else {
+      accountList.classList.add("hidden")
+      main.classList.remove("modal")
+    }
+  },
+
+  clickAccountTransfer: function(accountId) {
+    this.sendSocketNotification("ACCOUNT", accountId)
+    this.clickAccountList()
+  },
+
+  clickDeviceList: function() {
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+    const main = document.getElementById("SPOTIFY")
+
+    accountList.classList.add("hidden")
+
+    if (deviceList.classList.contains("hidden")) {
+      deviceList.classList.remove("hidden")
+      main.classList.add("modal")
+    } else {
+      deviceList.classList.add("hidden")
+      main.classList.remove("modal")
+    }
+  },
+
+  clickDeviceTransfer: function(deviceId) {
+    var transferPayload = { device_ids: [ deviceId ] }
+    this.sendSocketNotification("TRANSFERBYID", transferPayload)
+    this.clickDeviceList()
+  },
+
   getFAIcon(iconType) {
     switch (iconType) {
       case 'Spotify':
@@ -474,6 +608,9 @@ Module.register("MMM-Spotify", {
         return 'fa fa-user fa-sm';
       case 'Album':
         return 'fa fa-folder fa-sm';
+      // Account Icons
+      case 'Account':
+        return 'mdi mdi-account';
       // Volume Icons
       case 'VOL_HIGH':
         return 'mdi mdi-volume-high';
@@ -587,6 +724,10 @@ Module.register("MMM-Spotify", {
     if (this.config.control === "hidden") return control;
     
     const orderedButtonConfig = {
+      "SPOTIFY_CONTROL_ACCOUNTS": {
+        icon: 'mdi:account-switch',
+        action: () => { this.clickAccountList() },
+      },
       "SPOTIFY_CONTROL_SHUFFLE" : {
         icon: 'mdi:shuffle',
         action: () => { this.clickShuffle() },
@@ -596,7 +737,7 @@ Module.register("MMM-Spotify", {
         action: () => { this.clickBackward() },
       },
       "SPOTIFY_CONTROL_PLAY": {
-        icon: 'mdi:play-circle-outline',
+        icon: 'mdi:play',
         action: () => { this.clickPlay() },
       },
       "SPOTIFY_CONTROL_FORWARD": {
@@ -606,10 +747,16 @@ Module.register("MMM-Spotify", {
       "SPOTIFY_CONTROL_REPEAT": {
         icon: 'mdi:repeat-off',
         action: () => { this.clickRepeat() },
+      },
+      "SPOTIFY_CONTROL_DEVICES": {
+        icon: 'mdi:speaker-wireless',
+        action: () => { this.clickDeviceList() },
       }
     }
 
     for (const [key, config] of Object.entries(orderedButtonConfig)) {
+      if (!this.config.showAccountButton && key === "SPOTIFY_CONTROL_ACCOUNTS") continue
+      if (!this.config.showDeviceButton && key === "SPOTIFY_CONTROL_DEVICES") continue
       control.appendChild(
         this.getControlButton(key, config['icon'], config['action'])
       );
@@ -633,6 +780,7 @@ Module.register("MMM-Spotify", {
       info.appendChild(element)
     }
 
+    info.appendChild(this.getVolumeContainer())
     info.appendChild(this.getDeviceContainer())
     return info;
   },
@@ -670,6 +818,24 @@ Module.register("MMM-Spotify", {
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
     cover.appendChild(cover_img)
     return cover
+  },
+
+  getModalContainer: function() {
+    const modal = this.getHTMLElementWithID('div', "SPOTIFY_MODAL")
+
+    if (this.config.showAccountButton) {
+      const accountList = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT_LIST")
+      accountList.classList.add("hidden")
+      modal.appendChild(accountList)
+    }
+
+    if (this.config.showDeviceButton) {
+      const deviceList = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE_LIST")
+      deviceList.classList.add("hidden")
+      modal.appendChild(deviceList)
+    }
+
+    return modal;
   },
 
   getMinimalistBarDom: function (container) {
@@ -749,6 +915,10 @@ Module.register("MMM-Spotify", {
       return this.getMinimalistBarDom(m)
     }
 
+    if (this.config.moduleWidth !== "undefined" && (this.config.moduleWidth > 0 && this.config.moduleWidth != 360)) {
+      m.style.setProperty("--sp-width", this.config.moduleWidth + "px");
+    }
+
     m.appendChild(this.getHTMLElementWithID('div', "SPOTIFY_BACKGROUND"))
 
     const cover_img = this.getHTMLElementWithID('img', "SPOTIFY_COVER_IMAGE")
@@ -757,6 +927,10 @@ Module.register("MMM-Spotify", {
 
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
     cover.appendChild(cover_img)
+    if (this.config.showDeviceButton || this.config.showAccountButton) {
+      cover.appendChild(this.getModalContainer());
+    }
+
 
     const misc = this.getHTMLElementWithID('div', "SPOTIFY_MISC")
     misc.appendChild(this.getInfoContainer())
@@ -775,5 +949,26 @@ Module.register("MMM-Spotify", {
     this.enableMiniBar = false
     this.myPosition = this.data.position
     if (this.myPosition == "bottom_bar" || this.myPosition == "top_bar") this.enableMiniBar = true
-  }
+  },
+
+  suspend: function() {
+    console.log(this.name + " is suspended.")
+    this.sendSocketNotification("SUSPENDING")
+    if (typeof this.config.notificationsOnSuspend === "object" && this.config.notificationsOnSuspend.length > 0) {
+      for (let i = 0; i < this.config.notificationsOnSuspend.length; i++) {
+        this.sendNotification(this.config.notificationsOnSuspend[i].notification, this.config.notificationsOnSuspend[i].payload)
+      }
+    }
+  },
+
+  resume: function() {
+    console.log(this.name + " is resumed.")
+    this.sendSocketNotification("INIT", this.config)
+    if (typeof this.config.notificationsOnResume === "object" && this.config.notificationsOnResume.length > 0) {
+      for (let i = 0; i < this.config.notificationsOnResume.length; i++) {
+        this.sendNotification(this.config.notificationsOnResume[i].notification, this.config.notificationsOnResume[i].payload)
+      }
+    }
+  },
+
 })

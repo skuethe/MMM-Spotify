@@ -1,6 +1,6 @@
 const fs = require("fs")
 const path = require("path")
-const Spotify = require("@bugsounet/spotify")
+const Spotify = require("./Spotify.js")
 
 let file = path.resolve(__dirname, "spotify.config.json")
 let configurations = []
@@ -15,7 +15,6 @@ else return console.log("[SPOTIFY] Error: please configure your spotify.config.j
 
 function authorize(configuration) {
     return new Promise((resolve, reject) => {
-        configuration.PATH = "../../../"
         let Auth = new Spotify(configuration,true, true)
         Auth.authFlow(() => {
             console.log("[SPOTIFY] First authorization is finished for " + configuration.USERNAME + ". Check ", configuration.TOKEN)
