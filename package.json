@@ -1,6 +1,6 @@
 {
   "name": "MMM-Spotify",
-  "version": "1.5.2",
+  "version": "1.6.1",
   "description": "MM module for Spotify",
   "main": "MMM-Spotify.js",
   "keywords": [
@@ -11,19 +11,19 @@
   ],
   "author": [
     "eouia",
-    "bugsounet"
+    "bugsounet",
+    "skuethe"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bugsounet/MMM-Spotify/issues"
+    "url": "https://github.com/skuethe/MMM-Spotify/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bugsounet/MMM-Spotify"
+    "url": "https://github.com/skuethe/MMM-Spotify"
   },
-  "homepage": "https://github.com/bugsounet/MMM-Spotify",
+  "homepage": "https://github.com/skuethe/MMM-Spotify",
   "dependencies": {
-    "@bugsounet/spotify": "^1.0.2",
     "open": "^6.3.0",
     "querystring": "^0.2.0"
   }
