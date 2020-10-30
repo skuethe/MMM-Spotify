@@ -150,7 +150,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   background-color:rgba(0,0,0,0.2);
 }
 
-#SPOTIFY_CONTROL > *:hover, #SPOTIFY_CONTROL > *:active {
+#SPOTIFY_CONTROL > *:active {
   background-color:rgba(255,255,255,0.2);
 }
 
