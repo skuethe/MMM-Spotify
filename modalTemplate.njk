@@ -1,15 +1,15 @@
 <div id="SPOTIFY_MODAL_LIST">
     {% if data.type == "ACCOUNTS" %}
         {% for account in data.list %}
-        <div id="SPOTIFY_ACCOUNT{{ loop.index }}">
-            <i id="SPOTIFY_ACCOUNT{{ loop.index }}_ICON" class="infoicon mdi mdi-account"></i>
+        <div id="SPOTIFY_ACCOUNT{{ loop.index0 }}" data-id="{{ loop.index0 }}">
+            <i id="SPOTIFY_ACCOUNT{{ loop.index0 }}_ICON" class="infoicon mdi mdi-account"></i>
             <span class="text">{{ account.name }}{% if data.currentAccount == account.id %} (active){% endif %}</span>
         </div>
         {% endfor %}
     {% elif data.type == "DEVICES" %}
         {% for device in data.list %}
-        <div id="SPOTIFY_DEVICE{{ loop.index }}">
-            <i id="SPOTIFY_DEVICE{{ loop.index }}_ICON" class="infoicon 
+        <div id="SPOTIFY_DEVICE{{ loop.index0 }}" data-id="{{ device.id }}">
+            <i id="SPOTIFY_DEVICE{{ loop.index0 }}_ICON" class="infoicon 
                 {% if device.type == "Tablet" %}fas fa-tablet fa-sm
                 {% elif device.type == "GameConsole" %}fas fa-gamepad fa-sm
                 {% elif device.type == "AVR" or device.type == "STB" %}mdi mdi-audio-video

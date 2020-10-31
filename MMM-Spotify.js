@@ -65,6 +65,7 @@ Module.register("MMM-Spotify", {
     this.currentAccount = this.config.accountDefault
     this.devices = []
     this.accounts = []
+    this.externalModal = null
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -340,9 +341,11 @@ Module.register("MMM-Spotify", {
 
   updateAccountList: function (payload) {
     var self = this
+
+    // let's start clean
+    this.accounts = []
     const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
     if (typeof accountList !== "undefined" && accountList) {
-      // let's start clean
       while (accountList.hasChildNodes()) {
         accountList.removeChild(accountList.firstChild);
       }
@@ -383,9 +386,11 @@ Module.register("MMM-Spotify", {
 
   updateDeviceList: function (payload) {
     var self = this
+
+    // let's start clean
+    this.devices = []
     const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
     if (typeof deviceList !== "undefined" && deviceList) {
-      // let's start clean
       while (deviceList.hasChildNodes()) {
         deviceList.removeChild(deviceList.firstChild);
       }
@@ -858,26 +863,64 @@ Module.register("MMM-Spotify", {
   },
 
   getExternalModal: function (contentType) {
+    var self = this
+
     if (contentType === "ACCOUNTS") {
       if (typeof this.accounts !== "undefined" && this.accounts.length > 0) {
-        this.sendNotification("OPEN_MODAL", {
-          template: "modalTemplate.njk",
-          data: {
-            type: contentType,
-            currentAccount: this.currentAccount,
-            list: this.accounts,
-          }
-        })
+        if (this.externalModal == contentType) {
+          this.sendNotification("CLOSE_MODAL")
+          this.externalModal = null
+        } else {
+          this.sendNotification("OPEN_MODAL", {
+            template: "modalTemplate.njk",
+            data: {
+              type: contentType,
+              currentAccount: this.currentAccount,
+              list: this.accounts,
+            },
+            options: {
+              callback(success) {
+                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                if (typeof modalList !== "undefined" && modalList) {
+                  var children = modalList.children
+                  for (var i = 0; i < children.length; i++) {
+                    children[i].accountId = children[i].dataset.id
+                    children[i].addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+                  }
+                }
+              }
+            }
+          })
+          this.externalModal = contentType
+        }
       }
     } else if (contentType === "DEVICES") {
       if (typeof this.devices !== "undefined" && this.devices.length > 0) {
-        this.sendNotification("OPEN_MODAL", {
-          template: "modalTemplate.njk",
-          data: {
-            type: contentType,
-            list: this.devices,
-          }
-        })
+        if (this.externalModal == contentType) {
+          this.sendNotification("CLOSE_MODAL")
+          this.externalModal = null
+        } else {
+          this.sendNotification("OPEN_MODAL", {
+            template: "modalTemplate.njk",
+            data: {
+              type: contentType,
+              list: this.devices,
+            },
+            options: {
+              callback(success) {
+                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                if (typeof modalList !== "undefined" && modalList) {
+                  var children = modalList.children
+                  for (var i = 0; i < children.length; i++) {
+                    children[i].deviceId = children[i].dataset.id
+                    children[i].addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+                  }
+                }
+              }
+            }
+          })
+          this.externalModal = contentType
+        }
       }
     }
   },

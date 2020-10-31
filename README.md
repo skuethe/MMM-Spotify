@@ -131,6 +131,7 @@ That's all. `token.json` will be created, if success.
     control: "default", // "default" or "hidden"
     showAccountButton: true, // if you want to show the "switch account" control button
     showDeviceButton: true, // if you want to show the "switch device" control button
+    useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
     accountDefault: 0, // default account number, attention : 0 is the first account
     updateInterval: 1000, // update interval when playing
     idleInterval: 30000, // update interval on idle
@@ -245,7 +246,7 @@ The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/pa
 - `SPOTIFY_VOLUME_DOWN` : decreasing volume in this.config.volumeSteps steps. Minimum 0. Useful in combination with touch
 
 ```json
-  this.sendNotification("SPOTIFY_VOLUME_UP")
+  this.sendNotification("SPOTIFY_VOLUME_DOWN")
 ```
 
 - `SPOTIFY_TRANSFER` : change device of playing with device name (e.g: RASPOTIFY)
@@ -286,6 +287,11 @@ this.sendNotification("SPOTIFY_ACCOUNT", 0)
 It can be used with MMM-pages for example (for show or hide the module)
 
 ## Update History
+
+### 1.6.2 (2020-10-31)
+
+- Fixed: sticky hover pseudo class on button click (via touch display)
+- Added: option to use ["MMM-Modal"](https://github.com/fewieden/MMM-Modal) for device and account switching dialog
 
 ### 1.6.1 (2020-10-18)
 
