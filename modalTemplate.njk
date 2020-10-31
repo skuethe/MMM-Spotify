@@ -1,0 +1,28 @@
+<div id="SPOTIFY_MODAL_LIST">
+    {% if data.type == "ACCOUNTS" %}
+        {% for account in data.list %}
+        <div id="SPOTIFY_ACCOUNT{{ loop.index0 }}" data-id="{{ loop.index0 }}">
+            <i id="SPOTIFY_ACCOUNT{{ loop.index0 }}_ICON" class="infoicon mdi mdi-account"></i>
+            <span class="text">{{ account.name }}{% if data.currentAccount == account.id %} (active){% endif %}</span>
+        </div>
+        {% endfor %}
+    {% elif data.type == "DEVICES" %}
+        {% for device in data.list %}
+        <div id="SPOTIFY_DEVICE{{ loop.index0 }}" data-id="{{ device.id }}">
+            <i id="SPOTIFY_DEVICE{{ loop.index0 }}_ICON" class="infoicon 
+                {% if device.type == "Tablet" %}fas fa-tablet fa-sm
+                {% elif device.type == "GameConsole" %}fas fa-gamepad fa-sm
+                {% elif device.type == "AVR" or device.type == "STB" %}mdi mdi-audio-video
+                {% elif device.type == "AudioDongle" or device.type == "CastVideo" %}mdi mdi-cast-connected
+                {% elif device.type == "CastAudio" or device.type == "Speaker" %}mdi mdi-cast-audio
+                {% elif device.type == "Automobile" %}fas fa-car fa-sm
+                {% elif device.type == "Smartphone" %}fas fa-mobile fa-sm
+                {% elif device.type == "TV" %}fas fa-tv fa-sm
+                {% elif device.type == "Unknown" or device.type == "Computer" %}fa fa-desktop fa-sm
+                {% else %}fa fa-headphones fa-sm
+                {% endif %}"></i>
+            <span class="text">{{ device.name }}{% if device.is_active %} (active){% endif %}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>

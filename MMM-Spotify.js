@@ -10,6 +10,7 @@ Module.register("MMM-Spotify", {
     control: "default", //"default", "hidden" available
     showAccountButton: true,
     showDeviceButton: true,
+    useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
     updateInterval: 1000,
     idleInterval: 10000,
     accountDefault: 0, // default account number, attention : 0 is the first account
@@ -62,6 +63,9 @@ Module.register("MMM-Spotify", {
     this.ads = false
     this.volume = 50
     this.currentAccount = this.config.accountDefault
+    this.devices = []
+    this.accounts = []
+    this.externalModal = null
   },
 
   notificationReceived: function (noti, payload, sender) {
@@ -336,29 +340,35 @@ Module.register("MMM-Spotify", {
   },
 
   updateAccountList: function (payload) {
-    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
     var self = this
 
     // let's start clean
-    while (accountList.hasChildNodes()) {
-      accountList.removeChild(accountList.firstChild);
+    this.accounts = []
+    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+    if (typeof accountList !== "undefined" && accountList) {
+      while (accountList.hasChildNodes()) {
+        accountList.removeChild(accountList.firstChild);
+      }
     }
 
     if (typeof payload !== "undefined" && payload.length > 0) {
       for (var i = 0; i < payload.length; i++) {
-        var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
+        if (this.config.useExternalModal) this.accounts.push(payload[i])
+        else {
+          var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
 
-        var text = document.createElement("span")
-        text.className = "text"
-        text.textContent = payload[i].name
-        if (payload[i].id == this.currentAccount) text.textContent += " (active)"
+          var text = document.createElement("span")
+          text.className = "text"
+          text.textContent = payload[i].name
+          if (payload[i].id == this.currentAccount) text.textContent += " (active)"
 
-        account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
-        account.appendChild(text)
-        account.accountId = payload[i].id
-        account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+          account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
+          account.appendChild(text)
+          account.accountId = payload[i].id
+          account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
 
-        accountList.appendChild(account)
+          accountList.appendChild(account)
+        }
       }
     }
 
@@ -375,12 +385,15 @@ Module.register("MMM-Spotify", {
   },
 
   updateDeviceList: function (payload) {
-    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
     var self = this
 
     // let's start clean
-    while (deviceList.hasChildNodes()) {
-      deviceList.removeChild(deviceList.firstChild);
+    this.devices = []
+    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+    if (typeof deviceList !== "undefined" && deviceList) {
+      while (deviceList.hasChildNodes()) {
+        deviceList.removeChild(deviceList.firstChild);
+      }
     }
 
     if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
@@ -388,19 +401,22 @@ Module.register("MMM-Spotify", {
         if(payload.devices[i].is_restricted) continue
         if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
 
-        var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
+        if (this.config.useExternalModal) this.devices.push(payload.devices[i])
+        else {
+          var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
 
-        var text = document.createElement("span")
-        text.className = "text"
-        text.textContent = payload.devices[i].name
-        if (payload.devices[i].is_active) text.textContent += " (active)"
+          var text = document.createElement("span")
+          text.className = "text"
+          text.textContent = payload.devices[i].name
+          if (payload.devices[i].is_active) text.textContent += " (active)"
 
-        device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
-        device.appendChild(text)
-        device.deviceId = payload.devices[i].id
-        device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+          device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
+          device.appendChild(text)
+          device.deviceId = payload.devices[i].id
+          device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
 
-        deviceList.appendChild(device)
+          deviceList.appendChild(device)
+        }
       }
     }
 
@@ -555,44 +571,52 @@ Module.register("MMM-Spotify", {
     this.sendSocketNotification("NEXT")
   },
 
-  clickAccountList: function() {
-    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
-    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
-    const main = document.getElementById("SPOTIFY")
-
-    deviceList.classList.add("hidden")
-
-    if (accountList.classList.contains("hidden")) {
-      accountList.classList.remove("hidden")
-      main.classList.add("modal")
+  clickAccountList: function () {
+    if (this.config.useExternalModal) {
+      this.getExternalModal("ACCOUNTS")
     } else {
-      accountList.classList.add("hidden")
-      main.classList.remove("modal")
+      const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+      const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+      const main = document.getElementById("SPOTIFY")
+
+      deviceList.classList.add("hidden")
+
+      if (accountList.classList.contains("hidden")) {
+        accountList.classList.remove("hidden")
+        main.classList.add("modal")
+      } else {
+        accountList.classList.add("hidden")
+        main.classList.remove("modal")
+      }
     }
   },
 
-  clickAccountTransfer: function(accountId) {
+  clickAccountTransfer: function (accountId) {
     this.sendSocketNotification("ACCOUNT", accountId)
     this.clickAccountList()
   },
 
-  clickDeviceList: function() {
-    const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
-    const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
-    const main = document.getElementById("SPOTIFY")
-
-    accountList.classList.add("hidden")
-
-    if (deviceList.classList.contains("hidden")) {
-      deviceList.classList.remove("hidden")
-      main.classList.add("modal")
+  clickDeviceList: function () {
+    if (this.config.useExternalModal) {
+      this.getExternalModal("DEVICES")
     } else {
-      deviceList.classList.add("hidden")
-      main.classList.remove("modal")
+      const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
+      const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
+      const main = document.getElementById("SPOTIFY")
+
+      accountList.classList.add("hidden")
+
+      if (deviceList.classList.contains("hidden")) {
+        deviceList.classList.remove("hidden")
+        main.classList.add("modal")
+      } else {
+        deviceList.classList.add("hidden")
+        main.classList.remove("modal")
+      }
     }
   },
 
-  clickDeviceTransfer: function(deviceId) {
+  clickDeviceTransfer: function (deviceId) {
     var transferPayload = { device_ids: [ deviceId ] }
     this.sendSocketNotification("TRANSFERBYID", transferPayload)
     this.clickDeviceList()
@@ -820,7 +844,7 @@ Module.register("MMM-Spotify", {
     return cover
   },
 
-  getModalContainer: function() {
+  getModalContainer: function () {
     const modal = this.getHTMLElementWithID('div', "SPOTIFY_MODAL")
 
     if (this.config.showAccountButton) {
@@ -836,6 +860,69 @@ Module.register("MMM-Spotify", {
     }
 
     return modal;
+  },
+
+  getExternalModal: function (contentType) {
+    var self = this
+
+    if (contentType === "ACCOUNTS") {
+      if (typeof this.accounts !== "undefined" && this.accounts.length > 0) {
+        if (this.externalModal == contentType) {
+          this.sendNotification("CLOSE_MODAL")
+          this.externalModal = null
+        } else {
+          this.sendNotification("OPEN_MODAL", {
+            template: "modalTemplate.njk",
+            data: {
+              type: contentType,
+              currentAccount: this.currentAccount,
+              list: this.accounts,
+            },
+            options: {
+              callback(success) {
+                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                if (typeof modalList !== "undefined" && modalList) {
+                  var children = modalList.children
+                  for (var i = 0; i < children.length; i++) {
+                    children[i].accountId = children[i].dataset.id
+                    children[i].addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+                  }
+                }
+              }
+            }
+          })
+          this.externalModal = contentType
+        }
+      }
+    } else if (contentType === "DEVICES") {
+      if (typeof this.devices !== "undefined" && this.devices.length > 0) {
+        if (this.externalModal == contentType) {
+          this.sendNotification("CLOSE_MODAL")
+          this.externalModal = null
+        } else {
+          this.sendNotification("OPEN_MODAL", {
+            template: "modalTemplate.njk",
+            data: {
+              type: contentType,
+              list: this.devices,
+            },
+            options: {
+              callback(success) {
+                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                if (typeof modalList !== "undefined" && modalList) {
+                  var children = modalList.children
+                  for (var i = 0; i < children.length; i++) {
+                    children[i].deviceId = children[i].dataset.id
+                    children[i].addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+                  }
+                }
+              }
+            }
+          })
+          this.externalModal = contentType
+        }
+      }
+    }
   },
 
   getMinimalistBarDom: function (container) {
@@ -927,7 +1014,7 @@ Module.register("MMM-Spotify", {
 
     const cover = this.getHTMLElementWithID('div', "SPOTIFY_COVER")
     cover.appendChild(cover_img)
-    if (this.config.showDeviceButton || this.config.showAccountButton) {
+    if ((this.config.showDeviceButton || this.config.showAccountButton) && !this.config.useExternalModal) {
       cover.appendChild(this.getModalContainer());
     }
 
