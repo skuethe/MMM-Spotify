@@ -178,25 +178,32 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   border-radius: 6px;
 }
 
-#SPOTIFY_ACCOUNT_LIST > *, #SPOTIFY_DEVICE_LIST > * {
+#SPOTIFY_ACCOUNT_LIST > *, #SPOTIFY_DEVICE_LIST > *, #SPOTIFY_MODAL_LIST > * {
   padding: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-#SPOTIFY_ACCOUNT_LIST > *:hover, #SPOTIFY_ACCOUNT_LIST > *:active, #SPOTIFY_DEVICE_LIST > *:hover, #SPOTIFY_DEVICE_LIST > *:active {
+#SPOTIFY_ACCOUNT_LIST > *:hover, #SPOTIFY_ACCOUNT_LIST > *:active, #SPOTIFY_DEVICE_LIST > *:hover, #SPOTIFY_DEVICE_LIST > *:active, #SPOTIFY_MODAL_LIST > *:hover, #SPOTIFY_MODAL_LIST > *:active {
   background-color:rgba(255,255,255,0.2);
   border-radius: 6px;
 }
 
-#SPOTIFY_ACCOUNT_LIST .text, #SPOTIFY_DEVICE_LIST .text {
+#SPOTIFY_ACCOUNT_LIST .text, #SPOTIFY_DEVICE_LIST .text, #SPOTIFY_MODAL_LIST .text {
   padding-left: 5px;
 }
 
 #SPOTIFY_MODAL > .hidden {
   display:none;
 }
+
+/* for MMM-Modal integration */
+#SPOTIFY_MODAL_LIST {
+  background: rgba(0,0,0);
+  border-radius: 6px;
+}
+
 
 /* control "hidden" */
 #SPOTIFY.hidden #SPOTIFY_CONTROL{
