@@ -466,8 +466,8 @@ Module.register("MMM-Spotify", {
       const p = document.getElementById("SPOTIFY_CONTROL_PLAY")
       p.className = isPlaying ? "playing" : "pausing"
       const icon = isPlaying
-        ? "mdi:play"
-        : "mdi:pause";
+        ? "mdi:pause"
+        : "mdi:play";
 
       p.innerHTML = ""
       p.appendChild(
