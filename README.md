@@ -288,6 +288,10 @@ It can be used with MMM-pages for example (for show or hide the module)
 
 ## Update History
 
+### 1.6.3 (2020-11-05)
+
+- Fixed: reverted play / paused icons
+
 ### 1.6.2 (2020-10-31)
 
 - Fixed: sticky hover pseudo class on button click (via touch display)
