@@ -134,10 +134,7 @@ Module.register("MMM-Spotify", {
       case "INITIALIZED":
         break
       case "CURRENT_PLAYBACK":
-        if (
-          (this.config.allowDevices.length === 0)
-          || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))
-        ) {
+        if ((this.config.allowDevices.length === 0) || (this.config.allowDevices.length >= 1 && this.config.allowDevices.includes(payload.device.name))) {
           this.volume = payload.device.volume_percent
           this.sendSocketNotification("UNALLOWED_DEVICE", false)
           this.updateCurrentPlayback(payload)
@@ -165,6 +162,7 @@ Module.register("MMM-Spotify", {
   },
 
   updatePlayback: function (status) {
+    //console.info(`${this.name} --- DEBUG --- updatePlayback(${status}) - START`)
     var dom = document.getElementById("SPOTIFY")
     if (this.enableMiniBar) {
       this.timer = null
@@ -186,6 +184,8 @@ Module.register("MMM-Spotify", {
     }
     if (this.connected && !status) {
       this.connected = false
+      this.currentPlayback = null
+      this.updateCoverImage()
       this.sendNotification("SPOTIFY_DISCONNECTED")
     }
     if (!this.connected && status) {
@@ -201,12 +201,13 @@ Module.register("MMM-Spotify", {
   },
 
   updateCurrentPlayback: function (current) {
+    //console.info(`${this.name} --- DEBUG --- updateCurrentPlayback(${status}) - START`)
     if (!current) return
     if (!this.currentPlayback) {
       this.updateSongInfo(current.item)
       this.updatePlaying(current.is_playing)
       this.updateDevice(current.device)
-      this.updatePlayback(current.is_playing)
+      this.updatePlayback(true)
       if (current.device) this.updateVolume(current.device.volume_percent)
       this.updateShuffle(current.shuffle_state)
       this.updateRepeat(current.repeat_state)
@@ -483,7 +484,6 @@ Module.register("MMM-Spotify", {
     const sDom = document.getElementById("SPOTIFY")
     sDom.classList.remove("noPlayback")
 
-    const cover_img = document.getElementById("SPOTIFY_COVER_IMAGE")
     let img_index = 0
     // cover data is stored in 3 sizes. let's fetch the appropriate size to reduce 
     // bandwidth usage bsed on player style
@@ -501,20 +501,7 @@ Module.register("MMM-Spotify", {
       display_name = playbackItem.show.name
     }
 
-    
-
-    if (img_url !== cover_img.src) {
-      const back = document.getElementById("SPOTIFY_BACKGROUND")
-      back.classList.remove('fade-in')
-      back.offsetWidth = cover_img.offsetWidth;
-      back.classList.add('fade-in')
-      back.style.backgroundImage = `url(${img_url})`
-      
-      cover_img.classList.remove('fade-in')
-      cover_img.offsetWidth = cover_img.offsetWidth;
-      cover_img.classList.add('fade-in')
-      cover_img.src = img_url
-    }
+    this.updateCoverImage(img_url)
 
     const title = document.querySelector("#SPOTIFY_TITLE .text")
     title.textContent = playbackItem.name
@@ -540,6 +527,29 @@ Module.register("MMM-Spotify", {
     }
     artist.textContent = artistName
     this.sendNotification("SPOTIFY_UPDATE_SONG_INFO", playbackItem)
+  },
+
+  updateCoverImage: function (imgUrl) {
+    const cover_img = document.getElementById("SPOTIFY_COVER_IMAGE")
+    const back = document.getElementById("SPOTIFY_BACKGROUND")
+
+    if (typeof imgUrl === "undefined") {
+      imgUrl = "./modules/MMM-Spotify/resources/spotify-xxl.png"
+      back.style.removeProperty("background-image")
+    } else {
+      if (imgUrl !== cover_img.src) {
+        back.classList.remove('fade-in')
+        back.offsetWidth = cover_img.offsetWidth;
+        back.classList.add('fade-in')
+        back.style.backgroundImage = `url(${imgUrl})`
+      }
+    }
+    if (imgUrl !== cover_img.src) {
+      cover_img.classList.remove('fade-in')
+      cover_img.offsetWidth = cover_img.offsetWidth;
+      cover_img.classList.add('fade-in')
+      cover_img.src = imgUrl
+    }
   },
 
   clickPlay: function () {
@@ -995,6 +1005,7 @@ Module.register("MMM-Spotify", {
     }
 
     m.classList.add("noPlayback")
+    m.classList.add("inactive")
     if (this.enableMiniBar) {
       m.classList.add("minimalistBar")
       m.classList.add(this.config.miniBarConfig.scroll ? "Scroll" : "noScroll")

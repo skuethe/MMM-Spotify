@@ -149,6 +149,7 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (noti, payload) {
     if (noti == "INIT") {
       this.initAfterLoading(payload)
+      this.socketNotificationReceived("GET_ACCOUNTS")
       this.sendSocketNotification("INITIALIZED")
       return
     }

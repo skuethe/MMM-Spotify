@@ -20,7 +20,6 @@
 }
 
 #SPOTIFY.inactive {
-  display:none;
 }
 
 #SPOTIFY_BACKGROUND {
@@ -83,11 +82,14 @@
   width: calc(var(--sp-width) - 40px);
   height: calc(var(--sp-width) - 40px);
   margin-bottom:0.5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #SPOTIFY_COVER_IMAGE {
-  width:100%;
-  height:100%;
+  max-width:100%;
+  max-height:100%;
   border-radius:10px;
   box-shadow:black 1px 1px 1px 1px;
 }
@@ -161,8 +163,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 }
 
 #SPOTIFY_MODAL {
-  position: relative;
-  transform: translateY(-100%);
+  position: absolute;
   width: inherit;
   height: inherit;
 }
@@ -202,12 +203,6 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
 #SPOTIFY_MODAL_LIST {
   background: rgba(0,0,0);
   border-radius: 6px;
-}
-
-
-/* control "hidden" */
-#SPOTIFY.hidden #SPOTIFY_CONTROL{
-  display:none;
 }
 
 /* style "mini" */
@@ -258,12 +253,20 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   width:calc(var(--sp-width) - 240px);
 }
 
-#SPOTIFY.noPlayback #SPOTIFY_FOREGROUND > * {
-  display:none;
+#SPOTIFY.inactive #SPOTIFY_MISC > * {
+  display: none;
 }
 
-#SPOTIFY.noPlayback #SPOTIFY_FOREGROUND #SPOTIFY_COVER {
-  display:block;
+#SPOTIFY.inactive #SPOTIFY_MISC > #SPOTIFY_CONTROL {
+  display: flex;
+}
+
+#SPOTIFY.inactive #SPOTIFY_CONTROL > * {
+  display: none;
+}
+
+#SPOTIFY.inactive #SPOTIFY_CONTROL > #SPOTIFY_CONTROL_ACCOUNTS {
+  display: block;
 }
 
 /* style "minimalistBar" */

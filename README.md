@@ -288,6 +288,14 @@ It can be used with MMM-pages for example (for show or hide the module)
 
 ## Update History
 
+---
+
+**INFO**
+
+Will start using the github `releases` function as an update history. The below list is only for historical reasons.
+
+---
+
 ### 1.6.3 (2020-11-05)
 
 - Fixed: reverted play / paused icons
