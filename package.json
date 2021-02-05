@@ -1,6 +1,6 @@
 {
   "name": "MMM-Spotify",
-  "version": "1.6.3",
+  "version": "2.0.0",
   "description": "MM module for Spotify",
   "main": "MMM-Spotify.js",
   "keywords": [
