@@ -270,7 +270,7 @@ module.exports = NodeHelper.create({
         for (var section in map) {
           if (map.hasOwnProperty(section) && !foundForPlay) {
             var retType = map[section]
-            if (result[section] && result[section].items.length > 1) {
+            if (result[section] && result[section].items.length > 0) {
               foundForPlay = pickup(result[section].items, condition.random, retType)
             }
           }
