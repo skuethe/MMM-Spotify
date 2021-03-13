@@ -15,9 +15,8 @@ const moment = require("moment")
 var _Debug = (...args) => { /* do nothing */ }
 
 class Spotify {
-  constructor(config, callback, debug = false, first = false) {
+  constructor(config, debug = false, first = false) {
     this.version = require('./package.json').version
-    this.notification = callback
     this.default = {
       CLIENT_ID: "",
       CLIENT_SECRET: "",
@@ -29,7 +28,6 @@ class Spotify {
       updateInterval: 1000,
       idleInterval: 10000,
     }
-    this.timer = null
     this.token = null
     this.setup = first
     this.config = Object.assign({}, this.default, config)
@@ -43,33 +41,7 @@ class Spotify {
     this.initFromToken()
     _Debug("Spotify v" + this.version + " Initialized...")
   }
-  
-  async pulse() {
-    let idle = false
-    try {
-      let result = await this.updateSpotify(this.config)
-      this.notification("SPOTIFY_PLAY", result)
-    } catch (e) {
-      idle = true
-      if (e) console.log("[SPOTIFY:ERROR]", e)
-      this.notification("SPOTIFY_IDLE")
-    }
-    this.timer = setTimeout(() => {
-      this.pulse()
-    }, idle ? this.config.idleInterval : this.config.updateInterval)
-  }
 
-  start() {
-    _Debug("Started...")
-    this.pulse()
-  }
-    
-  stop() {
-    clearTimeout(this.timer)
-    this.timer = null
-    _Debug("Stop")
-  }
-    
   updateSpotify(spotify) {
     return new Promise((resolve, reject) => {
       this.getCurrentPlayback((code, error, result) => {
