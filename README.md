@@ -129,6 +129,8 @@ That's all. `token.json` will be created, if success.
     style: "default", // "default" or "mini" available (inactive for miniBar)
     moduleWidth: 360, // width of the module in px
     control: "default", // "default" or "hidden"
+    showAlbumLabel: true, // if you want to show the label for the current song album
+    showVolumeLabel: true, // if you want to show the label for the current volume
     showAccountButton: true, // if you want to show the "switch account" control button
     showDeviceButton: true, // if you want to show the "switch device" control button
     useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
