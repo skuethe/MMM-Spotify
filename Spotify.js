@@ -238,20 +238,16 @@ class Spotify {
     this.doRequest("/v1/me/player/seek", "PUT", { position_ms: 0 }, null, cb)
   }
 
-  authFlow(afterCallback = () => {}, error = () => {}) {
+  async authFlow() {
     var redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
     let msg = "[SPOTIFY - " + this.config.USERNAME + "] AUTH: "
 
     if (!this.config.CLIENT_ID) {
-      msg += "CLIENT_ID doesn't exist."
-      error(msg)
-      return
+      throw new Error(msg + "CLIENT_ID doesn't exist.")
     }
 
     if (this.token) {
-      msg += "You already have a token. no need to auth."
-      error(msg)
-      return
+      return msg + "You already have a token - no need to authenticate."
     }
 
     let server = app.get(this.config.AUTH_PATH, (req, res) => {
@@ -271,14 +267,11 @@ class Spotify {
 
       request.post(authOptions, (requestError, response, body) => {
         if (requestError || response.statusCode !== 200) {
-          msg += "Error in request"
-          error(msg)
-          return
+          throw new Error(msg + "Error in request")
         }
         this.writeToken(body)
         server.close()
         res.send(`${this.config.TOKEN} would be created. Check it`)
-        afterCallback()
       });
     }).listen(this.config.AUTH_PORT)
 
@@ -293,9 +286,16 @@ class Spotify {
       })
 
     console.log(msg + "Opening the browser for authentication on Spotify...")
-    opn(url).catch(() => {
+    await opn(url, {wait: true}).catch(e => {
       console.log(msg + "Failed to automatically open the URL. Copy/paste this in your browser:\n", url)
+      throw e
     })
+    var file = path.resolve(__dirname, this.config.TOKEN)
+    if (fs.existsSync(file)) {
+      return msg + "Authentication finished. Check file " + this.config.TOKEN
+    } else {
+      throw new Error(msg + "TOKEN file was not created")
+    }
   }
 }
 
