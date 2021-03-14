@@ -17,10 +17,10 @@ function authorize(configuration) {
     return new Promise((resolve, reject) => {
         let Auth = new Spotify(configuration, true, true)
         Auth.authFlow(() => {
-            console.log("[SPOTIFY] Authorization is finished for " + configuration.USERNAME + ". Check ", configuration.TOKEN)
+            console.log("[SPOTIFY - " + configuration.USERNAME + "] Authorization is finished. Check file ", configuration.TOKEN)
             resolve()
         }, (msg) => {
-            console.log("[SPOTIFY] Error in authentication for user " + configuration.USERNAME)
+            console.log("[SPOTIFY - " + configuration.USERNAME + "] Error in authentication:")
             console.log(msg)
             reject()
         })

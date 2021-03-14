@@ -18,6 +18,7 @@ class Spotify {
   constructor(config, debug = false, first = false) {
     this.version = require('./package.json').version
     this.default = {
+      USERNAME: "",
       CLIENT_ID: "",
       CLIENT_SECRET: "",
       AUTH_DOMAIN: "http://localhost",
@@ -31,7 +32,7 @@ class Spotify {
     this.token = null
     this.setup = first
     this.config = Object.assign({}, this.default, config)
-    if (debug) _Debug = (...args) => { console.log("[SPOTIFY]", ...args) }
+    if (debug) _Debug = (...args) => { console.log("[SPOTIFY - " + this.config.USERNAME + "]", ...args) }
 
     this.authorizationSeed = 'Basic ' + (
       Buffer.from(
@@ -39,7 +40,7 @@ class Spotify {
       ).toString('base64')
     )
     this.initFromToken()
-    _Debug("Spotify v" + this.version + " Initialized...")
+    _Debug("Spotify version", this.version, " Initialized...")
   }
 
   updateSpotify(spotify) {
@@ -60,8 +61,8 @@ class Spotify {
     this.token = token
     var file = path.resolve(__dirname, this.config.TOKEN)
     fs.writeFileSync(file, JSON.stringify(token))
-    _Debug("Token is written...")
-    _Debug("Token expire", moment(this.token.expires_at).format("LLLL"))
+    _Debug("Token file was created")
+    _Debug("Token will expire at: ", moment(this.token.expires_at).format("LLLL"))
     if (cb) cb()
   }
 
@@ -71,7 +72,7 @@ class Spotify {
       this.token = JSON.parse(fs.readFileSync(file))
     }
     else {
-      if (!this.setup) console.log("[SPOTIFY:ERROR] Token not found!", file)
+      if (!this.setup) console.log("[SPOTIFY:ERROR] Token file not found!", file)
     }
   }
 
@@ -80,7 +81,7 @@ class Spotify {
   }
 
   refreshToken(cb = null) {
-    _Debug("Token refreshing...")
+    _Debug("Refreshing Token...")
     var refresh_token = this.token.refresh_token
     var authOptions = {
       url: 'https://accounts.spotify.com/api/token',
@@ -103,7 +104,7 @@ class Spotify {
         body.refresh_token = this.token.refresh_token
         this.writeToken(body, cb)
       } else {
-        console.log("[SPOTIFY:ERROR] Token refreshing failed.")
+        console.log("[SPOTIFY:ERROR] Failed to refresh Token.")
       }
     })
   }
@@ -136,17 +137,17 @@ class Spotify {
     var req = () => {
       request(authOptions, (error, response, body) => {
         if (error) {
-          _Debug("API Request fail on :", api)
+          _Debug("API Request failed on: ", api)
         } else {
           if (api !== "/v1/me/player" && type !== "GET") {
-            _Debug("API Requested:", api)
+            _Debug("API Requested: ", api)
           }
         }
         if (cb) {
           if (response && response.statusCode) {
             cb(response.statusCode, error, body)
           } else {
-            _Debug("Invalid response: " + error)
+            _Debug("Invalid response: ", error)
             _Debug("Retry in 5 sec...")
             setTimeout(() => { cb('400', error, body) }, 5000)
           }
@@ -239,15 +240,16 @@ class Spotify {
 
   authFlow(afterCallback = () => {}, error = () => {}) {
     var redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
+    let msg = "[SPOTIFY - " + this.config.USERNAME + "] AUTH: "
 
     if (!this.config.CLIENT_ID) {
-      let msg = "[SPOTIFY_AUTH] CLIENT_ID doesn't exist."
+      msg += "CLIENT_ID doesn't exist."
       error(msg)
       return
     }
 
     if (this.token) {
-      let msg = "[SPOTIFY_AUTH] You already have a token. no need to auth."
+      msg += "You already have a token. no need to auth."
       error(msg)
       return
     }
@@ -269,7 +271,7 @@ class Spotify {
 
       request.post(authOptions, (requestError, response, body) => {
         if (requestError || response.statusCode !== 200) {
-          let msg = "[SPOTIFY_AUTH] Error in request"
+          msg += "Error in request"
           error(msg)
           return
         }
@@ -290,9 +292,9 @@ class Spotify {
         show_dialog: true
       })
 
-    console.log("[SPOTIFY_AUTH] Opening the browser for authentication on Spotify...")
+    console.log(msg + "Opening the browser for authentication on Spotify...")
     opn(url).catch(() => {
-      console.log('[SPOTIFY_AUTH] Failed to automatically open the URL. Copy/paste this in your browser:\n', url)
+      console.log(msg + "Failed to automatically open the URL. Copy/paste this in your browser:\n", url)
     })
   }
 }
