@@ -8,6 +8,8 @@ Module.register("MMM-Spotify", {
     style: "default", // "default", "mini" available.
     moduleWidth: 360, // width of the module
     control: "default", //"default", "hidden" available
+    showAlbumLabel: true,
+    showVolumeLabel: true,
     showAccountButton: true,
     showDeviceButton: true,
     useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
@@ -805,17 +807,21 @@ Module.register("MMM-Spotify", {
       "SPOTIFY_TITLE": 'Title',
       "SPOTIFY_ALBUM": 'Album',
       "SPOTIFY_ARTIST": 'Artist',
+      "SPOTIFY_VOLUME": 'VOL_OFF',
+      "SPOTIFY_DEVICE": 'default',
     }
 
     for (const [key, iconType] of Object.entries(infoElementsWithIcon)) {
       const element = this.getHTMLElementWithID('div', key)
-      element.appendChild(this.getIconContainer(this.getFAIconClass(iconType)))
+      element.appendChild(this.getIconContainer(this.getFAIconClass(iconType), key + "_ICON"))
       element.appendChild(this.getEmptyTextHTMLElement())
+      if ((key == "SPOTIFY_ALBUM" && !this.config.showAlbumLabel) || (key == "SPOTIFY_VOLUME" && !this.config.showVolumeLabel)) {
+        element.classList.add("hidden")
+      }
       info.appendChild(element)
     }
 
-    info.appendChild(this.getVolumeContainer())
-    info.appendChild(this.getDeviceContainer())
+
     return info;
   },
 
