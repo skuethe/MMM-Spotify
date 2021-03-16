@@ -10,6 +10,7 @@ Module.register("MMM-Spotify", {
     control: "default", //"default", "hidden" available
     showAlbumLabel: true,
     showVolumeLabel: true,
+    showAccountName: false, // also show the current account name in the device label; usefull for multi account setup
     showAccountButton: true,
     showDeviceButton: true,
     useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
@@ -164,7 +165,6 @@ Module.register("MMM-Spotify", {
   },
 
   updatePlayback: function (status) {
-    //console.info(`${this.name} --- DEBUG --- updatePlayback(${status}) - START`)
     var dom = document.getElementById("SPOTIFY")
     if (this.enableMiniBar) {
       this.timer = null
@@ -203,7 +203,6 @@ Module.register("MMM-Spotify", {
   },
 
   updateCurrentPlayback: function (current) {
-    //console.info(`${this.name} --- DEBUG --- updateCurrentPlayback(${status}) - START`)
     if (!current) return
     if (!this.currentPlayback) {
       this.updateSongInfo(current.item)
@@ -356,8 +355,8 @@ Module.register("MMM-Spotify", {
 
     if (typeof payload !== "undefined" && payload.length > 0) {
       for (var i = 0; i < payload.length; i++) {
-        if (this.config.useExternalModal) this.accounts.push(payload[i])
-        else {
+        this.accounts.push(payload[i])
+        if (!this.config.useExternalModal) {
           var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
 
           var text = document.createElement("span")
@@ -374,14 +373,21 @@ Module.register("MMM-Spotify", {
         }
       }
     }
-
   },
 
   updateDevice: function (device) {
     const deviceContainer = document.querySelector("#SPOTIFY_DEVICE .text")
     const deviceIcon = document.getElementById("SPOTIFY_DEVICE_ICON")
+    var textContent = ""
 
-    deviceContainer.textContent = (this.config.style == "default" || this.enableMiniBar) ? this.config.deviceDisplay + ' ' + device.name : device.name
+    if (this.config.style == "default" || this.enableMiniBar) {
+      if (this.config.showAccountName && this.accounts.length > 0) {
+        textContent += this.accounts[this.currentAccount].name + " "
+      }
+      textContent += this.config.deviceDisplay + " "
+    }
+    textContent += device.name
+    deviceContainer.textContent = textContent
     deviceIcon.className = this.getFAIconClass(device.type)
 
     this.sendNotification("SPOTIFY_UPDATE_DEVICE", device)
@@ -422,7 +428,6 @@ Module.register("MMM-Spotify", {
         }
       }
     }
-
   },
 
   updateVolume: function (volume_percent) {
