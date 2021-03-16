@@ -10,12 +10,12 @@ const request = require("request")
 const querystring = require("querystring")
 const opn = require("open")
 const express = require("express")
-const app = express()
 const moment = require("moment")
 var _Debug = (...args) => { /* do nothing */ }
 
 class Spotify {
   constructor(config, debug = false, first = false) {
+    if (first) this.app = express()
     this.version = require('./package.json').version
     this.default = {
       USERNAME: "",
@@ -239,8 +239,9 @@ class Spotify {
   }
 
   async authFlow() {
+    var self = this
     var redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
-    let msg = "[SPOTIFY - " + this.config.USERNAME + "] AUTH: "
+    var msg = "[SPOTIFY - " + this.config.USERNAME + "] AUTH: "
 
     if (!this.config.CLIENT_ID) {
       throw new Error(msg + "CLIENT_ID doesn't exist.")
@@ -250,7 +251,7 @@ class Spotify {
       return msg + "You already have a token - no need to authenticate."
     }
 
-    let server = app.get(this.config.AUTH_PATH, (req, res) => {
+    let server = this.app.get(this.config.AUTH_PATH, (req, res) => {
       let code = req.query.code || null
       let authOptions = {
         url: 'https://accounts.spotify.com/api/token',
@@ -264,16 +265,20 @@ class Spotify {
         },
         json: true
       }
-
       request.post(authOptions, (requestError, response, body) => {
         if (requestError || response.statusCode !== 200) {
-          throw new Error(msg + "Error in request")
+          let errorMsg = msg + "Error in request"
+          if (body.error_description) errorMsg += ": " + body.error_description
+          throw new Error(errorMsg)
         }
         this.writeToken(body)
+        _Debug("AUTH: stopping express app now")
         server.close()
-        res.send(`${this.config.TOKEN} would be created. Check it`)
+        res.send(this.config.TOKEN + " should now be created. Please close the browser to continue.")
       });
-    }).listen(this.config.AUTH_PORT)
+    }).listen(this.config.AUTH_PORT, () => {
+      _Debug("AUTH: express app started and listening on port", this.config.AUTH_PORT)
+    })
 
     let url = "https://accounts.spotify.com/authorize?" +
       querystring.stringify({
