@@ -127,7 +127,7 @@ module.exports = NodeHelper.create({
     this.initAfterLoading(this.config, account)
   },
 
-  getAccounts: function(cb) {
+  getAccounts: function() {
     let file = path.resolve(__dirname, "spotify.config.json")
     if (fs.existsSync(file)) {
       try {
@@ -138,7 +138,7 @@ module.exports = NodeHelper.create({
             let accountEntry = { "name": jsAccount.USERNAME, "id": number }
             result.push(accountEntry)
           })
-          if (typeof result !== "undefined" && result.length > 0) cb(result)
+          if (typeof result !== "undefined" && result.length > 0) this.sendSocketNotification("LIST_ACCOUNTS", result)
         }
       } catch (e) {
         return console.log("[SPOTIFY] ERROR fetching accounts from spotify.config.json", e.name)
@@ -149,7 +149,7 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (noti, payload) {
     if (noti == "INIT") {
       this.initAfterLoading(payload)
-      this.socketNotificationReceived("GET_ACCOUNTS")
+      this.getAccounts()
       this.sendSocketNotification("INITIALIZED")
       return
     }
@@ -157,9 +157,7 @@ module.exports = NodeHelper.create({
       this.account(payload)
     }
     if (noti == "GET_ACCOUNTS") {
-      this.getAccounts((result) => {
-        this.sendSocketNotification("LIST_ACCOUNTS", result)
-      })
+      this.getAccounts()
     }
     if (noti == "UNALLOWED_DEVICE") {
       this.unallowedDevice = payload
