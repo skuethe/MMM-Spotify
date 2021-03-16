@@ -15,12 +15,14 @@ else return console.log("[SPOTIFY] Error: please configure your spotify.config.j
 
 function authorize(configuration) {
     return new Promise((resolve, reject) => {
-        let Auth = new Spotify(configuration,true, true)
-        Auth.authFlow(() => {
-            console.log("[SPOTIFY] First authorization is finished for " + configuration.USERNAME + ". Check ", configuration.TOKEN)
+        // let Auth = new Spotify(configuration, true, true)
+        // Auth.authFlow().then(result => {
+        new Spotify(configuration, true, true).authFlow().then(result => {
+            console.log(result)
             resolve()
-        }, () => {
-            console.log("[SPOTIFY] Error in authentication")
+        }, reason => {
+            console.log("[SPOTIFY - " + configuration.USERNAME + "] Error in authentication:")
+            console.log(reason)
             reject()
         })
     })
