@@ -147,6 +147,7 @@ module.exports = NodeHelper.create({
   },
 
   socketNotificationReceived: function (noti, payload) {
+    var self = this
     if (noti == "INIT") {
       this.initAfterLoading(payload)
       this.getAccounts()
@@ -174,7 +175,32 @@ module.exports = NodeHelper.create({
       if (noti == "PLAY") {
         this.spotify.play(payload, (code, error, result) => {
           if ((code !== 204) && (code !== 202)) {
-            //console.log(error)
+            if ((result !== "undefined") && result.error && result.error.reason == "NO_ACTIVE_DEVICE") {
+              // Spotify is in "disconnected" mode. We need to pass a device ID to make it start playing a song.
+              if (self.config.defaultDevice) {
+                // User has defined a default device name, let's try to activate it and retry
+                self.spotify.transferByName(self.config.defaultDevice, (code, error, result) => {
+                  if (code === 204) {
+                    self.spotify.play(payload, (code, error, result) => {
+                      if ((code !== 204) && (code !== 202)) {
+                        console.log("[SPOTIFY] There was a problem during playback")
+                        console.log("[SPOTIFY] API response:", result)
+                        return
+                      }
+                      self.sendSocketNotification("DONE_PLAY", result)
+                    })
+                  } else {
+                    console.log("[SPOTIFY] There was a problem to activate your configured default device:", self.config.defaultDevice)
+                    console.log("[SPOTIFY] API response:", result)
+                  }
+                })
+              } else {
+                console.log("[SPOTIFY] You do not have an active device. Please start playback from another device or define the \"defaultDevice\" config option.")
+              }
+            } else {
+              console.log("[SPOTIFY] There was a problem during playback")
+              console.log("[SPOTIFY] API response:", result)
+            }
             return
           }
           this.sendSocketNotification("DONE_PLAY", result)

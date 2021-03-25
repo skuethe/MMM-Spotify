@@ -17,6 +17,7 @@ Module.register("MMM-Spotify", {
     updateInterval: 1000,
     idleInterval: 10000,
     accountDefault: 0, // default account number, attention : 0 is the first account
+    defaultDevice: null, // optional - if you want the "SPOTIFY_PLAY" notification to also work from "idle" status, you have to define your default device here (by name)
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
     //iconify: null,
