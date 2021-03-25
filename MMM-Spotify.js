@@ -16,7 +16,7 @@ Module.register("MMM-Spotify", {
     useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
     updateInterval: 1000,
     idleInterval: 10000,
-    accountDefault: 0, // default account number, attention : 0 is the first account
+    defaultAccount: 0, // default account number, attention : 0 is the first account
     defaultDevice: null, // optional - if you want the "SPOTIFY_PLAY" notification to also work from "idle" status, you have to define your default device here (by name)
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
@@ -66,7 +66,7 @@ Module.register("MMM-Spotify", {
     this.timer = null
     this.ads = false
     this.volume = 50
-    this.currentAccount = this.config.accountDefault
+    this.currentAccount = ((typeof this.config.accountDefault !== "undefined") ? this.config.accountDefault : this.config.defaultAccount) // check against both config settings for backwards compatibility since changes in version 2.0.2
     this.devices = []
     this.accounts = []
     this.externalModal = null

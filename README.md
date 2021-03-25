@@ -135,12 +135,12 @@ That's all. `token.json` will be created, if success.
     showAccountButton: true, // if you want to show the "switch account" control button
     showDeviceButton: true, // if you want to show the "switch device" control button
     useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
-    accountDefault: 0, // default account number, attention : 0 is the first account
     updateInterval: 1000, // update interval when playing
     idleInterval: 30000, // update interval on idle
-    onStart: null, // disable onStart feature with `null`
-    deviceDisplay: "Listening on", // text to display in the device block (default style only)
+    defaultAccount: 0, // default account number, attention : 0 is the first account
+    defaultDevice: null, // optional - if you want the "SPOTIFY_PLAY" notification to also work from "idle" status, you have to define your default device here (by name)
     allowDevices: [], //If you want to limit devices to display info, use this. f.e. allowDevices: ["RASPOTIFY", "My Home speaker"],
+    onStart: null, // disable onStart feature with `null`
     // if you want to send custom notifications when suspending the module, f.e. switch MMM-Touch to a different "mode"
     notificationsOnSuspend: [
       {
@@ -159,6 +159,7 @@ That's all. `token.json` will be created, if success.
         payload: "mySpotifyControlMode",
       },
     ],
+    deviceDisplay: "Listening on", // text to display in the device block (default style only)
     volumeSteps: 5, // in percent, the steps you want to increase or decrese volume when reacting on the "SPOTIFY_VOLUME_{UP,DOWN}" notifications
     miniBarConfig: {
       album: true, // display Album name in miniBar style
