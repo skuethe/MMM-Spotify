@@ -4,9 +4,8 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 ## Screenshot
 
-- ![default](screenshots/spotify_default.png)
-- ![mini](screenshots/spotify_mini.png)
-- ![minimalistBar](screenshots/miniature_bar.PNG)
+![default](screenshots/spotify_default.png)
+![mini](screenshots/spotify_mini.png)
 
 ## Main Features
 
@@ -14,6 +13,12 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 - Playing Controllable by Notification & touch (Play, pause, next, previous, volume)
 - Spotify Controllable by Notification & touch (change device, change account, search and play)
 - Multiple accounts supported
+
+## Restrictions
+
+- This is NOT a full blown Spotify client with integrated player! If you want to use your Pi also as playback device via soundcard, have a look at [Raspotify](https://github.com/dtcooper/raspotify)
+- Starting specific songs, playlists etc. is limited! This can only be done by the notifications described below but NOT via the UI / Buttons
+- Some of Spotify's API calls we are using are limited to premium accounts only! If you are using a free account, you will probably run into problems at some point
 
 ## Install
 
@@ -72,7 +77,8 @@ cp spotify.config.json.example-multi spotify.config.json
 nano spotify.config.json
 ```
 
-Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.
+Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.  
+Make sure that `TOKEN` is referencing different file names, as these files will be created.
 
 ```json
 [
@@ -100,9 +106,15 @@ cd ~/MagicMirror/modules/MMM-Spotify
 node first_auth.js
 ```
 
-Then, Allowance dialog popup will be opened. You MUST LOG IN IN SAME ORDER YOU PUT YOUR USERS IN CONFIGURATION FILE (only on multi-account). Log in(if it is needed) and allow it.  
-That's all. `token.json` will be created, if success.  
-**Note**: Change `TOKEN` file name, if you use multiple account.
+Then the allowance dialog popup will be opened:
+
+- You MUST login in the SAME ORDER you put your users in the configuration file (when using multiple accounts)
+- It helps to not save your login in the browser session (when using multiple accounts)
+- Allow the application to access your Spotify API
+- Close the browser
+- Another browser session will start when using multiple accounts -> repeat steps
+
+That's all - now all the specific json files where created.  
 
 ## Configuration
 
@@ -161,6 +173,7 @@ That's all. `token.json` will be created, if success.
     ],
     deviceDisplay: "Listening on", // text to display in the device block (default style only)
     volumeSteps: 5, // in percent, the steps you want to increase or decrese volume when reacting on the "SPOTIFY_VOLUME_{UP,DOWN}" notifications
+    // miniBar is no longer supported, use at your own "risk". Will be removed in a future version
     miniBarConfig: {
       album: true, // display Album name in miniBar style
       scroll: true, // scroll title / artist / album in miniBar style
@@ -209,7 +222,8 @@ When `search` field exists, `spotifyUri` will be ignored.
    })
 ```
 
-The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/paused player, when used without payloads
+The SPOTIFY_PLAY notification can also be used as `resume` feature of stopped/paused player, when used without payloads.  
+In addition, if you have `defaultDevice` configured, you can start playback from Spotify's "disconnected" mode (where Spotify does not have an active device in your account).
 
 - `SPOTIFY_PAUSE` : pausing current playback.
 

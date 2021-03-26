@@ -27,6 +27,7 @@ Module.register("MMM-Spotify", {
     notificationsOnResume: [],
     deviceDisplay: "Listening on",
     volumeSteps: 5, // in percent, the steps you want to increase or decrese volume when using the "SPOTIFY_VOLUME_{UP,DOWN}" notifications
+    // miniBar is no longer supported, use at your own "risk". Will be removed in a future version
     miniBarConfig: {
       album: true,
       scroll: true,
@@ -433,7 +434,6 @@ Module.register("MMM-Spotify", {
 
   updateVolume: function (volume_percent) {
     this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
-    //if (!this.enableMiniBar) return
     const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
     const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
 
@@ -494,7 +494,7 @@ Module.register("MMM-Spotify", {
 
     let img_index = 0
     // cover data is stored in 3 sizes. let's fetch the appropriate size to reduce 
-    // bandwidth usage bsed on player style
+    // bandwidth usage based on player style
     if (this.config.style !== "default") {
       img_index = this.enbaleMiniBar ? 2 : 1
     }

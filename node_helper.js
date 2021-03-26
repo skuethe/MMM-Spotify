@@ -175,7 +175,7 @@ module.exports = NodeHelper.create({
       if (noti == "PLAY") {
         this.spotify.play(payload, (code, error, result) => {
           if ((code !== 204) && (code !== 202)) {
-            if ((result !== "undefined") && result.error && result.error.reason == "NO_ACTIVE_DEVICE") {
+            if ((typeof result !== "undefined") && result.error && result.error.reason == "NO_ACTIVE_DEVICE") {
               // Spotify is in "disconnected" mode. We need to pass a device ID to make it start playing a song.
               if (self.config.defaultDevice) {
                 // User has defined a default device name, let's try to activate it and retry
@@ -281,9 +281,8 @@ module.exports = NodeHelper.create({
       }
     }
     this.spotify.search(param, (code, error, result) => {
-      //console.log(code, error, result)
       var foundForPlay = null
-      if (code == 200) { //When success
+      if (code == 200) {
         const map = {
           "tracks": "uris",
           "artists": "context_uri",
@@ -311,7 +310,7 @@ module.exports = NodeHelper.create({
           // nothing found or not play.
           this.sendSocketNotification("DONE_SEARCH_NOTHING")
         }
-      } else { //when fail
+      } else {
         //console.log(code, error, result)
         this.sendSocketNotification("DONE_SEARCH_ERROR")
       }
