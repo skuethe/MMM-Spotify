@@ -4,8 +4,8 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 ## Screenshot
 
-- ![default](screenshots/spotify_default.png)
-- ![mini](screenshots/spotify_mini.png)
+![default](screenshots/spotify_default.png)
+![mini](screenshots/spotify_mini.png)
 
 ## Main Features
 
