@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
     this.suspended = false
     this.config = config
     if (!account) {
-      account = this.config.accountDefault
+      account = ((typeof this.config.accountDefault !== "undefined") ? this.config.accountDefault : this.config.defaultAccount) // check against both config settings for backwards compatibility since changes in version 2.0.2
       console.log("[SPOTIFY] MMM-Spotify Version:",  require('./package.json').version)
     }
     let file = path.resolve(__dirname, "spotify.config.json")
