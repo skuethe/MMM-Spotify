@@ -15,8 +15,6 @@ else return console.log("[SPOTIFY] Error: please configure your spotify.config.j
 
 function authorize(configuration) {
     return new Promise((resolve, reject) => {
-        // let Auth = new Spotify(configuration, true, true)
-        // Auth.authFlow().then(result => {
         new Spotify(configuration, true, true).authFlow().then(result => {
             console.log(result)
             resolve()
