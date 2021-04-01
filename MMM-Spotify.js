@@ -3,6 +3,9 @@
 //
 
 Module.register("MMM-Spotify", {
+
+  requiresVersion: '2.15.0',
+
   defaults: {
     debug: false,
     style: "default", // "default", "mini" available.
@@ -901,13 +904,17 @@ Module.register("MMM-Spotify", {
               list: this.accounts,
             },
             options: {
-              callback(success) {
-                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
-                if (typeof modalList !== "undefined" && modalList) {
-                  var children = modalList.children
-                  for (var i = 0; i < children.length; i++) {
-                    children[i].accountId = children[i].dataset.id
-                    children[i].addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+              callback(error) {
+                if (error) {
+                  Log.error("[SPOTIFY] Modal rendering failed", error)
+                } else {
+                  const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                  if (typeof modalList !== "undefined" && modalList) {
+                    var children = modalList.children
+                    for (var i = 0; i < children.length; i++) {
+                      children[i].accountId = children[i].dataset.id
+                      children[i].addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+                    }
                   }
                 }
               }
@@ -929,13 +936,17 @@ Module.register("MMM-Spotify", {
               list: this.devices,
             },
             options: {
-              callback(success) {
-                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
-                if (typeof modalList !== "undefined" && modalList) {
-                  var children = modalList.children
-                  for (var i = 0; i < children.length; i++) {
-                    children[i].deviceId = children[i].dataset.id
-                    children[i].addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+              callback(error) {
+                if (error) {
+                  Log.error("[SPOTIFY] Modal rendering failed", error)
+                } else {
+                  const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                  if (typeof modalList !== "undefined" && modalList) {
+                    var children = modalList.children
+                    for (var i = 0; i < children.length; i++) {
+                      children[i].deviceId = children[i].dataset.id
+                      children[i].addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+                    }
                   }
                 }
               }
