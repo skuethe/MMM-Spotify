@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
     this.suspended = false
     this.config = config
     if (!account) {
-      account = this.config.accountDefault
+      account = ((typeof this.config.accountDefault !== "undefined") ? this.config.accountDefault : this.config.defaultAccount) // check against both config settings for backwards compatibility since changes in version 2.0.2
       console.log("[SPOTIFY] MMM-Spotify Version:",  require('./package.json').version)
     }
     let file = path.resolve(__dirname, "spotify.config.json")
@@ -147,6 +147,7 @@ module.exports = NodeHelper.create({
   },
 
   socketNotificationReceived: function (noti, payload) {
+    var self = this
     if (noti == "INIT") {
       this.initAfterLoading(payload)
       this.getAccounts()
@@ -174,7 +175,32 @@ module.exports = NodeHelper.create({
       if (noti == "PLAY") {
         this.spotify.play(payload, (code, error, result) => {
           if ((code !== 204) && (code !== 202)) {
-            //console.log(error)
+            if ((typeof result !== "undefined") && result.error && result.error.reason == "NO_ACTIVE_DEVICE") {
+              // Spotify is in "disconnected" mode. We need to pass a device ID to make it start playing a song.
+              if (self.config.defaultDevice) {
+                // User has defined a default device name, let's try to activate it and retry
+                self.spotify.transferByName(self.config.defaultDevice, (code, error, result) => {
+                  if (code === 204) {
+                    self.spotify.play(payload, (code, error, result) => {
+                      if ((code !== 204) && (code !== 202)) {
+                        console.log("[SPOTIFY] There was a problem during playback")
+                        console.log("[SPOTIFY] API response:", result)
+                        return
+                      }
+                      self.sendSocketNotification("DONE_PLAY", result)
+                    })
+                  } else {
+                    console.log("[SPOTIFY] There was a problem to activate your configured default device:", self.config.defaultDevice)
+                    console.log("[SPOTIFY] API response:", result)
+                  }
+                })
+              } else {
+                console.log("[SPOTIFY] You do not have an active device. Please start playback from another device or define the \"defaultDevice\" config option.")
+              }
+            } else {
+              console.log("[SPOTIFY] There was a problem during playback")
+              console.log("[SPOTIFY] API response:", result)
+            }
             return
           }
           this.sendSocketNotification("DONE_PLAY", result)
@@ -255,9 +281,8 @@ module.exports = NodeHelper.create({
       }
     }
     this.spotify.search(param, (code, error, result) => {
-      //console.log(code, error, result)
       var foundForPlay = null
-      if (code == 200) { //When success
+      if (code == 200) {
         const map = {
           "tracks": "uris",
           "artists": "context_uri",
@@ -285,7 +310,7 @@ module.exports = NodeHelper.create({
           // nothing found or not play.
           this.sendSocketNotification("DONE_SEARCH_NOTHING")
         }
-      } else { //when fail
+      } else {
         //console.log(code, error, result)
         this.sendSocketNotification("DONE_SEARCH_ERROR")
       }

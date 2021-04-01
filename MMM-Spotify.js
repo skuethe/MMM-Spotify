@@ -3,6 +3,9 @@
 //
 
 Module.register("MMM-Spotify", {
+
+  requiresVersion: '2.15.0',
+
   defaults: {
     debug: false,
     style: "default", // "default", "mini" available.
@@ -16,7 +19,8 @@ Module.register("MMM-Spotify", {
     useExternalModal: false, // if you want to use MMM-Modal for account and device popup selection instead of the build-in one (which is restricted to the album image size)
     updateInterval: 1000,
     idleInterval: 10000,
-    accountDefault: 0, // default account number, attention : 0 is the first account
+    defaultAccount: 0, // default account number, attention : 0 is the first account
+    defaultDevice: null, // optional - if you want the "SPOTIFY_PLAY" notification to also work from "idle" status, you have to define your default device here (by name)
     allowDevices: [],
     iconify: "https://code.iconify.design/1/1.0.6/iconify.min.js",
     //iconify: null,
@@ -26,6 +30,7 @@ Module.register("MMM-Spotify", {
     notificationsOnResume: [],
     deviceDisplay: "Listening on",
     volumeSteps: 5, // in percent, the steps you want to increase or decrese volume when using the "SPOTIFY_VOLUME_{UP,DOWN}" notifications
+    // miniBar is no longer supported, use at your own "risk". Will be removed in a future version
     miniBarConfig: {
       album: true,
       scroll: true,
@@ -65,7 +70,7 @@ Module.register("MMM-Spotify", {
     this.timer = null
     this.ads = false
     this.volume = 50
-    this.currentAccount = this.config.accountDefault
+    this.currentAccount = ((typeof this.config.accountDefault !== "undefined") ? this.config.accountDefault : this.config.defaultAccount) // check against both config settings for backwards compatibility since changes in version 2.0.2
     this.devices = []
     this.accounts = []
     this.externalModal = null
@@ -432,7 +437,6 @@ Module.register("MMM-Spotify", {
 
   updateVolume: function (volume_percent) {
     this.sendNotification("SPOTIFY_UPDATE_VOLUME", volume_percent)
-    //if (!this.enableMiniBar) return
     const volumeContainer = document.querySelector("#SPOTIFY_VOLUME .text")
     const volumeIcon = document.getElementById("SPOTIFY_VOLUME_ICON")
 
@@ -493,7 +497,7 @@ Module.register("MMM-Spotify", {
 
     let img_index = 0
     // cover data is stored in 3 sizes. let's fetch the appropriate size to reduce 
-    // bandwidth usage bsed on player style
+    // bandwidth usage based on player style
     if (this.config.style !== "default") {
       img_index = this.enbaleMiniBar ? 2 : 1
     }
@@ -900,13 +904,17 @@ Module.register("MMM-Spotify", {
               list: this.accounts,
             },
             options: {
-              callback(success) {
-                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
-                if (typeof modalList !== "undefined" && modalList) {
-                  var children = modalList.children
-                  for (var i = 0; i < children.length; i++) {
-                    children[i].accountId = children[i].dataset.id
-                    children[i].addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+              callback(error) {
+                if (error) {
+                  Log.error("[SPOTIFY] Modal rendering failed", error)
+                } else {
+                  const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                  if (typeof modalList !== "undefined" && modalList) {
+                    var children = modalList.children
+                    for (var i = 0; i < children.length; i++) {
+                      children[i].accountId = children[i].dataset.id
+                      children[i].addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+                    }
                   }
                 }
               }
@@ -928,13 +936,17 @@ Module.register("MMM-Spotify", {
               list: this.devices,
             },
             options: {
-              callback(success) {
-                const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
-                if (typeof modalList !== "undefined" && modalList) {
-                  var children = modalList.children
-                  for (var i = 0; i < children.length; i++) {
-                    children[i].deviceId = children[i].dataset.id
-                    children[i].addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+              callback(error) {
+                if (error) {
+                  Log.error("[SPOTIFY] Modal rendering failed", error)
+                } else {
+                  const modalList = document.getElementById("SPOTIFY_MODAL_LIST")
+                  if (typeof modalList !== "undefined" && modalList) {
+                    var children = modalList.children
+                    for (var i = 0; i < children.length; i++) {
+                      children[i].deviceId = children[i].dataset.id
+                      children[i].addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
+                    }
                   }
                 }
               }
