@@ -356,25 +356,24 @@ Module.register("MMM-Spotify", {
       while (accountList.hasChildNodes()) {
         accountList.removeChild(accountList.firstChild);
       }
-    }
+      if (typeof payload !== "undefined" && payload.length > 0) {
+        for (var i = 0; i < payload.length; i++) {
+          this.accounts.push(payload[i])
+          if (!this.config.useExternalModal) {
+            var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
 
-    if (typeof payload !== "undefined" && payload.length > 0) {
-      for (var i = 0; i < payload.length; i++) {
-        this.accounts.push(payload[i])
-        if (!this.config.useExternalModal) {
-          var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
+            var text = document.createElement("span")
+            text.className = "text"
+            text.textContent = payload[i].name
+            if (payload[i].id == this.currentAccount) text.textContent += " (active)"
 
-          var text = document.createElement("span")
-          text.className = "text"
-          text.textContent = payload[i].name
-          if (payload[i].id == this.currentAccount) text.textContent += " (active)"
+            account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
+            account.appendChild(text)
+            account.accountId = payload[i].id
+            account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
 
-          account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
-          account.appendChild(text)
-          account.accountId = payload[i].id
-          account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
-
-          accountList.appendChild(account)
+            accountList.appendChild(account)
+          }
         }
       }
     }
