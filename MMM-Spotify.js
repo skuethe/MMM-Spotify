@@ -407,28 +407,27 @@ Module.register("MMM-Spotify", {
       while (deviceList.hasChildNodes()) {
         deviceList.removeChild(deviceList.firstChild);
       }
-    }
+      if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
+        for (var i = 0; i < payload.devices.length; i++) {
+          if(payload.devices[i].is_restricted) continue
+          if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
 
-    if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
-      for (var i = 0; i < payload.devices.length; i++) {
-        if(payload.devices[i].is_restricted) continue
-        if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
+          if (this.config.useExternalModal) this.devices.push(payload.devices[i])
+          else {
+            var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
 
-        if (this.config.useExternalModal) this.devices.push(payload.devices[i])
-        else {
-          var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
+            var text = document.createElement("span")
+            text.className = "text"
+            text.textContent = payload.devices[i].name
+            if (payload.devices[i].is_active) text.textContent += " (active)"
 
-          var text = document.createElement("span")
-          text.className = "text"
-          text.textContent = payload.devices[i].name
-          if (payload.devices[i].is_active) text.textContent += " (active)"
+            device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
+            device.appendChild(text)
+            device.deviceId = payload.devices[i].id
+            device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
 
-          device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
-          device.appendChild(text)
-          device.deviceId = payload.devices[i].id
-          device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
-
-          deviceList.appendChild(device)
+            deviceList.appendChild(device)
+          }
         }
       }
     }
