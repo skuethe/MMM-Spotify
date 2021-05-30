@@ -351,29 +351,33 @@ Module.register("MMM-Spotify", {
 
     // let's start clean
     this.accounts = []
+
+    if (typeof payload !== "undefined" && payload.length > 0) {
+      for (var i = 0; i < payload.length; i++) {
+        this.accounts.push(payload[i])
+      }
+    }
+
     const accountList = document.getElementById("SPOTIFY_ACCOUNT_LIST")
-    if (typeof accountList !== "undefined" && accountList) {
+    if (!this.config.useExternalModal && typeof accountList !== "undefined" && accountList) {
       while (accountList.hasChildNodes()) {
         accountList.removeChild(accountList.firstChild);
       }
-      if (typeof payload !== "undefined" && payload.length > 0) {
-        for (var i = 0; i < payload.length; i++) {
-          this.accounts.push(payload[i])
-          if (!this.config.useExternalModal) {
-            var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
+      if (this.accounts.length > 0) {
+        for (var i = 0; i < this.accounts.length; i++) {
+          var account = this.getHTMLElementWithID("div", "SPOTIFY_ACCOUNT" + i)
 
-            var text = document.createElement("span")
-            text.className = "text"
-            text.textContent = payload[i].name
-            if (payload[i].id == this.currentAccount) text.textContent += " (active)"
+          var text = document.createElement("span")
+          text.className = "text"
+          text.textContent = this.accounts[i].name
+          if (this.accounts[i].id == this.currentAccount) text.textContent += " (active)"
 
-            account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
-            account.appendChild(text)
-            account.accountId = payload[i].id
-            account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
+          account.appendChild(this.getIconContainer(this.getFAIconClass("Account"), "SPOTIFY_ACCOUNT" + i + "_ICON"))
+          account.appendChild(text)
+          account.accountId = this.accounts[i].id
+          account.addEventListener("click", function() { self.clickAccountTransfer(this.accountId) })
 
-            accountList.appendChild(account)
-          }
+          accountList.appendChild(account)
         }
       }
     }
@@ -402,32 +406,37 @@ Module.register("MMM-Spotify", {
 
     // let's start clean
     this.devices = []
+
+    if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
+      for (var i = 0; i < payload.devices.length; i++) {
+        if(payload.devices[i].is_restricted) continue
+        if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
+
+        this.devices.push(payload.devices[i])
+      }
+    }
+
+
     const deviceList = document.getElementById("SPOTIFY_DEVICE_LIST")
-    if (typeof deviceList !== "undefined" && deviceList) {
+    if (!this.config.useExternalModal && typeof deviceList !== "undefined" && deviceList) {
       while (deviceList.hasChildNodes()) {
         deviceList.removeChild(deviceList.firstChild);
       }
-      if (typeof payload.devices !== "undefined" && payload.devices.length > 0) {
-        for (var i = 0; i < payload.devices.length; i++) {
-          if(payload.devices[i].is_restricted) continue
-          if(this.config.allowDevices.length >= 1 && !this.config.allowDevices.includes(payload.devices[i].name)) continue
+      if (this.devices.length > 0) {
+        for (var i = 0; i < this.devices.length; i++) {
+          var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
 
-          if (this.config.useExternalModal) this.devices.push(payload.devices[i])
-          else {
-            var device = this.getHTMLElementWithID("div", "SPOTIFY_DEVICE" + i)
+          var text = document.createElement("span")
+          text.className = "text"
+          text.textContent = this.devices[i].name
+          if (this.devices[i].is_active) text.textContent += " (active)"
 
-            var text = document.createElement("span")
-            text.className = "text"
-            text.textContent = payload.devices[i].name
-            if (payload.devices[i].is_active) text.textContent += " (active)"
+          device.appendChild(this.getIconContainer(this.getFAIconClass(this.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
+          device.appendChild(text)
+          device.deviceId = this.devices[i].id
+          device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
 
-            device.appendChild(this.getIconContainer(this.getFAIconClass(payload.devices[i].type), "SPOTIFY_DEVICE" + i + "_ICON"))
-            device.appendChild(text)
-            device.deviceId = payload.devices[i].id
-            device.addEventListener("click", function() { self.clickDeviceTransfer(this.deviceId) })
-
-            deviceList.appendChild(device)
-          }
+          deviceList.appendChild(device)
         }
       }
     }
