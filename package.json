@@ -25,6 +25,6 @@
   "homepage": "https://github.com/skuethe/MMM-Spotify",
   "dependencies": {
     "open": "^6.3.0",
-    "querystring": "^0.2.0"
+    "request": "^2.88.0"
   }
 }
