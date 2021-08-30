@@ -6,11 +6,11 @@
 
 const fs = require("fs")
 const path = require("path")
-const request = require("request")
+const axios = require("axios")
 const opn = require("open")
 const express = require("express")
 const moment = require("moment")
-var _Debug = (...args) => { /* do nothing */ }
+let _Debug = (...args) => { /* do nothing */ }
 
 class Spotify {
   constructor(config, debug = false, first = false) {
@@ -31,7 +31,8 @@ class Spotify {
     this.token = null
     this.setup = first
     this.config = Object.assign({}, this.default, config)
-    if (debug) _Debug = (...args) => { console.log("[SPOTIFY - " + this.config.USERNAME + "]", ...args) }
+    this.logMessage = "[SPOTIFY - " + this.config.USERNAME + "]"
+    if (debug) _Debug = (...args) => { console.debug(this.logMessage, ...args) }
 
     this.authorizationSeed = 'Basic ' + (
       Buffer.from(
@@ -55,23 +56,23 @@ class Spotify {
   }
 
   writeToken(output, cb = null) {
-    var token = Object.assign({}, output)
+    let token = Object.assign({}, output)
     token.expires_at = Date.now() + ((token.expires_in - 60) * 1000)
     this.token = token
-    var file = path.resolve(__dirname, this.config.TOKEN)
+    let file = path.resolve(__dirname, this.config.TOKEN)
     fs.writeFileSync(file, JSON.stringify(token))
     _Debug("Token file was created")
     _Debug("Token will expire at: ", moment(this.token.expires_at).format("LLLL"))
-    if (cb) cb()
+    if (cb) cb(this.token.access_token)
   }
 
   initFromToken() {
-    var file = path.resolve(__dirname, this.config.TOKEN)
+    let file = path.resolve(__dirname, this.config.TOKEN)
     if (fs.existsSync(file)) {
       this.token = JSON.parse(fs.readFileSync(file))
     }
     else {
-      if (!this.setup) console.log("[SPOTIFY:ERROR] Token file not found!", file)
+      if (!this.setup) console.log(this.logMessage, "Token file not found!", file)
     }
   }
 
@@ -79,79 +80,95 @@ class Spotify {
     return (Date.now() >= this.token.expires_at);
   }
 
+  handleRequestError(error) {
+    if (error.response) {
+      console.error(this.logMessage, "Invalid response")
+      _Debug("Response status: ", error.response.status)
+      _Debug("Response statusText: ", error.response.statusText)
+      _Debug("Response data: ", error.response.data)
+      _Debug("Response headers: ", error.response.headers)
+    } else if (error.request) {
+      console.error(this.logMessage, "Invalid request")
+      _Debug("Request: ", error.request)
+    } else {
+      console.error(this.logMessage, error.message)
+    }
+    _Debug(error.config)
+  }
+
   refreshToken(cb = null) {
     _Debug("Refreshing Token...")
-    var refresh_token = this.token.refresh_token
-    var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      headers: {
-        'Authorization': this.authorizationSeed
-      },
-      form: {
-        grant_type: 'refresh_token',
-        refresh_token: refresh_token
-      },
-      json: true
-    }
-
-    request.post(authOptions, (error, response, body) => {
-      if (
-        response !== 'undefined' &&
-        !error &&
-        response.statusCode === 200
-      ) {
-        body.refresh_token = this.token.refresh_token
-        this.writeToken(body, cb)
-      } else {
-        console.log("[SPOTIFY:ERROR] Failed to refresh Token.")
-      }
+    let refresh_token = this.token.refresh_token
+    let requestData = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refresh_token
     })
+    let requestConfig = {
+      url: "https://accounts.spotify.com/api/token",
+      method: "post",
+      data: requestData.toString(),
+      headers: {
+        Authorization: this.authorizationSeed
+      },
+      validateStatus: function (status) {
+        return status == 200
+      }
+    }
+    axios(requestConfig)
+      .then((response) => {
+        _Debug("API Response:", response.status)
+        response.data.refresh_token = refresh_token
+        this.writeToken(response.data, cb)
+      })
+      .catch((error) => {
+        console.error(this.logMessage, "Failed to refresh Token.")
+        this.handleRequestError(error)
+      })
   }
 
   accessToken() {
     return (this.token.access_token) ? this.token.access_token : null
   }
 
-  doRequest(api, type, qsParam, bodyParam, cb) {
+  doRequest(api, type, queryParam, bodyParam, cb) {
     if (!this.token) {
-      console.log("[SPOTIFY:ERROR] Token Error !", this.config.TOKEN)
+      console.error(this.logMessage, "Token error!", this.config.TOKEN)
       return
     }
-    var authOptions = {
+    let requestConfig = {
       url: "https://api.spotify.com" + api,
       method: type,
       headers: {
-          'Authorization': "Bearer " + this.token.access_token
-      },
-      json: true
+          Authorization: "Bearer " + this.token.access_token
+      }
     }
-    if (bodyParam) {
-      authOptions.body = bodyParam
+    if (typeof queryParam !== "undefined") {
+      requestConfig.params = queryParam
     }
-
-    if (qsParam) {
-      authOptions.qs = qsParam
+    if (typeof bodyParam !== "undefined") {
+      requestConfig.data = bodyParam
     }
-
-    var req = () => {
-      request(authOptions, (error, response, body) => {
-        if (error) {
-          _Debug("API Request failed on: ", api)
-        } else {
+    let req = (newAccessToken) => {
+      if(typeof newAccessToken !== "undefined") {
+        requestConfig.headers.Authorization = "Bearer " + newAccessToken
+      }
+      axios(requestConfig)
+        .then((response) => {
           if (api !== "/v1/me/player" && type !== "GET") {
-            _Debug("API Requested: ", api)
+            _Debug("API Response:", response.status, "; Requested:", api)
           }
-        }
-        if (cb) {
-          if (response && response.statusCode) {
-            cb(response.statusCode, error, body)
-          } else {
-            _Debug("Invalid response: ", error)
+          if (cb) {
+            cb(response.status, null, response.data)
+          }
+        })
+        .catch((error) => {
+          console.error(this.logMessage, "Failed to request API:", api)
+          this.handleRequestError(error)
+          if (cb) {
             _Debug("Retry in 5 sec...")
-            setTimeout(() => { cb('400', error, body) }, 5000)
+            setTimeout(() => { cb('400', error, error.response.data) }, 5000)
           }
-        }
-      })
+        })
     }
 
     if (this.isExpired()) {
@@ -162,7 +179,7 @@ class Spotify {
   }
 
   getCurrentPlayback(cb) {
-    var params = {
+    let params = {
       'additional_types': 'episode,track'
     }
     this.doRequest("/v1/me/player", "GET", params, null, cb)
@@ -184,7 +201,6 @@ class Spotify {
     this.doRequest("/v1/me/player/next", "POST", null, null, (code, error, body) => {
       this.doRequest("/v1/me/player/seek", "PUT", { position_ms: 0 }, null, cb)
     })
-
   }
 
   previous(cb) {
@@ -238,16 +254,16 @@ class Spotify {
   }
 
   async authFlow() {
-    var self = this
-    var redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
-    var msg = "[SPOTIFY - " + this.config.USERNAME + "] AUTH: "
+    let self = this
+    let redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
+    let logMsg = this.logMessage + " AUTH: "
 
     if (!this.config.CLIENT_ID) {
-      throw new Error(msg + "CLIENT_ID doesn't exist.")
+      throw new Error(logMsg + "CLIENT_ID doesn't exist.")
     }
 
     if (this.token) {
-      return msg + "You already have a token - no need to authenticate."
+      return logMsg + "You already have a token - no need to authenticate."
     }
 
     let server = this.app.get(this.config.AUTH_PATH, (req, res) => {
@@ -266,7 +282,7 @@ class Spotify {
       }
       request.post(authOptions, (requestError, response, body) => {
         if (requestError || response.statusCode !== 200) {
-          let errorMsg = msg + "Error in request"
+          let errorMsg = logMsg + "Error in request"
           if (body.error_description) errorMsg += ": " + body.error_description
           throw new Error(errorMsg)
         }
@@ -289,16 +305,16 @@ class Spotify {
     }).toString()
     let url = "https://accounts.spotify.com/authorize?" + urlParams
 
-    console.log(msg + "Opening the browser for authentication on Spotify...")
+    console.log(logMsg + "Opening the browser for authentication on Spotify...")
     await opn(url, {wait: true}).catch(e => {
-      console.log(msg + "Failed to automatically open the URL. Copy/paste this in your browser:\n", url)
+      console.log(logMsg + "Failed to automatically open the URL. Copy/paste this in your browser:\n", url)
       throw e
     })
-    var file = path.resolve(__dirname, this.config.TOKEN)
+    let file = path.resolve(__dirname, this.config.TOKEN)
     if (fs.existsSync(file)) {
-      return msg + "Authentication finished. Check file " + this.config.TOKEN
+      return logMsg + "Authentication finished. Check file " + this.config.TOKEN
     } else {
-      throw new Error(msg + "TOKEN file was not created")
+      throw new Error(logMsg + "TOKEN file was not created")
     }
   }
 }
