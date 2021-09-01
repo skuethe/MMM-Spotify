@@ -1,6 +1,6 @@
 {
   "name": "MMM-Spotify",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "description": "MM module for Spotify",
   "main": "MMM-Spotify.js",
   "keywords": [
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/skuethe/MMM-Spotify",
   "dependencies": {
-    "open": "^6.3.0",
+    "open": "^6.4.0",
     "axios": "^0.21.1"
   }
 }
