@@ -2,6 +2,26 @@
 
 Spotify controller for MagicMirror. Multiples accounts supported!
 
+- [Screenshot](#screenshot)
+- [Main Features](#main-features)
+- [Restrictions](#restrictions)
+- [Install](#install)
+  1. [Module install](#1-module-install)
+  2. [Setup Spotify](#2-setup-spotify)
+  3. [Setup your module](#3-setup-your-module)
+    - [Single account](#single-account)
+    - [Multi account](#multi-account)
+    - [Custom callback](#custom-callback)
+  4. [Get auth](#4-get-auth)
+- [Configuration](#configuration)
+  - [Simple](#simple)
+  - [Detail & Default](#detail--default)
+  - [`onStart` feature](#onstart-feature)
+- [Control with notifications](#control-with-notifications)
+- [Notification send](#notification-send)
+- [Credit](#credit)
+
+
 ## Screenshot
 
 ![default](screenshots/spotify_default.png)
@@ -26,7 +46,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Do not install MagicMirror or this module as root user ! (`sudo`)
 
-### 1. module install
+### 1. Module install
 
 ```sh
 cd ~/MagicMirror/modules
@@ -46,9 +66,9 @@ You should be a premium member of Spotify
    - That's all you need. Just save it.
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
-### 3. Setup your module.
+### 3. Setup your module
 
-#### Single-Account
+#### Single account
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
@@ -61,15 +81,15 @@ Or any editor as your wish be ok. Open the `spotify.config.json` then modify it.
 ```json
 [
   {
-      "USERNAME": "USERNAME",
-      "CLIENT_ID" : "YOUR_CLIENT_ID",
-      "CLIENT_SECRET" : "YOUR_CLIENT_SECRET",
-      "TOKEN" : "./token.json"
+      "USERNAME": "A_NAME_TO_IDENTIFY_YOUR_ACCOUNT",
+      "CLIENT_ID": "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET": "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN": "./token.json"
   }
 ]
 ```
 
-#### Multi-Account
+#### Multi account
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
@@ -83,23 +103,84 @@ Make sure that `TOKEN` is referencing different file names, as these files will 
 ```json
 [
   {
-      "USERNAME": "AN NAME TO IDENTIFY THIS ACCOUNT",
-      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
-      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
-      "TOKEN" : "./username_token.json"
+      "USERNAME": "A_NAME_TO_IDENTIFY_THE_FIRST_ACCOUNT",
+      "CLIENT_ID": "PUT_SPOTIFY_APP_CLIENT_ID_OF_FIRST_ACCOUNT",
+      "CLIENT_SECRET": "PUT_SPOTIFY_APP_CLIENT_SECRET_OF_FIRST_ACCOUNT",
+      "TOKEN": "./FIRSTUSERNAME_token.json"
   },
   {
-      "USERNAME": "ANOTHER NAME TO IDENTIFY THIS ACCOUNT",
-      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
-      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
-      "TOKEN" : "./another_token.json"
+      "USERNAME": "ANOTHER_NAME_TO_IDENTIFY_THE_SECOND_ACCOUNT",
+      "CLIENT_ID": "PUT_SPOTIFY_APP_CLIENT_ID_OF_SECOND_ACCOUNT",
+      "CLIENT_SECRET": "PUT_SPOTIFY_APP_CLIENT_SECRET_OF_SECOND_ACCOUNT",
+      "TOKEN": "./SECONDUSERNAME_token.json"
   }
 ]
 ```
 
-### 4. Get Auth
+#### Custom callback
 
-In RPI Desktop, log in in a Terminal (you can use VNC)
+If you are running MagicMirror in an environment without UI (Docker f.e.), you need to provide a custom callback URL in your account file, which points to your devices IP address.  
+This can be configured inside the `spotify.config.json` file.
+
+An example:  
+- you have `MM²` running inside a docker container, which is running on your Raspberry Pi
+- your Pi's local network IP is: `192.168.0.100`
+- some other application / container is already using port `8888` on your Pi, so you need to use something other thant the default (which is `8888`). For example: `8889`
+
+```json
+[
+  {
+      "USERNAME": "A_NAME_TO_IDENTIFY_YOUR_ACCOUNT",
+      "CLIENT_ID": "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET": "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN": "./token.json",
+      "AUTH_DOMAIN": "http://192.168.0.100",
+      "AUTH_PORT": "8889"
+  }
+]
+```
+
+Docker specific: make sour you pass the port specified by `AUTH_PORT` directly to the container running `MM²`.  
+In our case, a `docker-compose.yml` file could look like this:
+
+```yaml
+version: '3'
+
+services:
+  magicmirror:
+    container_name: mm
+    image: karsten13/magicmirror:latest
+    ports:
+      - "8080:8080"
+      - "8889:8889"
+    volumes:
+      - ../mounts/config:/opt/magic_mirror/config
+      - ../mounts/modules:/opt/magic_mirror/modules
+      - ../mounts/css:/opt/magic_mirror/css
+    restart: unless-stopped
+    command: 
+      - npm
+      - run
+      - server
+```
+
+This change needs to also be made if you run `MM²` in docker but keep the default `AUTH_PORT` of `8888`:
+
+```yaml
+[...]
+
+    ports:
+      - "8080:8080"
+      - "8888:8888"
+
+[...]
+```
+
+### 4. Get auth
+
+In RPI Desktop, log in in a Terminal (you can use VNC).  
+If you are running inside Docker (or any other environment without UI), be sure to configure a custom [Custom callback](#custom-callback) fist.  
+The `first_auth.js` script will then not try to open any browser, but output you an URL, which you need to open in your client workstation.
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
@@ -115,6 +196,7 @@ Then the allowance dialog popup will be opened:
 - Another browser session will start when using multiple accounts -> repeat steps
 
 That's all - now all the specific json files where created.  
+
 
 ## Configuration
 
@@ -202,7 +284,7 @@ You can control Spotify on start of MagicMirror (By example; Autoplay specific p
 
 When `search` field exists, `spotifyUri` will be ignored.
 
-## Control with notification
+## Control with notifications
 
 - `SPOTIFY_SEARCH` : search items with query and play it. `type`, `query`, `random` be payloads
 
@@ -303,6 +385,14 @@ this.sendNotification("SPOTIFY_ACCOUNT", 0)
 - `SPOTIFY_DISCONNECTED`: Spotify is disconnected
 
 It can be used with MMM-pages for example (for show or hide the module)
+
+
+## Credit
+
+- Biggest thanks to @eouia for all his work and inspiration
+- Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
+- Thanks to @KamisamaPT for helping design
+
 
 ## Update History
 
@@ -430,9 +520,3 @@ npm install
 - Device Limitation : Now you can allow or limit devices to display its playing on MM.
 - Some CSS structure is changed.
 - Now this module can emit `SPOTIFY_*` notifications for other module.
-
-## Credit
-
-- Biggest thanks to @eouia for all his work and inspiration
-- Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
-- Thanks to @KamisamaPT for helping design

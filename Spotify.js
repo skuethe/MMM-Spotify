@@ -1,9 +1,3 @@
-//
-// Spotify library
-// Developers : Seongnoh Sean Yi (eouia0819@gmail.com)
-//              bugsounet (bugsounet@bugsnana.fr)
-//
-
 const fs = require("fs")
 const path = require("path")
 const axios = require("axios")
@@ -136,30 +130,21 @@ class Spotify {
       return
     }
     let requestConfig = {
-      url: "https://api.spotify.com" + api,
+      baseURL: "https://api.spotify.com",
+      url: api,
       method: type,
       headers: {
           Authorization: "Bearer " + this.token.access_token
       }
     }
-    if (typeof queryParam !== "undefined") {
-      requestConfig.params = queryParam
-    }
-    if (typeof bodyParam !== "undefined") {
-      requestConfig.data = bodyParam
-    }
+    if (typeof queryParam !== "undefined") requestConfig.params = queryParam
+    if (typeof bodyParam !== "undefined") requestConfig.data = bodyParam
     let req = (newAccessToken) => {
-      if(typeof newAccessToken !== "undefined") {
-        requestConfig.headers.Authorization = "Bearer " + newAccessToken
-      }
+      if(typeof newAccessToken !== "undefined") requestConfig.headers.Authorization = "Bearer " + newAccessToken
       axios(requestConfig)
         .then((response) => {
-          if (api !== "/v1/me/player" && type !== "GET") {
-            _Debug("API Response:", response.status, "; Requested:", api)
-          }
-          if (cb) {
-            cb(response.status, null, response.data)
-          }
+          if (api !== "/v1/me/player" && type !== "GET") _Debug("API Response:", response.status, "; Requested:", api)
+          if (cb) cb(response.status, null, response.data)
         })
         .catch((error) => {
           console.error(this.logMessage, "Failed to request API:", api)
@@ -179,10 +164,7 @@ class Spotify {
   }
 
   getCurrentPlayback(cb) {
-    let params = {
-      'additional_types': 'episode,track'
-    }
-    this.doRequest("/v1/me/player", "GET", params, null, cb)
+    this.doRequest("/v1/me/player", "GET", { additional_types: "episode,track" }, null, cb)
   }
 
   getDevices(cb) {
@@ -215,9 +197,7 @@ class Spotify {
   }
 
   transfer(req, cb) {
-    if (req.device_ids.length > 1) {
-      req.device_ids = [req.device_ids[0]]
-    }
+    if (req.device_ids.length > 1) req.device_ids = [req.device_ids[0]]
     this.doRequest("/v1/me/player", "PUT", null, req, cb)
   }
 
@@ -253,44 +233,61 @@ class Spotify {
     this.doRequest("/v1/me/player/seek", "PUT", { position_ms: 0 }, null, cb)
   }
 
+  async waitForFileExists(filePath, currentTime = 0, timeout = 0) {
+    if (fs.existsSync(filePath)) return true
+    if (currentTime >= timeout) {
+      reject()
+      return false
+    }
+    await new Promise((resolve, reject) => setTimeout(() => resolve(true), 1000))
+    return this.waitForFileExists(filePath, currentTime + 1000, timeout)
+  }
+
   async authFlow() {
     let self = this
     let redirect_uri = this.config.AUTH_DOMAIN + ":" + this.config.AUTH_PORT + this.config.AUTH_PATH
-    let logMsg = this.logMessage + " AUTH: "
+    let logMsg = this.logMessage + " AUTH:"
+    let file = path.resolve(__dirname, this.config.TOKEN)
+    let waitForFileTimeout = 0
 
     if (!this.config.CLIENT_ID) {
-      throw new Error(logMsg + "CLIENT_ID doesn't exist.")
+      throw new Error(logMsg + " CLIENT_ID doesn't exist.")
     }
 
     if (this.token) {
-      return logMsg + "You already have a token - no need to authenticate."
+      return logMsg + " You already have a token - no need to authenticate."
     }
 
     let server = this.app.get(this.config.AUTH_PATH, (req, res) => {
       let code = req.query.code || null
-      let authOptions = {
-        url: 'https://accounts.spotify.com/api/token',
-        form: {
-          code: code,
-          redirect_uri: redirect_uri,
-          grant_type: 'authorization_code'
-        },
+      let requestData = new URLSearchParams({
+        code: code,
+        redirect_uri: redirect_uri,
+        grant_type: "authorization_code"
+      })
+      let requestConfig = {
+        url: "https://accounts.spotify.com/api/token",
+        method: "post",
+        data: requestData.toString(),
         headers: {
-          'Authorization': this.authorizationSeed
+          Authorization: this.authorizationSeed
         },
-        json: true
-      }
-      request.post(authOptions, (requestError, response, body) => {
-        if (requestError || response.statusCode !== 200) {
-          let errorMsg = logMsg + "Error in request"
-          if (body.error_description) errorMsg += ": " + body.error_description
-          throw new Error(errorMsg)
+        validateStatus: function (status) {
+          return status == 200
         }
-        this.writeToken(body)
-        _Debug("AUTH: stopping express app now")
-        server.close()
-        res.send(this.config.TOKEN + " should now be created. Please close the browser to continue.")
-      });
+      }
+      axios(requestConfig)
+        .then((response) => {
+          this.writeToken(response.data)
+          _Debug("AUTH: stopping express app now")
+          server.close()
+          res.send(this.config.TOKEN + " should now be created. Please close the browser to continue.")
+        })
+        .catch((error) => {
+          console.error(logMsg, "Error in request.")
+          this.handleRequestError(error)
+          // throw error
+        })
     }).listen(this.config.AUTH_PORT, () => {
       _Debug("AUTH: express app started and listening on port", this.config.AUTH_PORT)
     })
@@ -304,18 +301,29 @@ class Spotify {
       show_dialog: true
     }).toString()
     let url = "https://accounts.spotify.com/authorize?" + urlParams
-
-    console.log(logMsg + "Opening the browser for authentication on Spotify...")
-    await opn(url, {wait: true}).catch(e => {
-      console.log(logMsg + "Failed to automatically open the URL. Copy/paste this in your browser:\n", url)
-      throw e
-    })
-    let file = path.resolve(__dirname, this.config.TOKEN)
-    if (fs.existsSync(file)) {
-      return logMsg + "Authentication finished. Check file " + this.config.TOKEN
+    if (this.config.AUTH_DOMAIN == this.default.AUTH_DOMAIN) {
+      console.log(logMsg, "Opening browser for authentication on Spotify...")
+      await opn(url, {wait: true})
+        .catch((error) => {
+          server.close()
+          console.error(logMsg, "Failed to open the URL in your default browser.")
+          console.error(logMsg, "If you are using an environment without UI (docker f.e.) have a look at:\n", "\n\thttps://github.com/skuethe/MMM-Spotify#custom-callback\n")
+          throw error
+        })
     } else {
-      throw new Error(logMsg + "TOKEN file was not created")
+      console.log(logMsg, "Using custom callback URL. Copy + paste the following URL into your browser:\n\n\t", url, "\n")
+      console.log(logMsg, "This process will timeout after 5 minutes!")
+      waitForFileTimeout = 60000 * 5
     }
+
+    await this.waitForFileExists(file, 0, waitForFileTimeout)
+      .then((result) => {
+        return logMsg + " Authentication successful."
+      })
+      .catch((error) => {
+        server.close()
+        throw new Error("Token file was not created (\"" + file + "\")")
+      })
   }
 }
 
