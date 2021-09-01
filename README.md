@@ -66,6 +66,11 @@ You should be a premium member of Spotify
    - That's all you need. Just save it.
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
+Hint:  
+If you are running `MM²` inside an environment without a UI (Docker f.e.), you need to configure a [custom callback](#custom-callback) URL.  
+This custom callback URL needs to be adapted in step 3.
+
+
 ### 3. Setup your module
 
 #### Single account
@@ -175,6 +180,9 @@ This change needs to also be made if you run `MM²` in docker but keep the defau
 
 [...]
 ```
+
+Also make sure you configured the custom callback URL inside the Spotify App (see: [Setup Spotify](#2-setup-spotify)).
+
 
 ### 4. Get auth
 
@@ -392,131 +400,3 @@ It can be used with MMM-pages for example (for show or hide the module)
 - Biggest thanks to @eouia for all his work and inspiration
 - Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
 - Thanks to @KamisamaPT for helping design
-
-
-## Update History
-
----
-
-**INFO**
-
-Will start using the github `releases` function as an update history. The below list is only for historical reasons.
-
----
-
-### 1.6.3 (2020-11-05)
-
-- Fixed: reverted play / paused icons
-
-### 1.6.2 (2020-10-31)
-
-- Fixed: sticky hover pseudo class on button click (via touch display)
-- Added: option to use ["MMM-Modal"](https://github.com/fewieden/MMM-Modal) for device and account switching dialog
-
-### 1.6.1 (2020-10-18)
-
-- Added: buttons for swichting accounts and devices (for better touch support) - only tested in "mini" and "default" view
-
-### 1.6.0 (2020-10-15)
-
-- Fixed: reverting unnecessary changes
-- Fixed: image flickering on unallowed device
-- Fixed: volume container in "default" / "mini" view
-- Fixed: "play" / "pause" iconify family same as the other buttons
-- Added: better handling of suspending / resuming module (f.e. when hidden in combination with MMM-pages)
-- Added: better volume control for touch support
-- Added: possibility to send custom notifications when resuming or suspending the module (f.e. in combination with MMM-Touch)
-- Added: config option to control the module width
-
-### 1.5.2 (2020-07-24)
-
-- Fixed: broadcast volume change
-
-### 1.5.1 (2020-07-17)
-
-- Fixed: forget modify `first_auth.js` with new Spotify library (thx to wirdman@MagicMirror forum)
-
-### 1.5.0 (2020-07-16)
-
-- Fixed: Displayed ui (connect/disconnect)
-- Fixed: Another error with ads when playing
-- Added: New npm Spotify library
-- Fixed: Token updating process (Main library)
-
-### 1.4.3 (2020-06-08)
-
-- Fixed: First_auth process
-- Added: Podcast Support
-
-### 1.4.2 (2020-05-31)
-
-- Added: idleInterval Feature
-- Fixed: Crash on with mismake Token file
-
-### 1.4.1 (2020-05-21)
-
-- Added: new style miniBar
-- Added: miniBar Set automatically with position `top_bar` or `bottom_bar`
-- Added: some Features for MiniBar displaying
-- Fixed (more): Advertising for free account (simulate pausing)
-- Fixed: stability of the main code check
-- Fixed: onStart code
-
-### 1.4.0 (2020-05-16)
-
-- Added & Modified: Multi-account management by notification `SPOTIFY_ACCOUNT`
-- Fixed: Loop CONNECTED/DISCONNECTED on multi-account
-- Fixed: Less CPU time, Less DNS request
-- Fixed: Maybe RPI crashed  when using multi-account (memory leaks)
-
-### 1.3.2 (2020-05-15)
-
-- Modified: onStart script (Now launched if Spotify initialized)
-- Added: "Cast" Icons
-
-### 1.3.1 (2020-05-14)
-
-- Modified: 'progress bar'
-- Fixed: number of request on idle (depend now of updateInterval config)
-
-### 1.3.0 (2020-05-13) **Owner Change**
-
-- Fixed: on lost internet connexion
-- Added: `SPOTIFY_CONNECTED` `SPOTIFY_DISCONNECTED` notification
-- Added: `debug` mode
-- Added: `deviceDisplay` feature
-- Added: handling for extra device icons
-- Added: debug mode for Hiding console logs (memory leaks)
-- Added: fade in transition on cover
-- Added: box shadow around cover to highlight from background
-
-### 1.2.1 (2020-02-27)
-
-- Fixed: Using old configuration error.
-
-### 1.2 (2020-02-20)
-
-- Added : `MULTIPLE ACCOUNTS`
-- How to update from older version
-
-```sh
-cd ~/MagicMirror/modules/MMM-Spotify
-git pull
-npm install
-```
-
-### 1.1.2 (2019-05-06)
-
-- Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
-
-### 1.1.1 (2019-04-11)
-
-- Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize)
-- Added : Hiding module when current playback device is inactivated. (More test might be needed, but...)
-
-### 1.1.0 (2019-03-25)
-
-- Added: touch(click) interface
-- Device Limitation : Now you can allow or limit devices to display its playing on MM.
-- Some CSS structure is changed.
-- Now this module can emit `SPOTIFY_*` notifications for other module.
