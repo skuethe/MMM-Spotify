@@ -9,9 +9,9 @@ Spotify controller for MagicMirror. Multiples accounts supported!
   1. [Module install](#1-module-install)
   2. [Setup Spotify](#2-setup-spotify)
   3. [Setup your module](#3-setup-your-module)
-    - [Single account](#single-account)
-    - [Multi account](#multi-account)
-    - [Custom callback](#custom-callback)
+      - [Single account](#single-account)
+      - [Multi account](#multi-account)
+      - [Custom callback](#custom-callback)
   4. [Get auth](#4-get-auth)
 - [Configuration](#configuration)
   - [Simple](#simple)
@@ -67,8 +67,7 @@ You should be a premium member of Spotify
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
 Hint:  
-If you are running `MM²` inside an environment without a UI (Docker f.e.), you need to configure a [custom callback](#custom-callback) URL.  
-This custom callback URL needs to be adapted in step 3.
+If you are running `MM²` inside an environment without a UI (Docker f.e.), you need to configure a [custom callback](#custom-callback) URL. This custom callback URL needs to be adapted in step 3.
 
 
 ### 3. Setup your module
@@ -78,10 +77,10 @@ This custom callback URL needs to be adapted in step 3.
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
 cp spotify.config.json.example-single spotify.config.json
-nano spotify.config.json
+vim spotify.config.json
 ```
 
-Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You need to just fill `CLIENT_ID` and `CLIENT_SECRET`. Then, save it.
+Edit the `spotify.config.json` with the editor of your choice. Modify the entries as hinted below, hen save it.
 
 ```json
 [
@@ -89,7 +88,7 @@ Or any editor as your wish be ok. Open the `spotify.config.json` then modify it.
       "USERNAME": "A_NAME_TO_IDENTIFY_YOUR_ACCOUNT",
       "CLIENT_ID": "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
       "CLIENT_SECRET": "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
-      "TOKEN": "./token.json"
+      "TOKEN": "./USERNAME_token.json"
   }
 ]
 ```
@@ -99,10 +98,10 @@ Or any editor as your wish be ok. Open the `spotify.config.json` then modify it.
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
 cp spotify.config.json.example-multi spotify.config.json
-nano spotify.config.json
+vim spotify.config.json
 ```
 
-Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.  
+Open the `spotify.config.json` then modify it as described. You can create a configuration object for each account you want to use. Save the file.
 Make sure that `TOKEN` is referencing different file names, as these files will be created.
 
 ```json
@@ -127,7 +126,7 @@ Make sure that `TOKEN` is referencing different file names, as these files will 
 If you are running MagicMirror in an environment without UI (Docker f.e.), you need to provide a custom callback URL in your account file, which points to your devices IP address.  
 This can be configured inside the `spotify.config.json` file.
 
-An example:  
+An example:
 - you have `MM²` running inside a docker container, which is running on your Raspberry Pi
 - your Pi's local network IP is: `192.168.0.100`
 - some other application / container is already using port `8888` on your Pi, so you need to use something other thant the default (which is `8888`). For example: `8889`
@@ -145,8 +144,8 @@ An example:
 ]
 ```
 
-Docker specific: make sour you pass the port specified by `AUTH_PORT` directly to the container running `MM²`.  
-In our case, a `docker-compose.yml` file could look like this:
+**Docker specific**: make sour you pass the port specified by `AUTH_PORT` directly to the container running `MM²`.  
+In our case, a possible `docker-compose.yml` file could look like this:
 
 ```yaml
 version: '3'
@@ -187,8 +186,9 @@ Also make sure you configured the custom callback URL inside the Spotify App (se
 ### 4. Get auth
 
 In RPI Desktop, log in in a Terminal (you can use VNC).  
-If you are running inside Docker (or any other environment without UI), be sure to configure a custom [Custom callback](#custom-callback) fist.  
-The `first_auth.js` script will then not try to open any browser, but output you an URL, which you need to open in your client workstation.
+
+If you are running inside Docker (or any other environment without UI), be sure to configure a [Custom callback](#custom-callback) fist.
+The `first_auth.js` script will then not open your default browser, but output an URL, which you need to open in your workstation on the same network.
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
