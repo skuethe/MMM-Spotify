@@ -3,6 +3,8 @@
       "USERNAME": "A_NAME_TO_IDENTIFY_YOUR_ACCOUNT",
       "CLIENT_ID": "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
       "CLIENT_SECRET": "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
-      "TOKEN": "./USERNAME_token.json"
+      "TOKEN": "./USERNAME_token.json",
+      "AUTH_DOMAIN": "http://YOUR_DEVICES_IP",
+      "AUTH_PORT": "8889"
   }
 ]
