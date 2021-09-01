@@ -67,7 +67,8 @@ You should be a premium member of Spotify
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
 Hint:  
-If you are running `MM²` inside an environment without a UI (Docker f.e.), you need to configure a [custom callback](#custom-callback) URL. This custom callback URL needs to be adapted in step 3.
+If you are running `MM²` inside an environment without a UI (Docker f.e.), you need to configure a [custom callback](#custom-callback) URL.
+This custom callback URL needs to be adapted when editing the app in the Spotify developer dashboard.
 
 
 ### 3. Setup your module
@@ -130,6 +131,12 @@ An example:
 - you have `MM²` running inside a docker container, which is running on your Raspberry Pi
 - your Pi's local network IP is: `192.168.0.100`
 - some other application / container is already using port `8888` on your Pi, so you need to use something other thant the default (which is `8888`). For example: `8889`
+
+```sh
+cd ~/magicmirror/mounts/modules/MMM-Spotify
+cp spotify.config.json.example-callback spotify.config.json
+vim spotify.config.json
+```
 
 ```json
 [
