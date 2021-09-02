@@ -130,7 +130,7 @@ This can be configured inside the `spotify.config.json` file.
 An example:
 - you have `MM²` running inside a docker container, which is running on your Raspberry Pi
 - your Pi's local network IP is: `192.168.0.100`
-- some other application / container is already using port `8888` on your Pi, so you need to use something other thant the default (which is `8888`). For example: `8889`
+- some other application / container is already using port `8888` on your Pi, so you need to use something other than the default (which is `8888`). For example: `8889`
 
 ```sh
 cd ~/magicmirror/mounts/modules/MMM-Spotify
@@ -151,7 +151,7 @@ vim spotify.config.json
 ]
 ```
 
-**Docker specific**: make sour you pass the port specified by `AUTH_PORT` directly to the container running `MM²`.  
+**Docker specific**: make sure you pass the port specified by `AUTH_PORT` directly to the container running `MM²`.  
 In our case, a possible `docker-compose.yml` file could look like this:
 
 ```yaml
