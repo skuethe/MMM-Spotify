@@ -147,9 +147,12 @@ class Spotify {
           if (cb) cb(response.status, null, response.data)
         })
         .catch((error) => {
-          console.error(this.logMessage, "Failed to request API:", api)
+          console.error(this.logMessage, "Failed to request API:", api + "; Error Code: " + error.response.status + "; Error text: " + error.response.statusText)
           this.handleRequestError(error)
-          if (cb) {
+          if (error.response.status === 429) {
+            console.error("Retry in " + error.response.headers["retry-after"] + " sec...")
+            setTimeout(() => { cb('429', error, error.response.data) }, error.response.headers["retry-after"] * 1000)
+          } else if (cb) {
             _Debug("Retry in 5 sec...")
             setTimeout(() => { cb('400', error, error.response.data) }, 5000)
           }
