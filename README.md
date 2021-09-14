@@ -2,6 +2,26 @@
 
 Spotify controller for MagicMirror. Multiples accounts supported!
 
+- [Screenshot](#screenshot)
+- [Main Features](#main-features)
+- [Restrictions](#restrictions)
+- [Install](#install)
+  1. [Module install](#1-module-install)
+  2. [Setup Spotify](#2-setup-spotify)
+  3. [Setup your module](#3-setup-your-module)
+      - [Single account](#single-account)
+      - [Multi account](#multi-account)
+      - [Custom callback](#custom-callback)
+  4. [Get auth](#4-get-auth)
+- [Configuration](#configuration)
+  - [Simple](#simple)
+  - [Detail & Default](#detail--default)
+  - [`onStart` feature](#onstart-feature)
+- [Control with notifications](#control-with-notifications)
+- [Notification send](#notification-send)
+- [Credit](#credit)
+
+
 ## Screenshot
 
 ![default](screenshots/spotify_default.png)
@@ -26,7 +46,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 
 Do not install MagicMirror or this module as root user ! (`sudo`)
 
-### 1. module install
+### 1. Module install
 
 ```sh
 cd ~/MagicMirror/modules
@@ -46,60 +66,136 @@ You should be a premium member of Spotify
    - That's all you need. Just save it.
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
-### 3. Setup your module.
+Hint:  
+If you are running `MM²` inside an environment without a UI (Docker f.e.), you need to configure a [custom callback](#custom-callback) URL.
+This custom callback URL needs to be adapted when editing the app in the Spotify developer dashboard.
 
-#### Single-Account
+
+### 3. Setup your module
+
+#### Single account
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
 cp spotify.config.json.example-single spotify.config.json
-nano spotify.config.json
+vim spotify.config.json
 ```
 
-Or any editor as your wish be ok. Open the `spotify.config.json` then modify it. You need to just fill `CLIENT_ID` and `CLIENT_SECRET`. Then, save it.
+Edit the `spotify.config.json` with the editor of your choice. Modify the entries as hinted below, hen save it.
 
 ```json
 [
   {
-      "USERNAME": "USERNAME",
-      "CLIENT_ID" : "YOUR_CLIENT_ID",
-      "CLIENT_SECRET" : "YOUR_CLIENT_SECRET",
-      "TOKEN" : "./token.json"
+      "USERNAME": "A_NAME_TO_IDENTIFY_YOUR_ACCOUNT",
+      "CLIENT_ID": "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET": "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN": "./USERNAME_token.json"
   }
 ]
 ```
 
-#### Multi-Account
+#### Multi account
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
 cp spotify.config.json.example-multi spotify.config.json
-nano spotify.config.json
+vim spotify.config.json
 ```
 
-Open the `spotify.config.json` then modify it. You can create a configuration object for each account you need to use. You need to just fill `CLIENT_ID` and `CLIENT_SECRET` for each of them. Then, save it.  
+Open the `spotify.config.json` then modify it as described. You can create a configuration object for each account you want to use. Save the file.
 Make sure that `TOKEN` is referencing different file names, as these files will be created.
 
 ```json
 [
   {
-      "USERNAME": "AN NAME TO IDENTIFY THIS ACCOUNT",
-      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
-      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
-      "TOKEN" : "./username_token.json"
+      "USERNAME": "A_NAME_TO_IDENTIFY_THE_FIRST_ACCOUNT",
+      "CLIENT_ID": "PUT_SPOTIFY_APP_CLIENT_ID_OF_FIRST_ACCOUNT",
+      "CLIENT_SECRET": "PUT_SPOTIFY_APP_CLIENT_SECRET_OF_FIRST_ACCOUNT",
+      "TOKEN": "./FIRSTUSERNAME_token.json"
   },
   {
-      "USERNAME": "ANOTHER NAME TO IDENTIFY THIS ACCOUNT",
-      "CLIENT_ID" : "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
-      "CLIENT_SECRET" : "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
-      "TOKEN" : "./another_token.json"
+      "USERNAME": "ANOTHER_NAME_TO_IDENTIFY_THE_SECOND_ACCOUNT",
+      "CLIENT_ID": "PUT_SPOTIFY_APP_CLIENT_ID_OF_SECOND_ACCOUNT",
+      "CLIENT_SECRET": "PUT_SPOTIFY_APP_CLIENT_SECRET_OF_SECOND_ACCOUNT",
+      "TOKEN": "./SECONDUSERNAME_token.json"
   }
 ]
 ```
 
-### 4. Get Auth
+#### Custom callback
 
-In RPI Desktop, log in in a Terminal (you can use VNC)
+If you are running MagicMirror in an environment without UI (Docker f.e.), you need to provide a custom callback URL in your account file, which points to your devices IP address.  
+This can be configured inside the `spotify.config.json` file.
+
+An example:
+- you have `MM²` running inside a docker container, which is running on your Raspberry Pi
+- your Pi's local network IP is: `192.168.0.100`
+- some other application / container is already using port `8888` on your Pi, so you need to use something other than the default (which is `8888`). For example: `8889`
+
+```sh
+cd ~/magicmirror/mounts/modules/MMM-Spotify
+cp spotify.config.json.example-callback spotify.config.json
+vim spotify.config.json
+```
+
+```json
+[
+  {
+      "USERNAME": "A_NAME_TO_IDENTIFY_YOUR_ACCOUNT",
+      "CLIENT_ID": "PUT_YOUR_SPOTIFY_APP_CLIENT_ID",
+      "CLIENT_SECRET": "PUT_YOUR_SPOTIFY_APP_CLIENT_SECRET",
+      "TOKEN": "./token.json",
+      "AUTH_DOMAIN": "http://192.168.0.100",
+      "AUTH_PORT": "8889"
+  }
+]
+```
+
+**Docker specific**: make sure you pass the port specified by `AUTH_PORT` directly to the container running `MM²`.  
+In our case, a possible `docker-compose.yml` file could look like this:
+
+```yaml
+version: '3'
+
+services:
+  magicmirror:
+    container_name: mm
+    image: karsten13/magicmirror:latest
+    ports:
+      - "8080:8080"
+      - "8889:8889"
+    volumes:
+      - ../mounts/config:/opt/magic_mirror/config
+      - ../mounts/modules:/opt/magic_mirror/modules
+      - ../mounts/css:/opt/magic_mirror/css
+    restart: unless-stopped
+    command: 
+      - npm
+      - run
+      - server
+```
+
+This change needs to also be made if you run `MM²` in docker but keep the default `AUTH_PORT` of `8888`:
+
+```yaml
+[...]
+
+    ports:
+      - "8080:8080"
+      - "8888:8888"
+
+[...]
+```
+
+Also make sure you configured the custom callback URL inside the Spotify App (see: [Setup Spotify](#2-setup-spotify)).
+
+
+### 4. Get auth
+
+In RPI Desktop, log in in a Terminal (you can use VNC).  
+
+If you are running inside Docker (or any other environment without UI), be sure to configure a [Custom callback](#custom-callback) fist.
+The `first_auth.js` script will then not open your default browser, but output an URL, which you need to open in your workstation on the same network.
 
 ```sh
 cd ~/MagicMirror/modules/MMM-Spotify
@@ -115,6 +211,7 @@ Then the allowance dialog popup will be opened:
 - Another browser session will start when using multiple accounts -> repeat steps
 
 That's all - now all the specific json files where created.  
+
 
 ## Configuration
 
@@ -202,7 +299,7 @@ You can control Spotify on start of MagicMirror (By example; Autoplay specific p
 
 When `search` field exists, `spotifyUri` will be ignored.
 
-## Control with notification
+## Control with notifications
 
 - `SPOTIFY_SEARCH` : search items with query and play it. `type`, `query`, `random` be payloads
 
@@ -304,132 +401,6 @@ this.sendNotification("SPOTIFY_ACCOUNT", 0)
 
 It can be used with MMM-pages for example (for show or hide the module)
 
-## Update History
-
----
-
-**INFO**
-
-Will start using the github `releases` function as an update history. The below list is only for historical reasons.
-
----
-
-### 1.6.3 (2020-11-05)
-
-- Fixed: reverted play / paused icons
-
-### 1.6.2 (2020-10-31)
-
-- Fixed: sticky hover pseudo class on button click (via touch display)
-- Added: option to use ["MMM-Modal"](https://github.com/fewieden/MMM-Modal) for device and account switching dialog
-
-### 1.6.1 (2020-10-18)
-
-- Added: buttons for swichting accounts and devices (for better touch support) - only tested in "mini" and "default" view
-
-### 1.6.0 (2020-10-15)
-
-- Fixed: reverting unnecessary changes
-- Fixed: image flickering on unallowed device
-- Fixed: volume container in "default" / "mini" view
-- Fixed: "play" / "pause" iconify family same as the other buttons
-- Added: better handling of suspending / resuming module (f.e. when hidden in combination with MMM-pages)
-- Added: better volume control for touch support
-- Added: possibility to send custom notifications when resuming or suspending the module (f.e. in combination with MMM-Touch)
-- Added: config option to control the module width
-
-### 1.5.2 (2020-07-24)
-
-- Fixed: broadcast volume change
-
-### 1.5.1 (2020-07-17)
-
-- Fixed: forget modify `first_auth.js` with new Spotify library (thx to wirdman@MagicMirror forum)
-
-### 1.5.0 (2020-07-16)
-
-- Fixed: Displayed ui (connect/disconnect)
-- Fixed: Another error with ads when playing
-- Added: New npm Spotify library
-- Fixed: Token updating process (Main library)
-
-### 1.4.3 (2020-06-08)
-
-- Fixed: First_auth process
-- Added: Podcast Support
-
-### 1.4.2 (2020-05-31)
-
-- Added: idleInterval Feature
-- Fixed: Crash on with mismake Token file
-
-### 1.4.1 (2020-05-21)
-
-- Added: new style miniBar
-- Added: miniBar Set automatically with position `top_bar` or `bottom_bar`
-- Added: some Features for MiniBar displaying
-- Fixed (more): Advertising for free account (simulate pausing)
-- Fixed: stability of the main code check
-- Fixed: onStart code
-
-### 1.4.0 (2020-05-16)
-
-- Added & Modified: Multi-account management by notification `SPOTIFY_ACCOUNT`
-- Fixed: Loop CONNECTED/DISCONNECTED on multi-account
-- Fixed: Less CPU time, Less DNS request
-- Fixed: Maybe RPI crashed  when using multi-account (memory leaks)
-
-### 1.3.2 (2020-05-15)
-
-- Modified: onStart script (Now launched if Spotify initialized)
-- Added: "Cast" Icons
-
-### 1.3.1 (2020-05-14)
-
-- Modified: 'progress bar'
-- Fixed: number of request on idle (depend now of updateInterval config)
-
-### 1.3.0 (2020-05-13) **Owner Change**
-
-- Fixed: on lost internet connexion
-- Added: `SPOTIFY_CONNECTED` `SPOTIFY_DISCONNECTED` notification
-- Added: `debug` mode
-- Added: `deviceDisplay` feature
-- Added: handling for extra device icons
-- Added: debug mode for Hiding console logs (memory leaks)
-- Added: fade in transition on cover
-- Added: box shadow around cover to highlight from background
-
-### 1.2.1 (2020-02-27)
-
-- Fixed: Using old configuration error.
-
-### 1.2 (2020-02-20)
-
-- Added : `MULTIPLE ACCOUNTS`
-- How to update from older version
-
-```sh
-cd ~/MagicMirror/modules/MMM-Spotify
-git pull
-npm install
-```
-
-### 1.1.2 (2019-05-06)
-
-- Added : `SPOTIFY_TOGGLE` notification for toggling Play/Pause
-
-### 1.1.1 (2019-04-11)
-
-- Added : CSS variable for easy adjusting size. (Adjust only --sp-width to resize)
-- Added : Hiding module when current playback device is inactivated. (More test might be needed, but...)
-
-### 1.1.0 (2019-03-25)
-
-- Added: touch(click) interface
-- Device Limitation : Now you can allow or limit devices to display its playing on MM.
-- Some CSS structure is changed.
-- Now this module can emit `SPOTIFY_*` notifications for other module.
 
 ## Credit
 

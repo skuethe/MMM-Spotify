@@ -6,38 +6,39 @@ let file = path.resolve(__dirname, "spotify.config.json")
 let configurations = []
 
 if (fs.existsSync(file)) {
-    let configurators = JSON.parse(fs.readFileSync(file))
-    configurators.forEach(configurator => {
-        configurations.push(configurator)
-    })
+  let configurators = JSON.parse(fs.readFileSync(file))
+  configurators.forEach((configurator) => {
+    configurations.push(configurator)
+  })
 }
 else return console.log("[SPOTIFY] Error: please configure your spotify.config.json file")
 
-function authorize(configuration) {
-    return new Promise((resolve, reject) => {
-        new Spotify(configuration, true, true).authFlow().then(result => {
-            console.log(result)
-            resolve()
-        }, reason => {
-            console.log("[SPOTIFY - " + configuration.USERNAME + "] Error in authentication:")
-            console.log(reason)
-            reject()
-        })
+async function authorize(configuration) {
+  return await new Spotify(configuration, true, true).authFlow()
+    .catch((error) => {
+      console.error("[SPOTIFY - " + configuration.USERNAME + "] Error in authentication:")
+      throw error
     })
 }
 
 async function authorizations(configurations) {
-    for (const configuration of configurations) {
-        try {
-            await authorize(configuration)
-        } catch (e) {
-          if (e) console.log('[SPOTIFY] ERROR: ', e)
-        }
-    }
+  for (const configuration of configurations) {
+    await authorize(configuration)
+      .then((result) => {
+        console.log(result)
+      })
+      .catch((error) => {
+        console.error("[SPOTIFY - " + configuration.USERNAME + "]", error)
+        throw error
+    })
+  }
+  return true
 }
 
-authorizations(configurations).then(result => {
-    console.log('[SPOTIFY] Authorization process finished!')
-}, reason => {
-    console.log('[SPOTIFY] Authorization process failed!:', reason)
-})
+authorizations(configurations)
+  .then((result) => {
+    console.log("[SPOTIFY] Authorization process finished")
+  })
+  .catch((error) => {
+    console.error("[SPOTIFY] Authorization process failed")
+  })
