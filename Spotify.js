@@ -77,13 +77,13 @@ class Spotify {
   handleRequestError(error) {
     if (error.response) {
       console.error(this.logMessage, "Invalid response")
-      _Debug("Response status: ", error.response.status)
-      _Debug("Response statusText: ", error.response.statusText)
-      _Debug("Response data: ", error.response.data)
-      _Debug("Response headers: ", error.response.headers)
+      console.error(this.logMessage, "Response error code:", error.response.status)
+      console.error(this.logMessage, "Response error text:", error.response.statusText)
+      _Debug("Response error data:", error.response.data)
+      _Debug("Response error headers:", error.response.headers)
     } else if (error.request) {
       console.error(this.logMessage, "Invalid request")
-      _Debug("Request: ", error.request)
+      _Debug("Request:", error.request)
     } else {
       console.error(this.logMessage, error.message)
     }
@@ -237,11 +237,8 @@ class Spotify {
   }
 
   async waitForFileExists(filePath, currentTime = 0, timeout = 0) {
-    if (fs.existsSync(filePath)) return true
-    if (currentTime >= timeout) {
-      reject()
-      return false
-    }
+    if (fs.existsSync(filePath)) return this.logMessage + " Authentication successful"
+    if (currentTime >= timeout) throw new Error("Token file was not created (\"" + filePath + "\")")
     await new Promise((resolve, reject) => setTimeout(() => resolve(true), 1000))
     return this.waitForFileExists(filePath, currentTime + 1000, timeout)
   }
@@ -319,13 +316,10 @@ class Spotify {
       waitForFileTimeout = 60000 * 5
     }
 
-    await this.waitForFileExists(file, 0, waitForFileTimeout)
-      .then((result) => {
-        return logMsg + " Authentication successful."
-      })
+    return await this.waitForFileExists(file, 0, waitForFileTimeout)
       .catch((error) => {
         server.close()
-        throw new Error("Token file was not created (\"" + file + "\")")
+        throw error
       })
   }
 }
