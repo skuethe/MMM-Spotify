@@ -39,6 +39,7 @@ Spotify controller for MagicMirror. Multiples accounts supported!
 - This is NOT a full blown Spotify client with integrated player! If you want to use your Pi also as playback device via soundcard, have a look at [Raspotify](https://github.com/dtcooper/raspotify)
 - Starting specific songs, playlists etc. is limited! This can only be done by the notifications described below but NOT via the UI / Buttons
 - Some of Spotify's API calls we are using are limited to premium accounts only! If you are using a free account, you will probably run into problems at some point
+- The Spotify API is rate-limited and only a limited number of clients can make requests to the API. It is recommended to use a separate Spotify app for each client to avoid rate limitations
 
 ## Install
 
