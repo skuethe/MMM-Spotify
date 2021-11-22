@@ -134,13 +134,13 @@ class Spotify {
       url: api,
       method: type,
       headers: {
-          Authorization: "Bearer " + this.token.access_token
+        Authorization: "Bearer " + this.token.access_token
       }
     }
     if (typeof queryParam !== "undefined") requestConfig.params = queryParam
     if (typeof bodyParam !== "undefined") requestConfig.data = bodyParam
     let req = (newAccessToken) => {
-      if(typeof newAccessToken !== "undefined") requestConfig.headers.Authorization = "Bearer " + newAccessToken
+      if (typeof newAccessToken !== "undefined") requestConfig.headers.Authorization = "Bearer " + newAccessToken
       axios(requestConfig)
         .then((response) => {
           if (api !== "/v1/me/player" && type !== "GET") _Debug("API Response:", response.status, "; Requested:", api)
@@ -150,8 +150,10 @@ class Spotify {
           console.error(this.logMessage, "Failed to request API:", api)
           this.handleRequestError(error)
           if (cb) {
-            _Debug("Retry in 5 sec...")
-            setTimeout(() => { cb('400', error, error.response.data) }, 5000)
+            let retryTimerInSeconds = 5
+            if (typeof error.response.headers["retry-after"] !== "undefined") retryTimerInSeconds = error.response.headers["retry-after"]
+            console.log(this.logMessage, "Will retry in", retryTimerInSeconds, "seconds ...")
+            setTimeout(() => { cb(error.response.status, error, error.response.data) }, retryTimerInSeconds * 1000)
           }
         })
     }
@@ -300,7 +302,7 @@ class Spotify {
     let url = "https://accounts.spotify.com/authorize?" + urlParams
     if (this.config.AUTH_DOMAIN == this.default.AUTH_DOMAIN) {
       console.log(logMsg, "Opening browser for authentication on Spotify...")
-      await opn(url, {wait: true})
+      await opn(url, { wait: true })
         .catch((error) => {
           server.close()
           console.error(logMsg, "Failed to open the URL in your default browser.")
