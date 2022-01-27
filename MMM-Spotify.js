@@ -511,15 +511,21 @@ Module.register("MMM-Spotify", {
     var img_url
     var display_name
     if (playbackItem.album){
-      img_url = playbackItem.album.images[img_index].url
+      if (playbackItem.album.images.lengh > 0) {
+        img_url = playbackItem.album.images[img_index].url
+      }
       display_name = playbackItem.album.name
     }
     else{
-      img_url = playbackItem.images[img_index].url
+      if (playbackItem.images.length > 0) {
+        img_url = playbackItem.images[img_index].url
+      }
       display_name = playbackItem.show.name
     }
 
-    this.updateCoverImage(img_url)
+    if (img_url) {
+      this.updateCoverImage(img_url)
+    }
 
     const title = document.querySelector("#SPOTIFY_TITLE .text")
     title.textContent = playbackItem.name
