@@ -523,7 +523,7 @@ Module.register("MMM-Spotify", {
       display_name = playbackItem.show.name
     }
 
-    this.updateCoverImage(img_url);
+    this.updateCoverImage(img_url)
 
     const title = document.querySelector("#SPOTIFY_TITLE .text")
     title.textContent = playbackItem.name
