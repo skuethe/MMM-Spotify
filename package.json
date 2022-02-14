@@ -1,18 +1,25 @@
 {
-  "name": "MMM-Spotify",
-  "version": "2.1.0",
-  "description": "MM module for Spotify",
+  "name": "mmm-spotify",
+  "version": "2.1.2",
+  "description": "Spotify display and controller for MagicMirror²",
   "main": "MMM-Spotify.js",
   "keywords": [
+    "magicmirror",
     "magic mirror",
     "module",
+    "magicmirrormodule",
+    "magic mirror module",
     "spotify",
     "music"
   ],
-  "author": [
+  "author": {
+    "name": "skuethe"
+  },
+  "contributors": [
+    "humbertovirtudes",
     "eouia",
-    "bugsounet",
-    "skuethe"
+    "Ejay-3D",
+    "bugsounet"
   ],
   "license": "MIT",
   "bugs": {
