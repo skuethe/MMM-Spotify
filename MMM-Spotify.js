@@ -511,7 +511,7 @@ Module.register("MMM-Spotify", {
     var img_url
     var display_name
     if (playbackItem.album){
-      if (playbackItem.album.images.lengh > 0) {
+      if (playbackItem.album.images.length > 0) {
         img_url = playbackItem.album.images[img_index].url
       }
       display_name = playbackItem.album.name
