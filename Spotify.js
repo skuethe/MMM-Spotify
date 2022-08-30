@@ -151,7 +151,7 @@ class Spotify {
           this.handleRequestError(error)
           if (cb) {
             let retryTimerInSeconds = 5
-            if (typeof error.response.headers["retry-after"] !== "undefined") retryTimerInSeconds = error.response.headers["retry-after"]
+            if (error.response && typeof error.response.headers["retry-after"] !== "undefined") retryTimerInSeconds = error.response.headers["retry-after"]
             console.log(this.logMessage, "Will retry in", retryTimerInSeconds, "seconds ...")
             setTimeout(() => { cb(error.response.status, error, error.response.data) }, retryTimerInSeconds * 1000)
           }
