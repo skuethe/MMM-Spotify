@@ -7,8 +7,6 @@
     "magicmirror",
     "magic mirror",
     "module",
-    "magicmirrormodule",
-    "magic mirror module",
     "spotify",
     "music"
   ],
@@ -32,6 +30,6 @@
   "homepage": "https://github.com/skuethe/MMM-Spotify",
   "dependencies": {
     "open": "^6.4.0",
-    "axios": "^0.21.2"
+    "axios": "^1.6.0"
   }
 }

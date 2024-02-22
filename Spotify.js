@@ -87,6 +87,7 @@ class Spotify {
     } else {
       console.error(this.logMessage, error.message)
     }
+    _Debug(error.toJSON())
     _Debug(error.config)
   }
 
@@ -150,10 +151,12 @@ class Spotify {
           console.error(this.logMessage, "Failed to request API:", api)
           this.handleRequestError(error)
           if (cb) {
-            let retryTimerInSeconds = 5
-            if (typeof error.response.headers["retry-after"] !== "undefined") retryTimerInSeconds = error.response.headers["retry-after"]
+            let errorStatus = ((typeof error.response.status !== "undefined") ? error.response.status : "408")
+            let errorData = ((typeof error.response.data !== "undefined") ? error.response.data : {})
+            let retryTimerInSeconds = ((typeof error.response.headers["retry-after"] !== "undefined") ? error.response.headers["retry-after"] : 5)
+
             console.log(this.logMessage, "Will retry in", retryTimerInSeconds, "seconds ...")
-            setTimeout(() => { cb(error.response.status, error, error.response.data) }, retryTimerInSeconds * 1000)
+            setTimeout(() => { cb(errorStatus, error, errorData) }, retryTimerInSeconds * 1000)
           }
         })
     }
