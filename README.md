@@ -63,7 +63,7 @@ You should be a premium member of Spotify
 1. Go to https://developer.spotify.com
 2. Navigate to **DASHBOARD** > **Create an app** (fill information as your thought)
 3. Setup the app created, (**EDIT SETTINGS**)
-   - Redirect URIs. : `http://localhost:8888/callback`
+   - Redirect URIs. : `http://127.0.0.1:8888/callback`
    - That's all you need. Just save it.
 4. Now copy your **Client ID** and **Client Secret** to any memo
 
@@ -124,6 +124,11 @@ Make sure that `TOKEN` is referencing different file names, as these files will 
 ```
 
 #### Custom callback
+
+**Update 2025:**  
+Spotify is [now enforcing HTTPS scheme usage][1] on apps, with the exception of the local loopback adress of `127.0.0.1`.  
+This breaks the custom callback URLs for the method described here. Currently, there is no fix in progress. If you feel like it, contribute one via PR!
+
 
 If you are running MagicMirror in an environment without UI (Docker f.e.), you need to provide a custom callback URL in your account file, which points to your devices IP address.  
 This can be configured inside the `spotify.config.json` file.
@@ -408,3 +413,7 @@ It can be used with MMM-pages for example (for show or hide the module)
 - Biggest thanks to @eouia for all his work and inspiration
 - Special thanks to @ejay-ibm so much for taking the time to cowork to make this module.
 - Thanks to @KamisamaPT for helping design
+
+
+<!-- Links -->
+[1]: <https://developer.spotify.com/blog/2025-02-12-increasing-the-security-requirements-for-integrating-with-spotify> "Increasing the security requirements for integrating with Spotify"
