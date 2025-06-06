@@ -1,6 +1,6 @@
 {
   "name": "mmm-spotify",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Spotify display and controller for MagicMirror²",
   "main": "MMM-Spotify.js",
   "keywords": [

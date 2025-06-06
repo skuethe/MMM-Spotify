@@ -14,7 +14,7 @@ class Spotify {
       USERNAME: "",
       CLIENT_ID: "",
       CLIENT_SECRET: "",
-      AUTH_DOMAIN: "http://localhost",
+      AUTH_DOMAIN: "http://127.0.0.1",
       AUTH_PATH: "/callback",
       AUTH_PORT: "8888",
       SCOPE: "user-read-private app-remote-control playlist-read-private streaming user-read-playback-state user-modify-playback-state",
